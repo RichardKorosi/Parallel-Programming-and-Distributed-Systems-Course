@@ -62,7 +62,7 @@ def routine_jano(shared, tid):
     sleeping(tid)
     hygiene(tid)
     eating(tid)
-    #   CALL
+    calling(shared, tid)
 
 
 def routine_fero(shared, tid):
@@ -74,7 +74,7 @@ def routine_fero(shared, tid):
     """
     sleeping(tid)
     hygiene(tid)
-    #   RECEIVE
+    receiving(shared, tid)
     eating(tid)
 
 
@@ -121,6 +121,30 @@ def eating(tid):
     highlighted_print(f"{tid} is eating.", "eating")
     sleep(1)
     highlighted_print(f"{tid} has eaten.", "eating")
+
+
+def calling(shared, tid):
+    """Execute calling activity of the thread.
+
+    This function prints a message that the thread has called
+    and then signals the semaphore. This allows the other thread
+    (that is waiting in the receiving function) to continue with its tasks.
+    """
+    highlighted_print(f"{tid} has called.", "calling")
+    sleep(1)
+    shared.semaphore.signal()
+
+
+def receiving(shared, tid):
+    """Execute receiving activity of the thread.
+
+    This function makes the thread wait for the semaphore to be signaled
+    (signal is in calling function) and after receiving the signal
+    it prints a message that the thread has received a call.
+    """
+    shared.semaphore.wait()
+    highlighted_print(f"{tid} has received a call.", "receiving")
+    sleep(1)
 
 
 if __name__ == '__main__':
