@@ -37,6 +37,8 @@ def routine_jano(shared, tid):
     """
     sleeping(tid)
     hygiene(tid)
+    eating(tid)
+#   CALL
 
 
 def routine_fero(shared, tid):
@@ -48,6 +50,8 @@ def routine_fero(shared, tid):
     """
     sleeping(tid)
     hygiene(tid)
+#   RECEIVE
+    eating(tid)
 
 
 def sleeping(tid):
@@ -78,6 +82,21 @@ def hygiene(tid):
     print(f"{tid} is taking a shower.")
     sleep(1)
     print(f"{tid} is clean.")
+
+
+def eating(tid):
+    """Execute eating activity of the thread.
+
+    This function prints a message that the thread is eating
+    and then waits for a while before printing a message that the thread
+    has eaten.
+
+    Keyword arguments:
+    tid -- thread identifier
+    """
+    print(f"{tid} is eating.")
+    sleep(1)
+    print(f"{tid} has eaten.")
 
 
 if __name__ == '__main__':
