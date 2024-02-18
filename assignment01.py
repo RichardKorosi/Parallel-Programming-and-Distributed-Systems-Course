@@ -36,6 +36,7 @@ def routine_jano(shared, tid):
     tid -- thread identifier
     """
     sleeping(tid)
+    hygiene(tid)
 
 
 def routine_fero(shared, tid):
@@ -46,6 +47,7 @@ def routine_fero(shared, tid):
     tid -- thread identifier
     """
     sleeping(tid)
+    hygiene(tid)
 
 
 def sleeping(tid):
@@ -61,6 +63,21 @@ def sleeping(tid):
     print(f"{tid} is sleeping.")
     sleep(1)
     print(f"{tid} is awake.")
+
+
+def hygiene(tid):
+    """Execute hygiene activity of the thread.
+
+    This function prints a message that the thread is taking a shower
+    and then waits for a while before printing a message that the thread
+    is clean.
+
+    Keyword arguments:
+    tid -- thread identifier
+    """
+    print(f"{tid} is taking a shower.")
+    sleep(1)
+    print(f"{tid} is clean.")
 
 
 if __name__ == '__main__':
