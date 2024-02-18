@@ -2,6 +2,7 @@
 
 __author__ = "Richard Körösi"
 
+from colorama import Fore
 from fei.ppds import Thread, Semaphore, print
 from time import sleep
 
@@ -28,6 +29,29 @@ def main():
     thread2.join()
 
 
+def highlighted_print(message, activity):
+    """Print a highlighted message of a given activity.
+
+    The color of the message is based on the type of activity.
+    Cyan color represents sleeping activity.
+    Blue color represents hygiene activity.
+    Magenta color represents eating activity.
+    Red color represents other activities.
+
+    Keyword arguments:
+    message -- message to be printed
+    activity -- name of the activity
+    """
+    if activity == "sleeping":
+        print(Fore.CYAN + message)
+    elif activity == "hygiene":
+        print(Fore.BLUE + message)
+    elif activity == "eating":
+        print(Fore.MAGENTA + message)
+    else:
+        print(Fore.RED + message)
+
+
 def routine_jano(shared, tid):
     """Execute the routine of thread Jano.
 
@@ -38,7 +62,7 @@ def routine_jano(shared, tid):
     sleeping(tid)
     hygiene(tid)
     eating(tid)
-#   CALL
+    #   CALL
 
 
 def routine_fero(shared, tid):
@@ -50,7 +74,7 @@ def routine_fero(shared, tid):
     """
     sleeping(tid)
     hygiene(tid)
-#   RECEIVE
+    #   RECEIVE
     eating(tid)
 
 
@@ -64,9 +88,9 @@ def sleeping(tid):
     Keyword arguments:
     tid -- thread identifier
     """
-    print(f"{tid} is sleeping.")
+    highlighted_print(f"{tid} is sleeping.", "sleeping")
     sleep(1)
-    print(f"{tid} is awake.")
+    highlighted_print(f"{tid} is awake.", "sleeping")
 
 
 def hygiene(tid):
@@ -79,9 +103,9 @@ def hygiene(tid):
     Keyword arguments:
     tid -- thread identifier
     """
-    print(f"{tid} is taking a shower.")
+    highlighted_print(f"{tid} is taking a shower.", "hygiene")
     sleep(1)
-    print(f"{tid} is clean.")
+    highlighted_print(f"{tid} is clean.", "hygiene")
 
 
 def eating(tid):
@@ -94,9 +118,9 @@ def eating(tid):
     Keyword arguments:
     tid -- thread identifier
     """
-    print(f"{tid} is eating.")
+    highlighted_print(f"{tid} is eating.", "eating")
     sleep(1)
-    print(f"{tid} has eaten.")
+    highlighted_print(f"{tid} has eaten.", "eating")
 
 
 if __name__ == '__main__':
