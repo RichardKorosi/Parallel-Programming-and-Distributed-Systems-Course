@@ -83,7 +83,7 @@ def sleeping(tid):
 
     This function prints a message that the thread is sleeping
     and then waits for a while before printing a message that the thread
-    is awake.
+    has woken up.
 
     Keyword arguments:
     tid -- thread identifier
@@ -98,7 +98,7 @@ def hygiene(tid):
 
     This function prints a message that the thread is taking a shower
     and then waits for a while before printing a message that the thread
-    is clean.
+    has finished showering.
 
     Keyword arguments:
     tid -- thread identifier
@@ -128,7 +128,11 @@ def calling(shared, tid):
 
     This function prints a message that the thread has called
     and then signals the semaphore. This allows the other thread
-    (that is waiting in the receiving function) to continue with its tasks.
+    (that is waiting in the receiving() function) to continue with its tasks.
+
+    Keyword arguments:
+    shared -- shared data between threads
+    tid -- thread identifier
     """
     highlighted_print(f"{tid} is calling.", "calling")
     sleep(1)
@@ -138,9 +142,15 @@ def calling(shared, tid):
 def receiving(shared, tid):
     """Execute receiving activity of the thread.
 
-    This function makes the thread wait for the semaphore to be signaled
-    (signal is in calling function) and after receiving the signal
-    it prints a message that the thread has received a call.
+    This function makes the thread wait (assuming that semaphore
+    was initialized with value 0 and has not received any signals yet)
+    for the semaphore to be signaled (signal is in calling() function)
+    and after receiving the signal it prints a message
+    indicating that the thread has received a call.
+
+    Keyword arguments:
+    shared -- shared data between threads
+    tid -- thread identifier
     """
     shared.semaphore.wait()
     highlighted_print(f"{tid} has received a call.", "receiving")
