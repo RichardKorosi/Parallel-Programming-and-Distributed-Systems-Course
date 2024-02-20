@@ -36,7 +36,7 @@ def highlighted_print(message, activity):
     Cyan color represents sleeping activity.
     Blue color represents hygiene activity.
     Magenta color represents eating activity.
-    Red color represents other activities.
+    Red color represents calling and receiving activities.
 
     Keyword arguments:
     message -- message to be printed
