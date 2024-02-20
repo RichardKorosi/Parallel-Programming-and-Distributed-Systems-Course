@@ -90,7 +90,7 @@ def sleeping(tid):
     """
     highlighted_print(f"{tid} is sleeping.", "sleeping")
     sleep(1)
-    highlighted_print(f"{tid} is awake.", "sleeping")
+    highlighted_print(f"{tid} has woken up.", "sleeping")
 
 
 def hygiene(tid):
@@ -105,7 +105,7 @@ def hygiene(tid):
     """
     highlighted_print(f"{tid} is taking a shower.", "hygiene")
     sleep(1)
-    highlighted_print(f"{tid} is clean.", "hygiene")
+    highlighted_print(f"{tid} has finished showering.", "hygiene")
 
 
 def eating(tid):
@@ -130,7 +130,7 @@ def calling(shared, tid):
     and then signals the semaphore. This allows the other thread
     (that is waiting in the receiving function) to continue with its tasks.
     """
-    highlighted_print(f"{tid} has called.", "calling")
+    highlighted_print(f"{tid} is calling.", "calling")
     sleep(1)
     shared.semaphore.signal()
 
