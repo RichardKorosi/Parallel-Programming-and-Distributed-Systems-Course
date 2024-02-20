@@ -5,7 +5,7 @@
 Cieľom zadania je implementovať problém "Kto raňajkoval skôr". Zadanie spočíva vo vytvorení dvoch vlákien, ktoré môžu súbežne vykonávať svoje "ranné rutiny" (funkcie) až do momentu, kým vlákna nedokončia určitú činnosť (v našom prípade rannú hygienu).\
 V momente keď vlákno dokončí rannú hygienu tak:\
 Vlákno "Jano" (bez ohľadu čo zatiaľ robí vlákno "Fero") začne raňajkovať. Po dojedení raňajok informuje vlákno "Fero", že už raňajkoval.\
-Vlákno "Fero" (bez ohľadu čo zatiaľ robí vlákno "Jano") začne čakať na telefonát od vlákna "Jano" (inak povedané nevykonáva žiadnu aktivitu).
+Vlákno "Fero" (bez ohľadu čo zatiaľ robí vlákno "Jano") začne čakať na telefonát od vlákna "Jano" (inak povedané nevykonáva žiadnu aktivitu). Toto tvrdenie platí za predpokladu, že ho vlákno "Jano" ešte nekontaktovalo (môže nastať prípad kedy vlákno "Jano" začne volať vláknu "Fero" ešte predtým ako vlákno "Fero" dokončí rannú hygienu, v tomto prípade môže vlákno "Fero" okamžite zdvihnúť telefón a následne ísť raňajkovať).
 
 
 ## Úlohy zadania
