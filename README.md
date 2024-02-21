@@ -20,7 +20,7 @@ z konzoly.
 ## Implementácia
 
 ### 1) Vytvorenie Shared classy (inšpirované a prevzaté zo semináru PPDS, viď. zdroje)
-Za povšimnutie v tejto časti kódu stojí hodnota 0 pri inicializácii semafóru. Táto inicializácia nám zapríčiní, že ak vlákno "Fero", ktoré má mať raňajky až ako druhé, vykoná svoje aktivity rýchlejšie a dostane sa k časti `semaphore.wait()` skôr ako mu ako sa naraňajkuje vlákno "Jano", bude musieť čakať na signál (telefonát). 
+Za povšimnutie v tejto časti kódu stojí hodnota 0 pri inicializácii semaforu. Táto inicializácia nám zapríčiní, že ak vlákno "Fero", ktoré má mať raňajky až ako druhé, vykoná svoje aktivity rýchlejšie a dostane sa k časti `semaphore.wait()` skôr ako mu ako sa naraňajkuje vlákno "Jano", bude musieť čakať na signál (telefonát). 
 ```python
 class Shared:
     """This class represents shared data."""
@@ -63,7 +63,7 @@ def hygiene(tid):
     highlighted_print(f"{tid} has finished showering.", "hygiene")
 ```
 
-### 4) Vytvorenie funkcií obsahujúce semafór
+### 4) Vytvorenie funkcií obsahujúce semafor
 Funkcie `calling()` a `receiving()` majú v sebe implementovanú hlavnú logiku riešenia problému. Vo funkcii `calling()` si môžeme všimnúť `shared.semaphore.signal()`, to má za príčinu, že vlákno pošle signál a tým pádom odomkne možnosť druhému vláknu čakajúcemu v `receiving()` pokračovať ďalej vo vykonávaní aktivít.
 ```python
 def calling(shared, tid):
@@ -81,7 +81,7 @@ def calling(shared, tid):
     sleep(1)
     shared.semaphore.signal()
 ```
-Avšak môže nastať aj prípad kedy vlákno vo funkcii `receiving()` nebude musieť vôbec čakať, tento prípad by nastal ak vlákno "Jano" bolo schopné zavolať vláknu "Fero" ešte pred momentom kedy by sa vlákno "Fero" dostalo k riadku `shared.semaphore.wait()` vo funkcii `receiving()`.
+Avšak môže nastať aj prípad, kedy vlákno vo funkcii `receiving()` nebude musieť vôbec čakať. Tento prípad by nastal ak vlákno "Jano" bolo schopné zavolať vláknu "Fero" ešte pred momentom kedy by sa vlákno "Fero" dostalo k riadku `shared.semaphore.wait()` vo funkcii `receiving()`.
 
 ```python
 def receiving(shared, tid):
