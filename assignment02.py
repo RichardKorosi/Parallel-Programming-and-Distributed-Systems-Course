@@ -27,13 +27,12 @@ class Shared:
 
 def main():
     shared = Shared()
-    savage_threads = []
+    all_threads = []
     for i in range(savages):
-        savage_threads.append(Thread(daily_eating, shared, f"Savage({i})"))
-    cook = Thread(cook_goulash, shared, "Cook")
-    for i in range(savages):
-        savage_threads[i].join()
-    cook.join()
+        all_threads.append(Thread(daily_eating, shared, f"Savage({i})"))
+    all_threads.append(Thread(cook_goulash, shared, "Cook"))
+    for i in all_threads:
+        i.join()
 
 
 def daily_eating(shared, savage_name):
