@@ -26,6 +26,12 @@ class Shared:
 
 
 def main():
+    """Create certain number of savages threads and cook thread and start them.
+
+        More specifically, this example demonstrates the case in which
+        one group of threads (savages) are always eating together and wait for each-other every
+        day, when pot is empty savages wait for the cook to cook until the pot is full.
+    """
     shared = Shared()
     all_threads = []
     for i in range(savages):
@@ -36,6 +42,16 @@ def main():
 
 
 def daily_eating(shared, savage_name):
+    """ Execute the daily eating routine of the savages threads.
+
+    More specifically, this function represents two barriers that synchronize the savages,
+    activity of savages taking goulash from the pot (there can only be one savage at the pot
+    at a same time) and eating (eating is concurrent).
+
+    Keyword arguments:
+    shared -- shared data between threads
+    savage_name -- name of the thread (thread identifier)
+    """
     while True:
         waiting_room_barrier(shared, savage_name)
         sleep(0.5)
@@ -43,11 +59,22 @@ def daily_eating(shared, savage_name):
         sleep(0.5)
         savage_getting_goulash(shared, savage_name)
         sleep(0.5)
-        savage_eating(shared, savage_name)
+        savage_eating(shared)
         sleep(0.5)
 
 
 def waiting_room_barrier(shared, savage_name):
+    """ Synchronize savages before eating using barrier.
+
+    More specifically, this function represents a barrier that synchronize the savages
+    before eating. Last savage that arrives to the barrier signals the barrier and all
+    savages can continue. The last savage also resets the barrier for the next day
+    (iteration in the loop).
+
+    Keyword arguments:
+    shared -- shared data between threads
+    savage_name -- name of the thread (thread identifier)
+    """
     shared.mutex.lock()
     shared.waiting_savages += 1
     print(f"{Fore.LIGHTMAGENTA_EX}{savage_name} is waiting for others. ({shared.waiting_savages}/{savages})")
@@ -59,6 +86,18 @@ def waiting_room_barrier(shared, savage_name):
 
 
 def dinner_table_barrier(shared, savage_name):
+    """ Prevent savage from eating twice in a day, sync savages in second barrier.
+
+    More specifically, this function represents a barrier that prevents savage finish whole routine
+    before all savages even arrive to the dinner table. That would mean that savage could eat twice
+    a day and some savages would not eat at all. Savages sync here after the last savage "closes" the
+    waiting room barrier. Last savage that arrives to the barrier signals the barrier and all
+    savages can continue. The last savage also resets the barrier for the next day (iteration in the loop).
+
+    Keyword arguments:
+    shared -- shared data between threads
+    savage_name -- name of the thread (thread identifier)
+    """
     shared.mutex.lock()
     shared.waiting_savages += 1
     if shared.waiting_savages == savages:
@@ -70,6 +109,18 @@ def dinner_table_barrier(shared, savage_name):
 
 
 def savage_getting_goulash(shared, savage_name):
+    """ Lock the pot and take one portion of goulash, if the pot is empty signal the cook to cook.
+
+    More specifically, this function represents the activity of savages taking goulash from the pot
+    (there can only be one savage at the pot at a same time). Savage locks the pot and looks if there
+    is any goulash in the pot. If the pot is empty, savage signals the cook to cook and waits
+    for the pot to be full. If the pot is not empty, savage takes one portion of goulash and goes to eat
+    (and of unlocks the pot).
+
+    Keyword arguments:
+    shared -- shared data between threads
+    savage_name -- name of the thread (thread identifier)
+    """
     shared.mutex.lock()
     print(f"{Fore.GREEN}{savage_name}: I can see {shared.goulash_portions} portion(s) in the pot.")
     if shared.goulash_portions == 0:
@@ -81,11 +132,30 @@ def savage_getting_goulash(shared, savage_name):
     shared.mutex.unlock()
 
 
-def savage_eating(shared, savage_name):
+def savage_eating(savage_name):
+    """ Simulate the activity of eating.
+
+    More specifically, this function represents the activity of eating. This function is executed concurrently
+    by savages.
+
+    Keyword arguments:
+    savage_name -- name of the thread (thread identifier)
+    """
     print(f"{Fore.LIGHTBLUE_EX}{savage_name} is eating." + Style.RESET_ALL)
 
 
 def cook_goulash(shared, cook_name):
+    """ Simulate the cook activity.
+
+    More specifically, this function represents the activity of the cook. Cook waits for the signal from the
+    savages that the pot is empty and then cooks the goulash until the pot is full. After that, cook signals
+    the savage that came to the pot to take the goulash portion and then waits for the another signal from the
+    savages that the pot is empty.
+
+    Keyword arguments:
+    shared -- shared data between threads
+    cook_name -- name of the thread (thread identifier)
+    """
     while True:
         shared.empty_pot.wait()
         while shared.goulash_portions < pot_capacity:
