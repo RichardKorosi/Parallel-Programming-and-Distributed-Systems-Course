@@ -108,10 +108,10 @@ def dinner_table_barrier(shared, savage_name):
     shared.waiting_savages += 1
     if shared.waiting_savages == savages:
         shared.waiting_savages = 0
+        print(f"{Fore.YELLOW}{savage_name}: We are all here, let's eat!")
         shared.dinner_table.signal(savages)
     shared.mutex.unlock()
     shared.dinner_table.wait()
-    print(f"{Fore.YELLOW}{savage_name}: We are all here, let's eat!")
 
 
 def savage_getting_goulash(shared, savage_name):
