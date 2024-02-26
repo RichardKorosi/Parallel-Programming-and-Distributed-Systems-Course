@@ -53,6 +53,60 @@ def main():
 ```
 Vo funkcii `main()` sa inicializujú vlákna divochov a aj kuchára. Počet vlákien divochov závisí od nastavenej globálnej premennej `savages`, vlákno reprezentujúce kuchára je vždy len jedno.
 
+### Princíp fungovania implementácie (hlavný loop)
+```python
+def daily_eating(shared, savage_name):
+    """Execute the daily eating routine of the savages threads.
+
+    More specifically, this function represents two barriers that
+    synchronize the savages, activity of savages taking goulash
+    from the pot (there can only be one savage at the pot at a same time)
+    and eating (eating is concurrent).
+
+    Keyword arguments:
+    shared -- shared data between threads
+    savage_name -- name of the thread (thread identifier)
+    """
+    while True:
+        waiting_room_barrier(shared, savage_name)
+        sleep(0.5)
+        dinner_table_barrier(shared, savage_name)
+        sleep(0.5)
+        savage_getting_goulash(shared, savage_name)
+        sleep(0.5)
+        savage_eating(savage_name)
+        sleep(0.5)
+```
+Divosi vykonávajú nekonečný loop 4 hlavných funkcií `waiting_room_barrier()`, `dinner_table_barrier()`, `savage_getting_goulash()` a `savage_eating()`. Samotné funkcie budú vysvetlené neskôr v dokumentácii. Všeobecný princíp fungovania je následovný:
+1) Divosi sa spoločne stretnú v bariére `waiting_room_barrier()`
+2) Následne prechádzajú do druhej bariéry `dinner_table_barrier()`, pointa tejto bariéry je aby zabránila prípadu kedy divoch po otvorení bariéry `waiting_room_barrier()` stihne zjesť guláš a dostať sa znova to `waiting_room_barrier()` predtým ako ostatní divosi stihli čo i len začať jesť, tento prípad je neželané správanie, keďže v tomto prípade existuje pravdepodobnosť, že jeden divoch môže jesť viackrát a iný divoch/divosi sa nemusia najesť vôbec. Výhodou využitia tejto druhej bariéry je, že aj ak by sa divoch stihol najesť predtým ako sa iný divoch ešte nedostal k hrncu, tak ostane zablokovaný v bariére `waiting_room_barrier()`, ktorá sa zavrela keď posledný divoch cez ňu v daný deň prešiel.
+3) Vo funkcii `savage_getting_goulash()` pristupujú divosi po jednom k hrncu s gulášom a berú si porciu, v prípade kedy je hrniec prázdny, tak divoch ohlási kuchára (bližšie informácie neskôr v dokumentácii v sekcii zameranej na implementované funkcie).
+4) Divosi následne zjedia guláš.
+
+```python
+def cook_goulash(shared, cook_name):
+    """Simulate the cook activity.
+
+    More specifically, this function represents the activity of the cook.
+    Cook waits for the signal from the savages that the pot is empty
+    and then cooks the goulash until the pot is full. After that, cook signals
+    the savage that came to the pot to take the goulash portion and
+    then waits for the another signal from the savages that the pot is empty.
+
+    Keyword arguments:
+    shared -- shared data between threads
+    cook_name -- name of the thread (thread identifier)
+    """
+    while True:
+        shared.empty_pot.wait()
+        while shared.goulash_portions < pot_capacity:
+            shared.goulash_portions += 1
+            print(f"{Fore.LIGHTCYAN_EX}{cook_name} is cooking."
+                  f"({shared.goulash_portions}/{pot_capacity}).")
+        print(f"{Fore.RED}{cook_name} has cooked full pot of goulash.")
+        shared.full_pot.signal()
+```
+
 ## Opis znovupoužiteľnej baríery
 V našom riešení sme implementovali 2 znovupoužiteľné bariéry, na konktrétnom príklade si vysvetlíme jej fungovanie.
 ```python
