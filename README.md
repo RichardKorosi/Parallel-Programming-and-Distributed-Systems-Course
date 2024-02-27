@@ -175,3 +175,132 @@ while shared.goulash_portions < pot_capacity:
 print(f"{Fore.RED}{cook_name} has cooked full pot of goulash.")
 shared.full_pot.signal()
 ```
+### Výpis
+![image](https://github.com/RichardKorosi/Korosi-111313-PPDS2024/assets/99643046/0a0db026-3445-4f86-b31b-8b08432d3dd8)
+```
+Savage(0) is waiting for others. (1/7)
+Savage(1) is waiting for others. (2/7)
+Savage(2) is waiting for others. (3/7)
+Savage(3) is waiting for others. (4/7)
+Savage(4) is waiting for others. (5/7)
+Savage(5) is waiting for others. (6/7)
+Savage(6) is waiting for others. (7/7)
+Savage(5): We are all here, let's eat!
+Savage(5): I can see 5 portion(s) in the pot.
+Savage(5) has taken 1 portion.
+Savage(5) is eating.
+Savage(2): I can see 4 portion(s) in the pot.
+Savage(2) has taken 1 portion.
+Savage(2) is eating.
+Savage(4): I can see 3 portion(s) in the pot.
+Savage(4) has taken 1 portion.
+Savage(4) is eating.
+Savage(6): I can see 2 portion(s) in the pot.
+Savage(6) has taken 1 portion.
+Savage(6) is eating.
+Savage(0): I can see 1 portion(s) in the pot.
+Savage(0) has taken 1 portion.
+Savage(0) is eating.
+Savage(0) is waiting for others. (1/7)
+Savage(1): I can see 0 portion(s) in the pot.
+Savage(1) is telling the cook to cook.
+Cook is cooking.(1/5).
+Cook is cooking.(2/5).
+Cook is cooking.(3/5).
+Cook is cooking.(4/5).
+Cook is cooking.(5/5).
+Cook has cooked full pot of goulash.
+Savage(1) has taken 1 portion.
+Savage(1) is eating.
+Savage(5) is waiting for others. (2/7)
+Savage(2) is waiting for others. (3/7)
+Savage(4) is waiting for others. (4/7)
+Savage(6) is waiting for others. (5/7)
+Savage(3): I can see 4 portion(s) in the pot.
+Savage(3) has taken 1 portion.
+Savage(3) is eating.
+Savage(3) is waiting for others. (6/7)
+Savage(1) is waiting for others. (7/7)
+Savage(2): We are all here, let's eat!
+Savage(2): I can see 3 portion(s) in the pot.
+Savage(2) has taken 1 portion.
+Savage(2) is eating.
+Savage(6): I can see 2 portion(s) in the pot.
+Savage(6) has taken 1 portion.
+Savage(6) is eating.
+Savage(6) is waiting for others. (1/7)
+Savage(0): I can see 1 portion(s) in the pot.
+Savage(0) has taken 1 portion.
+Savage(0) is eating.
+Savage(1): I can see 0 portion(s) in the pot.
+Savage(1) is telling the cook to cook.
+Cook is cooking.(1/5).
+Cook is cooking.(2/5).
+Cook is cooking.(3/5).
+Cook is cooking.(4/5).
+Cook is cooking.(5/5).
+Cook has cooked full pot of goulash.
+Savage(1) has taken 1 portion.
+Savage(1) is eating.
+Savage(1) is waiting for others. (2/7)
+Savage(4): I can see 4 portion(s) in the pot.
+Savage(4) has taken 1 portion.
+Savage(4) is eating.
+Savage(4) is waiting for others. (3/7)
+Savage(3): I can see 3 portion(s) in the pot.
+Savage(3) has taken 1 portion.
+Savage(3) is eating.
+Savage(3) is waiting for others. (4/7)
+Savage(5): I can see 2 portion(s) in the pot.
+Savage(5) has taken 1 portion.
+Savage(5) is eating.
+Savage(5) is waiting for others. (5/7)
+Savage(0) is waiting for others. (6/7)
+Savage(2) is waiting for others. (7/7)
+Savage(5): We are all here, let's eat!
+Savage(5): I can see 1 portion(s) in the pot.
+Savage(5) has taken 1 portion.
+Savage(5) is eating.
+Savage(1): I can see 0 portion(s) in the pot.
+Savage(1) is telling the cook to cook.
+Cook is cooking.(1/5).
+Cook is cooking.(2/5).
+Cook is cooking.(3/5).
+Cook is cooking.(4/5).
+Cook is cooking.(5/5).
+Cook has cooked full pot of goulash.
+Savage(1) has taken 1 portion.
+Savage(1) is eating.
+Savage(1) is waiting for others. (1/7)
+Savage(0): I can see 4 portion(s) in the pot.
+Savage(0) has taken 1 portion.
+Savage(0) is eating.
+Savage(0) is waiting for others. (2/7)
+Savage(5) is waiting for others. (3/7)
+Savage(6): I can see 3 portion(s) in the pot.
+Savage(6) has taken 1 portion.
+Savage(6) is eating.
+Savage(6) is waiting for others. (4/7)
+Savage(3): I can see 2 portion(s) in the pot.
+Savage(3) has taken 1 portion.
+Savage(3) is eating.
+Savage(3) is waiting for others. (5/7)
+Savage(4): I can see 1 portion(s) in the pot.
+Savage(4) has taken 1 portion.
+Savage(4) is eating.
+Savage(4) is waiting for others. (6/7)
+Savage(2): I can see 0 portion(s) in the pot.
+Savage(2) is telling the cook to cook.
+Cook is cooking.(1/5).
+Cook is cooking.(2/5).
+Cook is cooking.(3/5).
+Cook is cooking.(4/5).
+Cook is cooking.(5/5).
+Cook has cooked full pot of goulash.
+Savage(2) has taken 1 portion.
+Savage(2) is eating.
+Savage(2) is waiting for others. (7/7)
+
+Process finished with exit code -1
+```
+
