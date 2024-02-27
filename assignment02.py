@@ -58,11 +58,8 @@ def daily_eating(shared, savage_name):
         waiting_room_barrier(shared, savage_name)
         sleep(0.5)
         dinner_table_barrier(shared, savage_name)
-        sleep(0.5)
         savage_getting_goulash(shared, savage_name)
-        sleep(0.5)
         savage_eating(savage_name)
-        sleep(0.5)
 
 
 def waiting_room_barrier(shared, savage_name):
