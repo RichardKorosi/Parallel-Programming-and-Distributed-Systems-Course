@@ -11,7 +11,7 @@
 Cieľom zadania je implementovať (modifikovaný) problém "hodujúcich divochov". Problém spočíva v tom, že sa divosi vždy chcú najesť spolu a musia teda na seba vždy počkať. Následne keď príde na večeru aj posledný divoch, tak všetkým naokolo zasignalizuje, že tam sú už všetci a že sa môžu ísť najesť. Divosi následne pojednom pristupujú k hrncu a naberajú si jednu porciu gulášu. V prípade keď príde divoch k hrncu a zbadá, že je prázdny, tak ohlási kuchára a začne čakať pri hrnci až pokým ho kuchár nenaplní. Keď kuchár naplní hrniec tak dá signál divochovi, že si môže nabrať jedlo a ide "spať". Divosi, ktorí majú jedlo naložené môžu konkurentne jesť.
 
 ## Opis fungovania implementácie
-Táto časť sa zaoberá vysvetlením fungovania implementácie na konkrétnych príkladoch zo zdrojového kódu programu.
+Táto časť sa zaoberá vysvetlením fungovania implementácie na konkrétnych príkladoch zo zdrojového kódu programu. Implementácia riešenia problému bola inšpirovaná poskytnutým pseudokódom na seminári PPDS.
 ### Inicializácia vlákien, hodnoty globálnych premenných
 ```python
 savages = 7
@@ -32,7 +32,7 @@ class Shared:
         self.waiting_room = Semaphore(0)
         self.dinner_table = Semaphore(0)
 ```
-Globálna premenná `savages` predstavuje počet divochov. Globálna premenná `pot_capacity` predstavuje veľkosť hrnca (koľko porcií sa doň zmestí). Trieda Shared predstavuje zdielanú pamäť medzi jadrami. Obsahuje `mutex`, ktorý jadrá využívaju aby zachovali integritu počítadiel. Ďalej obsahuje dve spomenuté počítadlá a to `goulash_portions` a `waiting_savages`. Prvé spomenuté počítadlo reprezentuje aktuálny počet porcií v hrnci a druhé počítadlo reprezentuje počet čakajúcich divochov v bariére. Ďalej tam je zadefinovaná dvojica semaforov `full_pot` a `empty_pot`, táto dvojica semafórov slúži na "komunikáciu" medzi divochmi a kuchárom (princíp fungovania bude vysvetlený neskôr v dokumentácii). Následne `waiting_room` a `dinner_table` sú semafory, ktoré sa využívajú pri bariérach v programe.
+Globálna premenná `savages` predstavuje počet divochov. Globálna premenná `pot_capacity` predstavuje veľkosť hrnca (koľko porcií sa doň zmestí). Trieda Shared predstavuje zdielanú pamäť medzi jadrami. Obsahuje `mutex`, ktorý jadrá využívaju aby zachovali integritu počítadiel. Ďalej obsahuje dve spomenuté počítadlá a to `goulash_portions` a `waiting_savages`. Prvé spomenuté počítadlo reprezentuje aktuálny počet porcií v hrnci a druhé počítadlo reprezentuje počet čakajúcich divochov v bariére. Ďalej tam je zadefinovaná dvojica semaforov `full_pot` a `empty_pot`, táto dvojica semafórov slúži na "komunikáciu" medzi divochmi a kuchárom (princíp fungovania bude vysvetlený neskôr v dokumentácii). Následne `waiting_room` a `dinner_table` sú semafory, ktoré sa využívajú pri bariérach v programe. Daný úsek kódu bol inšpirovaný poskytnutým kódom zo semináru PPDS.
 
 ```python
 def main():
@@ -71,11 +71,8 @@ def daily_eating(shared, savage_name):
         waiting_room_barrier(shared, savage_name)
         sleep(0.5)
         dinner_table_barrier(shared, savage_name)
-        sleep(0.5)
         savage_getting_goulash(shared, savage_name)
-        sleep(0.5)
         savage_eating(savage_name)
-        sleep(0.5)
 ```
 Divosi vykonávajú nekonečný loop 4 hlavných funkcií `waiting_room_barrier()`, `dinner_table_barrier()`, `savage_getting_goulash()` a `savage_eating()`. Samotné funkcie budú vysvetlené neskôr v dokumentácii. Všeobecný princíp fungovania je následovný:
 1) Divosi sa spoločne stretnú v bariére `waiting_room_barrier()`
@@ -165,7 +162,7 @@ print(f"{Fore.GREEN}{savage_name} has taken 1 portion.")
 shared.goulash_portions -= 1
 shared.mutex.unlock()
 ```
-V prípade, keď sa v hrnci nenachádza už žiadna porcia, tak divoch signalizuje kuchárovi, že má začať variť a začne čakať. Kuchár na začiatku programu vojde do svojej funkcie a čaká kým nedostane práve spomínaný signál, že  má začať variť, akonáhle dovarí dá signál divochovi, že je navarané a začne opäť čakať kým ho ďaľší divoch nezavolá. Implementovaná logika predstavuje synchronizačný vzor `Rendezvous`.
+V prípade, keď sa v hrnci nenachádza už žiadna porcia, tak divoch signalizuje kuchárovi, že má začať variť a začne čakať. Kuchár na začiatku programu vojde do svojej funkcie a čaká kým nedostane práve spomínaný signál, že  má začať variť, akonáhle dovarí, dá signál divochovi, že je navarané a začne opäť čakať kým ho ďaľší divoch nezavolá. Implementovaná logika predstavuje synchronizačný vzor `Rendezvous`.
 ```python
 shared.empty_pot.wait()
 while shared.goulash_portions < pot_capacity:
@@ -303,4 +300,10 @@ Savage(2) is waiting for others. (7/7)
 
 Process finished with exit code -1
 ```
-
+## Zdroje
+Inšpirácie, využité časti kódu a podobne:
+* [README template](https://github.com/matiassingers/awesome-readme)
+* [Časti kódu (spomenuté vyššie v dokumentácii v sekcii "Implementácia")](https://github.com/tj314/ppds-seminars/tree/ppds2024)
+* [PEP 8 & PEP 257 validator](https://www.codewof.co.nz/style/python3/)
+* [Conventional Commits guide](https://www.conventionalcommits.org/en/v1.0.0/)
+* [Teoretické časti boli vysvetlené na základe vedomostí získaných na prednáške a seminári na predmete PPDS](https://uim.fei.stuba.sk/predmet/i-ppds/)
