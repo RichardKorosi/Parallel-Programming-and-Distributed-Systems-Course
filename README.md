@@ -172,7 +172,7 @@ while shared.goulash_portions < pot_capacity:
 print(f"{Fore.RED}{cook_name} has cooked full pot of goulash.")
 shared.full_pot.signal()
 ```
-### Výpis
+## Výpis programu
 ![image](https://github.com/RichardKorosi/Korosi-111313-PPDS2024/assets/99643046/0a0db026-3445-4f86-b31b-8b08432d3dd8)
 ```
 Savage(0) is waiting for others. (1/7)
