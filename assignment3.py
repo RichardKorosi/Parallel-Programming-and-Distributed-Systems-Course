@@ -15,7 +15,6 @@ class Shared:
 
     def __init__(self):
         """Initialize shared data."""
-        self.mutex = Mutex()
 
         self.boarding_queue = Semaphore(0)
         self.boarding_barrier = Barrier(train_capacity)
