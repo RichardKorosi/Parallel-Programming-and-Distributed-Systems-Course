@@ -200,3 +200,11 @@ Process finished with exit code -1
 ```
 ![image](https://github.com/RichardKorosi/Korosi-111313-PPDS2024/assets/99643046/edd44510-5e54-45a1-bbcc-6de8985b28ac)
 
+## Zdroje
+Inšpirácie, využité časti kódu a podobne:
+* [README template](https://github.com/matiassingers/awesome-readme)
+* [Časti kódu (spomenuté vyššie v dokumentácii v sekcii "Implementácia")](https://github.com/tj314/ppds-seminars/tree/ppds2024)
+* [PEP 8 & PEP 257 validator](https://www.codewof.co.nz/style/python3/)
+* [Conventional Commits guide](https://www.conventionalcommits.org/en/v1.0.0/)
+* [Teoretické časti boli vysvetlené na základe vedomostí získaných na prednáške a seminári na predmete PPDS](https://uim.fei.stuba.sk/predmet/i-ppds/)
+
