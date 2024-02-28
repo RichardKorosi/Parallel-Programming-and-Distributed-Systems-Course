@@ -154,10 +154,10 @@ def train_loop(shared, tid):
         shared.unboarding_queue.signal(train_capacity)
         shared.unboarded.wait()
 ```
-### Problém, ktorý môže nastať
+## Problém, ktorý môže nastať
 Problém, ktorým táto implementácia trpí je možnosť vyhladovenia. Vyhladovenie môžeme opísať ako problém pri ktorom sa nejaký proces nikdy „nedostane k slovu”. U nás tento problém môže nastať medzi pasažiermi keďže podľa zadania je pasažierov viac ako je maximálna kapatica vláčiku. Môže teda nastať prípad kedy sa pasažier nikdy nedostane do vláčika (naša implementácia nevyužíva FIFO/Silný semafor).
 
-### Výpis
+## Výpis
 ```
 Train is loading passengers.
 Passenger(3) is boarding.
