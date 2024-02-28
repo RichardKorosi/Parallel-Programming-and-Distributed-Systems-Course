@@ -87,3 +87,70 @@ def main():
         i.join()
 ```
 Vo funkcii `main()` sa inicializujú vlákna pasažierov a aj vláčika. Počet vlákien pasažierov závisí od nastavenej globálnej premennej `no_passengers`, vlákno reprezentujúce vláčik je vždy len jedno.
+### Hlavné slučky vláčiku a pasažierov
+```python
+def passengers_loop(shared, tid):
+    """Simulate passenger's behavior in the infinite loop.
+
+    More specifically, this function simulates the following behavior:
+    - passengers start waiting for the train to start loading
+    (signal from semaphore in train_loop)
+    - passengers board the train (and wait for train to be full),
+    last passenger signals the train to start moving (signal in barrier)
+    - passengers wait for the train to stop and start unboarding
+    (signal from semaphore in train_loop)
+    - passengers unboard the train (and wait for each other),
+    last passenger signals the train to start loading (signal in barrier)
+
+    Keyword arguments:
+    shared -- shared data
+    tid -- thread identifier
+    """
+    while True:
+        shared.boarding_queue.wait()
+        board(tid)
+        shared.boarding_barrier.wait(shared.boarded)
+        shared.unboarding_queue.wait()
+        unboard(tid)
+        shared.unboarding_barrier.wait(shared.unboarded)
+```
+Pasažieri začínajú čakaním kým vláčik nezačne príjmať pasažierov. Keď obdržia signál začnú nastupovať do vláčika (vojsť však môže len taký počet pasažierov aká je kapacita vláčika), nastupovanie do vláčika predstavuje jednoduchá funkcia, ktorá akurát vypíše, že konkrétny pasažier doň vstúpil. Podobnou logikou, kde hlavnou úlohou funkcie je akurát výpis sú implementované aj ďaľšie funkcie ako `run()`, `unboard()`, `load()` a `unload()`.
+```python
+def board(passenger):
+    """Print message about passenger boarding.
+
+    Keyword arguments:
+    passenger -- name of the passenger (thread identifier)
+    """
+    print(Fore.LIGHTBLUE_EX + f"{passenger} is boarding." + Style.RESET_ALL)
+```
+Následne po nastúpení pasažieri čakajú v `shared.boarding_barrier.wait()`, kým sa vláčik nenaplní, posledný cestujúci následne otvorí bariéru a umožní teda pasažierom prejsť k `shared.unboarding_queue.wait()`. Okrem signálu pre cestujúcich taktiež posledný pasažier pošle aj signál vláčiku a ten tým pádom už nebude čakať v `shared.boarded.wait()` a môže teda začať jazdu. Následne program simuluje cestu vláčikom funkciou `run()`, po jej skončení vláčik informuje, sa otvára a že pasažieri majú vystúpiť a následne vláčik začne čakať kým sa vyprázdni. Do tohto momentu čakali pasažieri v `shared.unboarding_queue.wait()`, teraz však dostali signál od vláčiku a začínajú vychádzať von. Pod pojmom vychádzať von rozumieme barériu `unboarding_barrier()`, kde podobne ako pri `boarding_barrier()` posledný pasažier otvorí bariéru ostatným pasažierom (a sebe) a idú na začiatok slučky a teda znova čakajú na vláčik. Okrem iného posledný pasažier znova informuje aj vláčik, teraz ho však informuje, že už je prázdny a po tomto signále vláčik môže prejsť cez `shared.unboarded.wait()` a začína svoju slučku, podobne ako aj pasažieri, znova od začiatku.
+
+
+```python
+def train_loop(shared, tid):
+    """Simulate train's behavior in the infinite loop.
+
+    More specifically, this function simulates the following behavior:
+    - train starts loading passengers (signals passengers to board)
+    - train waits for all passengers to board (to full capacity)
+    - train starts running
+    - train stops and starts unboarding passengers
+    (signals passengers to unboard)
+    - train waits for all passengers to unboard (to empty capacity)
+    - after all passengers unboarded, train starts loading passengers again
+
+
+    Keyword arguments:
+    shared -- shared data
+    tid -- thread identifier
+    """
+    while True:
+        load(tid)
+        shared.boarding_queue.signal(train_capacity)
+        shared.boarded.wait()
+        run(tid)
+        unload(tid)
+        shared.unboarding_queue.signal(train_capacity)
+        shared.unboarded.wait()
+```
