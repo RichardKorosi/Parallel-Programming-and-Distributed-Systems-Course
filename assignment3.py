@@ -6,8 +6,8 @@ __author__ = "Richard Körösi"
 from colorama import Fore, Style
 from fei.ppds import Thread, Semaphore, print, Mutex
 
-no_passengers = 7
-train_capacity = 4
+no_passengers = 13
+train_capacity = 6
 
 
 class Shared:
