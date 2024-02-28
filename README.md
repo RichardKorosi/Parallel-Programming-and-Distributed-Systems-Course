@@ -37,7 +37,7 @@ class Shared:
         self.unboarded = Semaphore(0)
 ```
 Globálna premenná `no_passengers` predstavuje celkový počet pasažierov, ktorí sa chcú prejsť na vláčiku. Premenná `train_capacity` predstavuje kapacitu vláčika (koľko pasažierov sa doň zmestí). Trieda `Shared` predstavuje zdielanú pamäť medzi jadrami.
-Premenné v tejto triede si vieme rozdeliť na dve skupiny. Prvá skupina sa využíva pri logike nastupovania do vláčika a druhá skupina zasa pri vystupovaní z vláčika. Obe obsahujú dva semafóry a bariéru, ich využitie si vysvetlíme neskôr v dokumentácii.
+Premenné v tejto triede si vieme rozdeliť na dve skupiny. Prvá skupina sa využíva pri logike nastupovania do vláčika a druhá skupina zasa pri vystupovaní z vláčika. Obe obsahujú dva semafory a bariéru, ich využitie si vysvetlíme neskôr v dokumentácii.
 ```python
 class Barrier:
     """This class represents barrier."""
@@ -154,6 +154,9 @@ def train_loop(shared, tid):
         shared.unboarding_queue.signal(train_capacity)
         shared.unboarded.wait()
 ```
+### Problém, ktorý môže nastať
+Problém, ktorým táto implementácia trpí je možnosť vyhladovenia. Vyhladovenie môžeme opísať ako problém pri ktorom sa nejaký proces nikdy „nedostane k slovu”. U nás tento problém môže nastať medzi pasažiermi keďže podľa zadania je pasažierov viac ako je maximálna kapatica vláčiku. Môže teda nastať prípad kedy sa pasažier nikdy nedostane do vláčika (naša implementácia nevyužíva FIFO/Silný semafor).
+
 ### Výpis
 ```
 Train is loading passengers.
