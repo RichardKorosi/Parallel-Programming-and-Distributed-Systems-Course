@@ -154,3 +154,49 @@ def train_loop(shared, tid):
         shared.unboarding_queue.signal(train_capacity)
         shared.unboarded.wait()
 ```
+### Výpis
+```
+Train is loading passengers.
+Passenger(3) is boarding.
+Passenger(10) is boarding.
+Passenger(9) is boarding.
+Passenger(6) is boarding.
+Passenger(7) is boarding.
+Passenger(2) is boarding.
+Train is running.
+Train is unloading passengers.
+Passenger(7) is unboarding.
+Passenger(2) is unboarding.
+Passenger(9) is unboarding.
+Passenger(10) is unboarding.
+Passenger(3) is unboarding.
+Passenger(6) is unboarding.
+Train is loading passengers.
+Passenger(9) is boarding.
+Passenger(11) is boarding.
+Passenger(0) is boarding.
+Passenger(7) is boarding.
+Passenger(6) is boarding.
+Passenger(8) is boarding.
+Train is running.
+Train is unloading passengers.
+Passenger(11) is unboarding.
+Passenger(9) is unboarding.
+Passenger(6) is unboarding.
+Passenger(7) is unboarding.
+Passenger(0) is unboarding.
+Passenger(8) is unboarding.
+Train is loading passengers.
+Passenger(8) is boarding.
+Passenger(5) is boarding.
+Passenger(9) is boarding.
+Passenger(0) is boarding.
+Passenger(4) is boarding.
+Passenger(12) is boarding.
+Train is running.
+Train is unloading passengers.
+
+Process finished with exit code -1
+```
+![image](https://github.com/RichardKorosi/Korosi-111313-PPDS2024/assets/99643046/edd44510-5e54-45a1-bbcc-6de8985b28ac)
+
