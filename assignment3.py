@@ -2,12 +2,12 @@
 
 __author__ = "Richard Körösi"
 
+
 from colorama import Fore, Style
 from fei.ppds import Thread, Semaphore, print, Mutex
-from time import sleep
 
-no_passengers = 50
-train_capacity = 30
+no_passengers = 7
+train_capacity = 4
 
 
 class Shared:
@@ -16,7 +16,6 @@ class Shared:
     def __init__(self):
         """Initialize shared data."""
         self.mutex = Mutex()
-        self.passengers_in_train = 0
 
         self.boarding_queue = Semaphore(0)
         self.boarding_barrier = Barrier(train_capacity)
@@ -34,12 +33,13 @@ class Barrier:
         self.mutex = Mutex()
         self.barrier = Semaphore(0)
 
-    def wait(self):
+    def wait(self, signal_to_train):
         self.mutex.lock()
         self.counter += 1
-        if self.counter == train_capacity:
+        if self.counter == self.n:
             self.counter = 0
             self.barrier.signal(self.n)
+            signal_to_train.signal()
         self.mutex.unlock()
         self.barrier.wait()
 
@@ -56,12 +56,23 @@ def main():
 
 def train_loop(shared, tid):
     while True:
-        pass
+        load(tid)
+        shared.boarding_queue.signal(train_capacity)
+        shared.boarded.wait()
+        run(tid)
+        unload(tid)
+        shared.unboarding_queue.signal(train_capacity)
+        shared.unboarded.wait()
 
 
 def passengers_loop(shared, tid):
     while True:
-        pass
+        shared.boarding_queue.wait()
+        board(tid)
+        shared.boarding_barrier.wait(shared.boarded)
+        shared.unboarding_queue.wait()
+        unboard(tid)
+        shared.unboarding_barrier.wait(shared.unboarded)
 
 
 def board(passenger):
