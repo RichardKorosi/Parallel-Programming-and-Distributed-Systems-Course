@@ -18,8 +18,8 @@ Cieľom zadania je implementovať problém pasažierov a vláčiku. Problém spo
 Táto časť sa zaoberá vysvetlením fungovania implementácie na konkrétnych príkladoch zo zdrojového kódu programu. Implementácia riešenia problému bola inšpirovaná poskytnutým pseudokódom na seminári PPDS.
 ### Inicializácia vlákien, hodnoty globálnych premenných, využité triedy
 ```python
-no_passengers = 7
-train_capacity = 4
+no_passengers = 13
+train_capacity = 6
 
 
 class Shared:
