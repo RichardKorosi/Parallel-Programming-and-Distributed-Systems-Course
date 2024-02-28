@@ -105,7 +105,7 @@ def cook_goulash(shared, cook_name):
 ```
 
 ## Opis znovupoužiteľnej bariéry
-V našom riešení sme implementovali 2 znovupoužiteľné bariéry, na konktrétnom príklade si vysvetlíme jej fungovanie.
+V našom riešení sme implementovali aj znovupoužiteľnú bariéru, jej fungovanie si vysvetlíme na príklade. Znovu použiteľná bariéra sa skladá z dvoch jednoduchých bariér (SimpleBarrier).
 ```python
 def waiting_room_barrier(shared, savage_name):
     """Synchronize savages before eating using barrier.
@@ -129,7 +129,14 @@ def waiting_room_barrier(shared, savage_name):
     shared.mutex.unlock()
     shared.waiting_room.wait()
 ```
-Keď sa vlákno dostane do bariéry, tak sa pre zachovanie integrity zdielaného počítadla zamkne pomocou mutexu. Následne inkrementuje hodnotu počítadla a vypíše informáciu, že vlákno prišlo na miesto čakania. Po výpise vlákno skontroluje, či už prišlo ako úplne posledné (hodnota počítadla sa rovná počtu vlákien divochov v programe). Ak neprišlo ako posledné odomkne mutex a začne čakať na ostatné vlákna. Ak je posledné, tak vynuluje počídatlo (to má za príčinu znovupoužitelnosť bariéry) a dá signál všetkým vláknam, že môžu pokračovať vo vykonávaní kódu.
+Najprv si vysvetlime logiku jednoduchej bariéry. Keď sa vlákno dostane do bariéry, tak sa pre zachovanie integrity zdielaného počítadla zamkne pomocou mutexu. Následne inkrementuje hodnotu počítadla a vypíše informáciu, že vlákno prišlo na miesto čakania. Po výpise vlákno skontroluje, či už prišlo ako úplne posledné (hodnota počítadla sa rovná počtu vlákien divochov v programe). Ak neprišlo ako posledné odomkne mutex a začne čakať na ostatné vlákna. Ak je posledné, tak vynuluje počídatlo a dá signál všetkým vláknam, že môžu pokračovať vo vykonávaní kódu, odomkne mutex a prejde cez beriéru spolu aj s ostatnými vláknami.
+```python
+ while True:
+        waiting_room_barrier(shared, savage_name)
+        dinner_table_barrier(shared, savage_name)
+```
+Ako bolo spomenuté vyššie, znovu použiteľná bariéra sa skladá z dvoch jednoduchých bariér, jej implementácia je teda pomerne jednoduchá, ale jej význam je veľký. Jej význam už bol spomenutý v sekcii opisujúcej `daily_eating()`, konktrétnejšie pri opise prvého a druhého bodu. V skratke jej výhodou je to, že zabraňuje prípadu, kedy sa jeden divoch dokáže rýchlo najesť a ešte v ten istý deň prísť za zbytkom divochov a dostať večeru aj druhýkrát na úkor iného divocha.
+
 
 ## Synchronizácia v programe
 
