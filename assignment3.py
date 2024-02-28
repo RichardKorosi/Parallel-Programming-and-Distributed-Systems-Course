@@ -54,29 +54,34 @@ def main():
         i.join()
 
 
-def train_loop(shared):
-    load_train()
-    shared.boarding_queue.signal()
+def train_loop(shared, tid):
+    while True:
+        pass
 
 
-def boarding():
-    pass
+def passengers_loop(shared, tid):
+    while True:
+        pass
 
 
-def unboarding():
-    pass
+def board(passenger):
+    print(Fore.LIGHTBLUE_EX + f"{passenger} is boarding." + Style.RESET_ALL)
 
 
-def load_train():
-    pass
+def unboard(passenger):
+    print(Fore.LIGHTRED_EX + f"{passenger} is unboarding." + Style.RESET_ALL)
 
 
-def unload_train():
-    pass
+def load(train):
+    print(Fore.LIGHTMAGENTA_EX + f"{train} is loading passengers.")
 
 
-def passengers_loop():
-    pass
+def run(train):
+    print(Fore.LIGHTYELLOW_EX + f"{train} is running.")
+
+
+def unload(train):
+    print(Fore.LIGHTMAGENTA_EX + f"{train} is unloading passengers.")
 
 
 if __name__ == '__main__':
