@@ -19,10 +19,29 @@ class Shared:
         self.passengers_in_train = 0
 
         self.boarding_queue = Semaphore(0)
+        self.boarding_barrier = Barrier(train_capacity)
         self.boarded = Semaphore(0)
 
         self.unboarding_queue = Semaphore(0)
+        self.unboarding_barrier = Barrier(train_capacity)
         self.unboarded = Semaphore(0)
+
+
+class Barrier:
+    def __init__(self, n):
+        self.n = n
+        self.counter = 0
+        self.mutex = Mutex()
+        self.barrier = Semaphore(0)
+
+    def wait(self):
+        self.mutex.lock()
+        self.counter += 1
+        if self.counter == train_capacity:
+            self.counter = 0
+            self.barrier.signal(self.n)
+        self.mutex.unlock()
+        self.barrier.wait()
 
 
 def main():
@@ -58,26 +77,6 @@ def unload_train():
 
 def passengers_loop():
     pass
-
-
-def board_barrier(shared):
-    shared.mutex.lock()
-    shared.passengers_in_train += 1
-    if shared.passengers_in_train == no_passengers:
-        shared.passengers_in_train = 0
-        shared.boarding_queue.signal(no_passengers)
-    shared.mutex.unlock()
-    shared.boarding_queue.wait()
-
-
-def unboard_barrier(shared):
-    shared.mutex.lock()
-    shared.passengers_in_train -= 1
-    if shared.passengers_in_train == 0:
-        shared.passengers_in_train = 0
-        shared.unboarding_queue.signal(no_passengers)
-    shared.mutex.unlock()
-    shared.unboarding_queue.wait()
 
 
 if __name__ == '__main__':
