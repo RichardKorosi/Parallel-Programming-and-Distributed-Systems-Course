@@ -159,6 +159,7 @@ def train_loop(shared, tid):
 Problém, ktorým táto implementácia trpí je možnosť vyhladovenia. Vyhladovenie môžeme opísať ako problém pri ktorom sa nejaký proces nikdy „nedostane k slovu”. U nás tento problém môže nastať medzi pasažiermi keďže podľa zadania je pasažierov viac ako je maximálna kapatica vláčiku. Môže teda nastať prípad kedy sa pasažier nikdy nedostane do vláčika (naša implementácia nevyužíva FIFO/Silný semafor).
 
 ## Výpis
+Vo výpise si môžeme všimnúť zaujímavé prípady, keď napríklad pasažier 3 okamžite po informovaní vláčiku (keďže je posledný čo z neho vyšiel) že je prázdny, začne čakať vo fronte (ešte predtým ako sa vláčik otvorí pre nových pasažierov). V ďalšej iterácií, si zas môžeme všimnúť, že vlákna, ktoré sa vracajú z jazdy prichádzajú do fronty v čase keď už vláčik naberá pasažierov.
 ```
 Passenger(0) is waiting in queue.
 Passenger(1) is waiting in queue.
