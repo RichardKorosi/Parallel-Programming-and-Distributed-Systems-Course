@@ -117,6 +117,7 @@ def passengers_loop(shared, tid):
     tid -- thread identifier
     """
     while True:
+        print(Fore.LIGHTWHITE_EX + f"{tid} is waiting in queue.")
         shared.boarding_queue.wait()
         board(tid)
         shared.boarding_barrier.wait(shared.boarded)
