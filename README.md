@@ -107,6 +107,7 @@ def passengers_loop(shared, tid):
     tid -- thread identifier
     """
     while True:
+        print(Fore.LIGHTWHITE_EX + f"{tid} is waiting in queue.")
         shared.boarding_queue.wait()
         board(tid)
         shared.boarding_barrier.wait(shared.boarded)
@@ -114,7 +115,7 @@ def passengers_loop(shared, tid):
         unboard(tid)
         shared.unboarding_barrier.wait(shared.unboarded)
 ```
-Pasažieri začínajú čakaním kým vláčik nezačne príjmať pasažierov. Keď obdržia signál začnú nastupovať do vláčika (vojsť však môže len taký počet pasažierov aká je kapacita vláčika), nastupovanie do vláčika predstavuje jednoduchá funkcia, ktorá akurát vypíše, že konkrétny pasažier doň vstúpil. Podobnou logikou, kde hlavnou úlohou funkcie je akurát výpis sú implementované aj ďaľšie funkcie ako `run()`, `unboard()`, `load()` a `unload()`.
+Pasažieri začínajú čakaním kým vláčik nezačne príjmať pasažierov (predtým však informujú, že začínajú čakať vo fronte na vláčik). Ich "loop" teda vždy začína informáciou, že prišli do fronty (túto informáciu teda poskytnú napríklad aj keď sa vrátia z jazdy s vláčikom a opäť prídu do fronty) Keď obdržia signál začnú nastupovať do vláčika (vojsť však môže len taký počet pasažierov aká je kapacita vláčika), nastupovanie do vláčika predstavuje jednoduchá funkcia, ktorá akurát vypíše, že konkrétny pasažier doň vstúpil. Podobnou logikou, kde hlavnou úlohou funkcie je akurát výpis sú implementované aj ďaľšie funkcie ako `run()`, `unboard()`, `load()` a `unload()`.
 ```python
 def board(passenger):
     """Print message about passenger boarding.
@@ -159,49 +160,86 @@ Problém, ktorým táto implementácia trpí je možnosť vyhladovenia. Vyhladov
 
 ## Výpis
 ```
+Passenger(0) is waiting in queue.
+Passenger(1) is waiting in queue.
+Passenger(2) is waiting in queue.
+Passenger(3) is waiting in queue.
+Passenger(4) is waiting in queue.
+Passenger(5) is waiting in queue.
+Passenger(6) is waiting in queue.
+Passenger(7) is waiting in queue.
+Passenger(8) is waiting in queue.
+Passenger(9) is waiting in queue.
+Passenger(10) is waiting in queue.
+Passenger(11) is waiting in queue.
+Passenger(12) is waiting in queue.
 Train is loading passengers.
-Passenger(3) is boarding.
-Passenger(10) is boarding.
-Passenger(9) is boarding.
-Passenger(6) is boarding.
-Passenger(7) is boarding.
-Passenger(2) is boarding.
-Train is running.
-Train is unloading passengers.
-Passenger(7) is unboarding.
-Passenger(2) is unboarding.
-Passenger(9) is unboarding.
-Passenger(10) is unboarding.
-Passenger(3) is unboarding.
-Passenger(6) is unboarding.
-Train is loading passengers.
-Passenger(9) is boarding.
+Passenger(1) is boarding.
+Passenger(4) is boarding.
 Passenger(11) is boarding.
 Passenger(0) is boarding.
 Passenger(7) is boarding.
-Passenger(6) is boarding.
-Passenger(8) is boarding.
+Passenger(3) is boarding.
 Train is running.
 Train is unloading passengers.
 Passenger(11) is unboarding.
-Passenger(9) is unboarding.
-Passenger(6) is unboarding.
-Passenger(7) is unboarding.
 Passenger(0) is unboarding.
-Passenger(8) is unboarding.
+Passenger(7) is unboarding.
+Passenger(1) is unboarding.
+Passenger(4) is unboarding.
+Passenger(3) is unboarding.
+Passenger(3) is waiting in queue.
 Train is loading passengers.
-Passenger(8) is boarding.
-Passenger(5) is boarding.
-Passenger(9) is boarding.
-Passenger(0) is boarding.
-Passenger(4) is boarding.
+Passenger(4) is waiting in queue.
+Passenger(7) is waiting in queue.
+Passenger(1) is waiting in queue.
+Passenger(11) is waiting in queue.
+Passenger(0) is waiting in queue.
 Passenger(12) is boarding.
+Passenger(2) is boarding.
+Passenger(9) is boarding.
+Passenger(5) is boarding.
+Passenger(6) is boarding.
+Passenger(3) is boarding.
 Train is running.
 Train is unloading passengers.
-
-Process finished with exit code -1
+Passenger(5) is unboarding.
+Passenger(12) is unboarding.
+Passenger(9) is unboarding.
+Passenger(3) is unboarding.
+Passenger(2) is unboarding.
+Passenger(6) is unboarding.
+Passenger(6) is waiting in queue.
+Train is loading passengers.
+Passenger(2) is waiting in queue.
+Passenger(2) is boarding.
+Passenger(5) is waiting in queue.
+Passenger(12) is waiting in queue.
+Passenger(3) is waiting in queue.
+Passenger(10) is boarding.
+Passenger(1) is boarding.
+Passenger(4) is boarding.
+Passenger(11) is boarding.
+Passenger(6) is boarding.
+Passenger(9) is waiting in queue.
+Train is running.
+Train is unloading passengers.
+Passenger(11) is unboarding.
+Passenger(2) is unboarding.
+Passenger(10) is unboarding.
+Passenger(1) is unboarding.
+Passenger(4) is unboarding.
+Passenger(6) is unboarding.
+Passenger(6) is waiting in queue.
+Passenger(2) is waiting in queue.
+Passenger(10) is waiting in queue.
+Passenger(4) is waiting in queue.
+Passenger(11) is waiting in queue.
+Train is loading passengers.
+Passenger(1) is waiting in queue.
 ```
-![image](https://github.com/RichardKorosi/Korosi-111313-PPDS2024/assets/99643046/edd44510-5e54-45a1-bbcc-6de8985b28ac)
+![image](https://github.com/RichardKorosi/Korosi-111313-PPDS2024/assets/99643046/2430f45d-e24f-4ff9-9a21-bd11aaa4bd42)
+
 
 ## Zdroje
 Inšpirácie, využité časti kódu a podobne:
