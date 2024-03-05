@@ -12,7 +12,7 @@ Stručný popis zadania v bodoch:
 4) Do dokumentácie umiestnite aj výpisy z konzoly
 
 ## Opis problému a cieľe zadania
-Cieľom zadania je implementovať problém pasažierov a vláčiku. Problém spočíva v tom, že máme pasažierov (počet pasažierov je väčší ako počet miest vo vláčiku), ktorí v nekonečnej slučke čakajú a následne nastupujú na vlak, potom sa na ňom povozia a následne z neho vystúpia a opäť naň idú čakať.
+Cieľom zadania je implementovať problém pasažierov a vláčiku. Problém spočíva v tom, že máme pasažierov (počet pasažierov je väčší ako počet miest vo vláčiku), ktorí v nekonečnej slučke čakajú a následne nastupujú na vlak, potom sa na ňom povozia a následne z neho vystúpia a opäť naň idú čakať. Nemôžu však začať nastupovať skôr ako sa vláčik otvorí a taktiež vláčik nemôže púšťať po jazde nových pasažierov, pokiaľ sa úplne nevyprázdnil. Vláčik môže začať jazdu až keď je naplnený a začať sa napĺňať, až keď bol úplne vyprázdnený.
 
 ## Opis fungovania implementácie
 Táto časť sa zaoberá vysvetlením fungovania implementácie na konkrétnych príkladoch zo zdrojového kódu programu. Implementácia riešenia problému bola inšpirovaná poskytnutým pseudokódom na seminári PPDS.
@@ -71,7 +71,7 @@ class Barrier:
         self.mutex.unlock()
         self.barrier.wait()
 ```
-Trieda `Barrier` predstavuje implementáciu klasickej bariéry, až na jednu výnimku. Pri dosiahnutí určitej hodnoty počítadla nepošle posledné vlákno, ktoré prišlo do bariéry len signál pre ostatné vlákna, ale aj signál pre vlákno vlaku. Príkaz `self.barrier.signal(self.n)` má teda za úlohu poslať signál a teda otvoriť bariéru pre `n` vlákien, kde `n` reprezentuje kapacitu vláčika. Následne `signal_to_train.signal()` slúži už na informovanie vláčika, že je plný a že môže začať jazdu. Pri otvorení bariéry a signalizácií vláčika sa taktiež vypíše informácia, že vláčik bol informovaný.
+Trieda `Barrier` predstavuje implementáciu klasickej bariéry, až na jednu výnimku. Pri dosiahnutí určitej hodnoty počítadla nepošle posledné vlákno, ktoré prišlo do bariéry len signál pre ostatné vlákna, ale aj signál pre vlákno vlaku. Signál, ktorý sa pošle vlaku závisí od vstupného parametru metódy `wait()`. Vstupný parameter `signal_to_train` predstavuje semafor, ktorý vykoná `signal_to_train.signal()`. Semafory, ktoré vchádzajú do metódy cez argument môžu byť `shared.boarded` a `shared.unboarded`. Prvý slúži na zaslanie informácie pri nastupovaní, že je vlak plný a druhý slúži pri vystupovaní na signalizáciu, že je vlak prázdny. Príkaz `self.barrier.signal(self.n)` má za úlohu poslať signál a teda otvoriť bariéru pre `n` vlákien, kde `n` reprezentuje kapacitu vláčika. Následne `signal_to_train.signal()` slúži už na informovanie vláčika, že je plný a že môže začať jazdu, poprípade prázdny a môže začať naberať nových pasažierov. Pri otvorení bariéry a signalizácií vláčika sa taktiež vypíše informácia, že vláčik bol informovaný.
 ```python
 def main():
     """Create certain number of passengers threads and train thread and start them.
@@ -116,7 +116,7 @@ def passengers_loop(shared, tid):
         unboard(tid)
         shared.unboarding_barrier.wait(shared.unboarded)
 ```
-Pasažieri začínajú čakaním kým vláčik nezačne príjmať pasažierov (predtým však informujú, že začínajú čakať vo fronte na vláčik). Ich "loop" teda vždy začína informáciou, že prišli do fronty (túto informáciu teda poskytnú napríklad aj keď sa vrátia z jazdy s vláčikom a opäť prídu do fronty). Keď obdržia signál začnú nastupovať do vláčika (vojsť však môže len taký počet pasažierov aká je kapacita vláčika), nastupovanie do vláčika predstavuje jednoduchá funkcia, ktorá akurát vypíše, že konkrétny pasažier doň vstúpil. Podobnou logikou, kde hlavnou úlohou funkcie je akurát výpis sú implementované aj ďaľšie funkcie ako `run()`, `unboard()`, `load()` a `unload()`.
+Pasažieri začínajú čakaním kým vláčik nezačne príjmať pasažierov. Ich "loop" teda vždy začína informáciou, že prišli do fronty (túto informáciu teda poskytnú napríklad aj keď sa vrátia z jazdy s vláčikom a opäť prídu do fronty). Keď obdržia signál začnú nastupovať do vláčika (vojsť však môže len taký počet pasažierov aká je kapacita vláčika), nastupovanie do vláčika predstavuje jednoduchá funkcia, ktorá akurát vypíše, že konkrétny pasažier doň vstúpil. Podobnou logikou, kde hlavnou úlohou funkcie je akurát výpis sú implementované aj ďaľšie funkcie ako `run()`, `unboard()`, `load()` a `unload()`.
 ```python
 def board(passenger):
     """Print message about passenger boarding.
@@ -126,7 +126,7 @@ def board(passenger):
     """
     print(Fore.LIGHTBLUE_EX + f"{passenger} is boarding." + Style.RESET_ALL)
 ```
-Následne po nastúpení pasažieri čakajú v `shared.boarding_barrier.wait()`, kým sa vláčik nenaplní, posledný cestujúci následne otvorí bariéru a umožní teda pasažierom prejsť k `shared.unboarding_queue.wait()`. Okrem signálu pre cestujúcich taktiež posledný pasažier pošle aj signál vláčiku a ten tým pádom už nebude čakať v `shared.boarded.wait()` a môže teda začať jazdu. Následne program simuluje cestu vláčikom funkciou `run()`, po jej skončení vláčik informuje, sa otvára a že pasažieri majú vystúpiť a následne vláčik začne čakať kým sa vyprázdni. Do tohto momentu čakali pasažieri v `shared.unboarding_queue.wait()`, teraz však dostali signál od vláčiku a začínajú vychádzať von. Pod pojmom vychádzať von rozumieme barériu `unboarding_barrier()`, kde podobne ako pri `boarding_barrier()` posledný pasažier otvorí bariéru ostatným pasažierom (a sebe) a idú na začiatok slučky. To teda znamená, že prichádzajú do fronty a čakajú na vláčik. Okrem iného posledný pasažier znova informuje aj vláčik, teraz ho však informuje, že už je prázdny a po tomto signále vláčik môže prejsť cez `shared.unboarded.wait()` a začína svoju slučku, podobne ako aj pasažieri, znova od začiatku.
+Následne pri nastupovaní pasažieri čakajú v `shared.boarding_barrier.wait()`, kým sa vláčik nenaplní, posledný cestujúci následne otvorí bariéru. Okrem signálu pre cestujúcich taktiež posledný pasažier pošle aj signál vláčiku a ten tým pádom už nebude čakať v `shared.boarded.wait()` a môže teda začať jazdu. Následne program simuluje cestu vláčikom funkciou `run()`, po jej skončení vláčik informuje, sa otvára a že pasažieri majú vystúpiť a následne vláčik začne čakať kým sa vyprázdni. Do tohto momentu čakali pasažieri v `shared.unboarding_queue.wait()`, teraz však dostali signál od vláčiku a začínajú vychádzať von. Pod pojmom vychádzať von rozumieme barériu `unboarding_barrier()`, kde podobne ako pri `boarding_barrier()` posledný pasažier otvorí bariéru ostatným pasažierom (a sebe) a idú na začiatok slučky. To teda znamená, že prichádzajú do fronty a čakajú na vláčik. Okrem iného posledný pasažier znova informuje aj vláčik, teraz ho však informuje, že už je prázdny a po tomto signále vláčik môže prejsť cez `shared.unboarded.wait()` a začína svoju slučku, podobne ako aj pasažieri, znova od začiatku.
 
 
 ```python
@@ -160,7 +160,10 @@ def train_loop(shared, tid):
 Problém, ktorým táto implementácia trpí je možnosť vyhladovenia. Vyhladovenie môžeme opísať ako problém pri ktorom sa nejaký proces nikdy „nedostane k slovu”. U nás tento problém môže nastať medzi pasažiermi keďže podľa zadania je pasažierov viac ako je maximálna kapatica vláčiku. Môže teda nastať prípad kedy sa pasažier nikdy nedostane do vláčika (naša implementácia nevyužíva FIFO/Silný semafor).
 
 ## Výpis
-Vo výpise si môžeme všimnúť zaujímavé prípady, keď napríklad pasažier 2 okamžite po informovaní vláčiku (keďže je posledný čo z neho vyšiel) že je prázdny, začne čakať vo fronte (ešte predtým ako sa vláčik otvorí pre nových pasažierov). Taktiež si môžeme všimnúť, že vlákna, ktoré sa vracajú z jazdy prichádzajú do fronty v čase keď už vláčik naberá pasažierov. Napriek tomu sa vláknu 4 (pasažier 4) podarilo ihneď nastúpiť aj do vláčika a teda tu si môžeme všimnúť, že nemáme implementovanú FIFO verziu semaforu a teda môže nastať problém vyhladovenia spomínaný vyššie v dokumentácii.
+Vo výpise si môžeme všimnúť zaujímavé prípady, keď napríklad pasažier 2 okamžite po informovaní vláčiku (keďže je posledný čo z neho vyšiel) že je prázdny, začne čakať vo fronte (ešte predtým ako sa vláčik otvorí pre nových pasažierov). Taktiež si môžeme všimnúť vlákna, ktoré sa vracajú z jazdy a prichádzajú do fronty v čase keď už vláčik naberá pasažierov. Napriek tomu sa vláknu 4 (pasažier 4) podarilo ihneď nastúpiť aj do vláčika a teda tu si môžeme všimnúť, že nemáme implementovanú FIFO verziu semaforu a teda môže nastať problém vyhladovenia spomínaný vyššie v dokumentácii.
+
+![image](https://github.com/RichardKorosi/Korosi-111313-PPDS2024/assets/99643046/a0515291-5d1e-48b5-86cf-3c546b7d89bb)
+
 ```Passenger(0) is waiting in queue.
 Passenger(1) is waiting in queue.
 Passenger(2) is waiting in queue.
@@ -241,7 +244,6 @@ Passenger(7) is unboarding.
 Passenger(6) is unboarding.
 ALARMING THE TRAIN!
 ```
-![image](https://github.com/RichardKorosi/Korosi-111313-PPDS2024/assets/99643046/a0515291-5d1e-48b5-86cf-3c546b7d89bb)
 
 
 
