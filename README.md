@@ -65,12 +65,13 @@ class Barrier:
         self.counter += 1
         if self.counter == self.n:
             self.counter = 0
+            print(Fore.LIGHTGREEN_EX + "ALARMING THE TRAIN!" + Style.RESET_ALL)
             self.barrier.signal(self.n)
             signal_to_train.signal()
         self.mutex.unlock()
         self.barrier.wait()
 ```
-Trieda `Barrier` predstavuje implementáciu klasickej bariéry, až na jednu výnimku. Pri dosiahnutí určitej hodnoty počítadla nepošle posledné vlákno, ktoré prišlo do bariéry len signál pre ostatné vlákna, ale aj signál pre vlákno vlaku. Príkaz `self.barrier.signal(self.n)` má teda za úlohu poslať signál a teda otvoriť bariéru pre `n` vlákien, kde `n` reprezentuje kapacitu vláčika. Následne `signal_to_train.signal()` slúži už na informovanie vláčika, že je plný a že môže začať jazdu.
+Trieda `Barrier` predstavuje implementáciu klasickej bariéry, až na jednu výnimku. Pri dosiahnutí určitej hodnoty počítadla nepošle posledné vlákno, ktoré prišlo do bariéry len signál pre ostatné vlákna, ale aj signál pre vlákno vlaku. Príkaz `self.barrier.signal(self.n)` má teda za úlohu poslať signál a teda otvoriť bariéru pre `n` vlákien, kde `n` reprezentuje kapacitu vláčika. Následne `signal_to_train.signal()` slúži už na informovanie vláčika, že je plný a že môže začať jazdu. Pri otvorení bariéry a signalizácií vláčika sa taktiež vypíše informácia, že vláčik bol informovaný.
 ```python
 def main():
     """Create certain number of passengers threads and train thread and start them.
@@ -159,9 +160,8 @@ def train_loop(shared, tid):
 Problém, ktorým táto implementácia trpí je možnosť vyhladovenia. Vyhladovenie môžeme opísať ako problém pri ktorom sa nejaký proces nikdy „nedostane k slovu”. U nás tento problém môže nastať medzi pasažiermi keďže podľa zadania je pasažierov viac ako je maximálna kapatica vláčiku. Môže teda nastať prípad kedy sa pasažier nikdy nedostane do vláčika (naša implementácia nevyužíva FIFO/Silný semafor).
 
 ## Výpis
-Vo výpise si môžeme všimnúť zaujímavé prípady, keď napríklad pasažier 3 okamžite po informovaní vláčiku (keďže je posledný čo z neho vyšiel) že je prázdny, začne čakať vo fronte (ešte predtým ako sa vláčik otvorí pre nových pasažierov). V ďalšej iterácií, si zas môžeme všimnúť, že vlákna, ktoré sa vracajú z jazdy prichádzajú do fronty v čase keď už vláčik naberá pasažierov.
-```
-Passenger(0) is waiting in queue.
+Vo výpise si môžeme všimnúť zaujímavé prípady, keď napríklad pasažier 2 okamžite po informovaní vláčiku (keďže je posledný čo z neho vyšiel) že je prázdny, začne čakať vo fronte (ešte predtým ako sa vláčik otvorí pre nových pasažierov). Taktiež si môžeme všimnúť, že vlákna, ktoré sa vracajú z jazdy prichádzajú do fronty v čase keď už vláčik naberá pasažierov. Napriek tomu sa vláknu 4 (pasažier 4) podarilo ihneď nastúpiť aj do vláčika a teda tu si môžeme všimnúť, že nemáme implementovanú FIFO verziu semaforu a teda môže nastať problém vyhladovenia spomínaný vyššie v dokumentácii.
+```Passenger(0) is waiting in queue.
 Passenger(1) is waiting in queue.
 Passenger(2) is waiting in queue.
 Passenger(3) is waiting in queue.
@@ -175,71 +175,74 @@ Passenger(10) is waiting in queue.
 Passenger(11) is waiting in queue.
 Passenger(12) is waiting in queue.
 Train is loading passengers.
-Passenger(1) is boarding.
+Passenger(5) is boarding.
+Passenger(8) is boarding.
+Passenger(2) is boarding.
+Passenger(6) is boarding.
+Passenger(10) is boarding.
 Passenger(4) is boarding.
-Passenger(11) is boarding.
-Passenger(0) is boarding.
-Passenger(7) is boarding.
-Passenger(3) is boarding.
+ALARMING THE TRAIN!
 Train is running.
+Train is stopping.
 Train is unloading passengers.
-Passenger(11) is unboarding.
-Passenger(0) is unboarding.
-Passenger(7) is unboarding.
-Passenger(1) is unboarding.
+Passenger(6) is unboarding.
+Passenger(8) is unboarding.
+Passenger(10) is unboarding.
+Passenger(5) is unboarding.
 Passenger(4) is unboarding.
-Passenger(3) is unboarding.
-Passenger(3) is waiting in queue.
+Passenger(2) is unboarding.
+ALARMING THE TRAIN!
+Passenger(2) is waiting in queue.
 Train is loading passengers.
 Passenger(4) is waiting in queue.
-Passenger(7) is waiting in queue.
-Passenger(1) is waiting in queue.
-Passenger(11) is waiting in queue.
-Passenger(0) is waiting in queue.
+Passenger(4) is boarding.
+Passenger(8) is waiting in queue.
+Passenger(10) is waiting in queue.
+Passenger(5) is waiting in queue.
+Passenger(11) is boarding.
+Passenger(3) is boarding.
+Passenger(0) is boarding.
 Passenger(12) is boarding.
 Passenger(2) is boarding.
-Passenger(9) is boarding.
-Passenger(5) is boarding.
-Passenger(6) is boarding.
-Passenger(3) is boarding.
-Train is running.
-Train is unloading passengers.
-Passenger(5) is unboarding.
-Passenger(12) is unboarding.
-Passenger(9) is unboarding.
-Passenger(3) is unboarding.
-Passenger(2) is unboarding.
-Passenger(6) is unboarding.
+ALARMING THE TRAIN!
 Passenger(6) is waiting in queue.
-Train is loading passengers.
-Passenger(2) is waiting in queue.
-Passenger(2) is boarding.
-Passenger(5) is waiting in queue.
-Passenger(12) is waiting in queue.
-Passenger(3) is waiting in queue.
-Passenger(10) is boarding.
-Passenger(1) is boarding.
-Passenger(4) is boarding.
-Passenger(11) is boarding.
-Passenger(6) is boarding.
-Passenger(9) is waiting in queue.
 Train is running.
+Train is stopping.
 Train is unloading passengers.
+Passenger(4) is unboarding.
+Passenger(0) is unboarding.
+Passenger(3) is unboarding.
+Passenger(12) is unboarding.
 Passenger(11) is unboarding.
 Passenger(2) is unboarding.
-Passenger(10) is unboarding.
-Passenger(1) is unboarding.
-Passenger(4) is unboarding.
-Passenger(6) is unboarding.
-Passenger(6) is waiting in queue.
+ALARMING THE TRAIN!
 Passenger(2) is waiting in queue.
-Passenger(10) is waiting in queue.
-Passenger(4) is waiting in queue.
-Passenger(11) is waiting in queue.
 Train is loading passengers.
-Passenger(1) is waiting in queue.
+Passenger(0) is waiting in queue.
+Passenger(0) is boarding.
+Passenger(12) is waiting in queue.
+Passenger(4) is waiting in queue.
+Passenger(3) is waiting in queue.
+Passenger(11) is waiting in queue.
+Passenger(6) is boarding.
+Passenger(7) is boarding.
+Passenger(1) is boarding.
+Passenger(10) is boarding.
+Passenger(2) is boarding.
+ALARMING THE TRAIN!
+Train is running.
+Train is stopping.
+Train is unloading passengers.
+Passenger(1) is unboarding.
+Passenger(0) is unboarding.
+Passenger(2) is unboarding.
+Passenger(10) is unboarding.
+Passenger(7) is unboarding.
+Passenger(6) is unboarding.
+ALARMING THE TRAIN!
 ```
-![image](https://github.com/RichardKorosi/Korosi-111313-PPDS2024/assets/99643046/2430f45d-e24f-4ff9-9a21-bd11aaa4bd42)
+![image](https://github.com/RichardKorosi/Korosi-111313-PPDS2024/assets/99643046/a0515291-5d1e-48b5-86cf-3c546b7d89bb)
+
 
 
 ## Zdroje
