@@ -51,6 +51,7 @@ class Barrier:
         self.counter += 1
         if self.counter == self.n:
             self.counter = 0
+            print(Fore.LIGHTGREEN_EX + "ALARMING THE TRAIN!" + Style.RESET_ALL)
             self.barrier.signal(self.n)
             signal_to_train.signal()
         self.mutex.unlock()
@@ -160,6 +161,7 @@ def run(train):
     train -- name of the train (thread identifier)
     """
     print(Fore.LIGHTYELLOW_EX + f"{train} is running.")
+    print(Fore.LIGHTYELLOW_EX + f"{train} is stopping.")
 
 
 def unload(train):
