@@ -77,14 +77,15 @@ def collective_version(nra, nca, ncb):
 
     A = None
     B = None
-    rows = nra // nproc
     if rank == MASTER:
         print(f"{rank}: Initializing matrices A and B.")
-        A = np.array([i+j for j in range(nra) for i in range(nca)]).reshape(nproc, nra // nproc, nca)
+        A = np.array([i+j for j in range(nra) for i in range(nca)]).reshape(nra, nca)
+        A = np.array_split(A, nproc)
         B = np.array([i*j for j in range(nca) for i in range(ncb)]).reshape(nca, ncb)
 
     A_loc = comm.scatter(A, root = MASTER)
     B = comm.bcast(B, root = MASTER)
+    rows = A_loc.shape[0]
 
     # Perform sequential matrix multiplication
     C_loc = np.zeros((rows, ncb), dtype = int)
