@@ -1,60 +1,84 @@
+"""This file is implementation of the fourth/seventh assignment of the PPDS."""
+
+__author__ = "Richard Körösi"
+
 import numpy as np
 from mpi4py import MPI
-
-
-NRA = 32  # number of rows in matrix A
-NCA = 15  # number of columns in matrix A
-NCB = 7   # number of columns in matrix B
-
 
 MASTER = 0
 
 comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
 nproc = comm.Get_size()
-assert NRA % nproc == 0, f"#MPI_nodes should divide #rows of matrix A"
 
-print(f"{rank}: Starting parallel matrix multiplication example...")
-print(f"{rank}: Using matrix sizes A[{NRA}][{NCA}], B[{NCA}][{NCB}], C[{NRA}][{NCB}]")
+def p2p_version(nra, nca, ncb):
+    print(f"{rank}: Starting parallel matrix multiplication example...")
+    print(f"{rank}: Using matrix sizes A[{nra}][{nca}], B[{nca}][{ncb}], C[{nra}][{ncb}]")
+
+    avg_rows = nra // nproc
+    extras = nra % nproc
+    rows = None
+    offset = 0
+
+    if rank == MASTER:
+        print(f"{rank}: Initializing matrices A and B.")
+        A = np.array([i+j for j in range(nra) for i in range(nca)]).reshape(nra, nca)
+        B = np.array([i*j for j in range(nca) for i in range(ncb)]).reshape(nca, ncb)
+        rows = avg_rows + 1 if extras else avg_rows
+
+        for proc in range(nproc):
+            rows_for_process = avg_rows + 1 if proc < extras else avg_rows
+            if proc == MASTER:
+                A_loc = A[offset:(offset+rows_for_process)]
+                offset += rows_for_process
+                continue
+            comm.send(A[offset:(offset+rows_for_process)], dest = proc)
+            offset += rows_for_process
+    else:
+        A_loc = comm.recv()
+        rows = A_loc.shape[0]
+        B = None
+
+    print(f"A_LOC {rank}: {A_loc}")
+    B = comm.bcast(B, root = MASTER)
+
+    # Perform sequential matrix multiplication
+    C_loc = np.zeros((rows, ncb), dtype = int)
+    print(f"{rank}: Performing matrix multiplication...")
+    for i in range(rows):
+        for j in range(ncb):
+            for k in range(nca):
+                C_loc[i][j] += A_loc[i][k] * B[k][j]
 
 
-rows = NRA // nproc
-if rank == MASTER:
-    print(f"{rank}: Initializing matrices A and B.")
-    A = np.array([i+j for j in range(NRA) for i in range(NCA)]).reshape(NRA, NCA)
-    B = np.array([i*j for j in range(NCA) for i in range(NCB)]).reshape(NCA, NCB)
+    # Combine results into matrix C
+    C = np.zeros((nra, ncb), dtype = int)
+    offset = 0
+    if rank == MASTER:
+        for proc in range(nproc):
+            rows_for_process = avg_rows + 1 if proc < extras else avg_rows
+            if proc == MASTER:
+                C[offset:(offset+rows_for_process)] = C_loc
+                offset += rows_for_process
+                continue
+            C[offset:(offset+rows_for_process)] = comm.recv(source = proc)
+            offset += rows_for_process
+        print(f"{rank}: Here is the result matrix:")
+        print(C)
+    else:
+        comm.send(C_loc, dest = MASTER)
 
-    for proc in range(nproc):
-        if proc == MASTER:
-            A_loc = A[proc*rows:proc*rows+rows]
-            continue
-        comm.send(A[proc*rows:proc*rows+rows], dest = proc)
-else:
-    A_loc = comm.recv()
-    B = None
-
-B = comm.bcast(B, root = MASTER)
-
-# Perform sequential matrix multiplication
-C_loc = np.zeros((rows, NCB), dtype = int)
-print(f"{rank}: Performing matrix multiplication...")
-for i in range(rows):
-    for j in range(NCB):
-        for k in range(NCA):
-            C_loc[i][j] += A_loc[i][k] * B[k][j]
+    print(f"{rank}: Done.")
 
 
-# Combine results into matrix C
-C = np.zeros((NRA, NCB), dtype = int)
-if rank == MASTER:
-    for proc in range(nproc):
-        if proc == MASTER:
-            C[proc*rows:proc*rows+rows] = C_loc
-            continue
-        C[proc*rows:proc*rows+rows] = comm.recv(source = proc)
-    print(f"{rank}: Here is the result matrix:")
-    print(C)
-else:
-    comm.send(C_loc, dest = MASTER)
+def main():
+    nra = 32
+    nca = 15
+    ncb = 7
 
-print(f"{rank}: Done.")
+    p2p_version(nra, nca, ncb)
+
+
+
+if __name__ == "__main__":
+    main()
