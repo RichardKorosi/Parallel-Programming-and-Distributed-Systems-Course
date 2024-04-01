@@ -4,14 +4,16 @@ __author__ = "Richard Körösi"
 
 import numpy as np
 from mpi4py import MPI
+import time
 
-MASTER = 0
-
-comm = MPI.COMM_WORLD
-rank = comm.Get_rank()
-nproc = comm.Get_size()
 
 def p2p_version(nra, nca, ncb):
+    MASTER = 0
+
+    comm = MPI.COMM_WORLD
+    rank = comm.Get_rank()
+    nproc = comm.Get_size()
+
     print(f"{rank}: Starting parallel matrix multiplication example...")
     print(f"{rank}: Using matrix sizes A[{nra}][{nca}], B[{nca}][{ncb}], C[{nra}][{ncb}]")
 
@@ -72,6 +74,12 @@ def p2p_version(nra, nca, ncb):
 
 
 def collective_version(nra, nca, ncb):
+    MASTER = 0
+
+    comm = MPI.COMM_WORLD
+    rank = comm.Get_rank()
+    nproc = comm.Get_size()
+
     print(f"{rank}: Starting parallel matrix multiplication example...")
     print(f"{rank}: Using matrix sizes A[{nra}][{nca}], B[{nca}][{ncb}], C[{nra}][{ncb}]")
 
@@ -109,8 +117,29 @@ def main():
     nca = 15
     ncb = 7
 
-    p2p_version(nra, nca, ncb)
-    collective_version(nra, nca, ncb)
+    times = []
+    avgs = []
+    for _ in range(200):
+        start_time = time.time()
+        p2p_version(nra, nca, ncb)
+        end_time = time.time()
+        times.append(end_time - start_time)
+
+    average_time = sum(times) / len(times)
+    avgs.append(average_time)
+
+    times = []
+    for _ in range(200):
+        start_time = time.time()
+        collective_version(nra, nca, ncb)
+        end_time = time.time()
+        times.append(end_time - start_time)
+
+    average_time = sum(times) / len(times)
+    avgs.append(average_time)
+
+    print(f"Average time for p2p_version: {avgs[0]}")
+    print(f"Average time for collective_version: {avgs[1]}")
 
 
 
