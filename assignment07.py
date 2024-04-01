@@ -6,13 +6,12 @@ import numpy as np
 from mpi4py import MPI
 import time
 
+MASTER = 0
+comm = MPI.COMM_WORLD
+rank = comm.Get_rank()
+nproc = comm.Get_size()
 
-def p2p_version(nra, nca, ncb):
-    MASTER = 0
-
-    comm = MPI.COMM_WORLD
-    rank = comm.Get_rank()
-    nproc = comm.Get_size()
+def p2p_version(nra, nca, ncb):   
 
     print(f"{rank}: Starting parallel matrix multiplication example...")
     print(f"{rank}: Using matrix sizes A[{nra}][{nca}], B[{nca}][{ncb}], C[{nra}][{ncb}]")
@@ -74,11 +73,6 @@ def p2p_version(nra, nca, ncb):
 
 
 def collective_version(nra, nca, ncb):
-    MASTER = 0
-
-    comm = MPI.COMM_WORLD
-    rank = comm.Get_rank()
-    nproc = comm.Get_size()
 
     print(f"{rank}: Starting parallel matrix multiplication example...")
     print(f"{rank}: Using matrix sizes A[{nra}][{nca}], B[{nca}][{ncb}], C[{nra}][{ncb}]")
@@ -112,34 +106,46 @@ def collective_version(nra, nca, ncb):
 
     print(f"{rank}: Done.")
 
+
+def measure_version(version = "P2P"):
+    matrixes = [{"nra": 32, "nca": 15, "ncb": 7},
+                {"nra": 64, "nca": 30, "ncb": 14},
+                {"nra": 128, "nca": 60, "ncb": 28},
+                {"nra": 256, "nca": 120, "ncb": 56},
+                {"nra": 200, "nca": 200, "ncb": 200},
+                ]
+    results = []
+    for matrix in matrixes:
+        nra = matrix["nra"]
+        nca = matrix["nca"]
+        ncb = matrix["ncb"]
+
+        times = []
+        for _ in range(200):
+            if version == "P2P":
+                start_time = time.time()
+                p2p_version(nra, nca, ncb)
+                end_time = time.time()
+            elif version == "COLLECTIVE":
+                start_time = time.time()
+                collective_version(nra, nca, ncb)
+                end_time = time.time()
+            else:
+                raise ValueError("Invalid version")    
+            times.append(end_time - start_time)
+
+        average_time = sum(times) / len(times)
+        results.append({"nra": nra, "nca": nca, "ncb": ncb, "time": average_time, "version": version, "nproc": nproc})
+    
+    return results
+
 def main():
-    nra = 32
-    nca = 15
-    ncb = 7
 
-    times = []
-    avgs = []
-    for _ in range(200):
-        start_time = time.time()
-        p2p_version(nra, nca, ncb)
-        end_time = time.time()
-        times.append(end_time - start_time)
+    results = measure_version("P2P")
 
-    average_time = sum(times) / len(times)
-    avgs.append(average_time)
-
-    times = []
-    for _ in range(200):
-        start_time = time.time()
-        collective_version(nra, nca, ncb)
-        end_time = time.time()
-        times.append(end_time - start_time)
-
-    average_time = sum(times) / len(times)
-    avgs.append(average_time)
-
-    print(f"Average time for p2p_version: {avgs[0]}")
-    print(f"Average time for collective_version: {avgs[1]}")
+    if rank == MASTER:
+        for result in results:
+            print(result, end="\n\n")
 
 
 
