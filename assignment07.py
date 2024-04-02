@@ -68,9 +68,9 @@ def p2p_version(nra, nca, ncb):
                 C_loc[i][j] += A_loc[i][k] * B[k][j]
 
     # Combine results into matrix C
-    C = np.zeros((nra, ncb), dtype=int)
-    offset = 0
     if rank == MASTER:
+        C = np.zeros((nra, ncb), dtype=int)
+        offset = 0
         for proc in range(nproc):
             rows_for_process = avg_rows + 1 if proc < extras else avg_rows
             if proc == MASTER:
@@ -239,6 +239,7 @@ def main():
     using the measured results. Only the master process
     prints out the results and creates the graph.
     """
+
     results2 = measure_version("COLLECTIVE")
     results = measure_version("P2P")
 
