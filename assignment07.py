@@ -5,6 +5,7 @@ __author__ = "Richard Körösi"
 import numpy as np
 from mpi4py import MPI
 import time
+import matplotlib.pyplot as plt
 
 MASTER = 0
 comm = MPI.COMM_WORLD
@@ -40,7 +41,7 @@ def p2p_version(nra, nca, ncb):
         rows = A_loc.shape[0]
         B = None
 
-    print(f"A_LOC {rank}: {A_loc}")
+    # print(f"A_LOC {rank}: {A_loc}")
     B = comm.bcast(B, root = MASTER)
 
     # Perform sequential matrix multiplication
@@ -108,11 +109,11 @@ def collective_version(nra, nca, ncb):
 
 
 def measure_version(version = "P2P"):
-    matrixes = [{"nra": 32, "nca": 15, "ncb": 7},
-                {"nra": 64, "nca": 30, "ncb": 14},
-                {"nra": 128, "nca": 60, "ncb": 28},
+    matrixes = [{"nra": 128, "nca": 60, "ncb": 28},
                 {"nra": 256, "nca": 120, "ncb": 56},
-                {"nra": 200, "nca": 200, "ncb": 200},
+                {"nra": 512, "nca": 240, "ncb": 112},
+                {"nra": 240, "nca": 120, "ncb": 112},
+                {"nra": 512, "nca": 112, "ncb": 240},
                 ]
     results = []
     for matrix in matrixes:
@@ -121,7 +122,7 @@ def measure_version(version = "P2P"):
         ncb = matrix["ncb"]
 
         times = []
-        for _ in range(200):
+        for _ in range(1):
             if version == "P2P":
                 start_time = time.time()
                 p2p_version(nra, nca, ncb)
@@ -139,13 +140,53 @@ def measure_version(version = "P2P"):
     
     return results
 
+
+def createGraph(p2p_results, collective_results):
+    nras = [result["nra"] for result in p2p_results]
+    ncas = [result["nca"] for result in p2p_results]
+    ncbs = [result["ncb"] for result in p2p_results]
+
+    p2p_version = p2p_results[0]["version"]
+    p2p_times = [result["time"] for result in p2p_results]
+    collective_version = collective_results[0]["version"]
+    collective_times = [result["time"] for result in collective_results]
+
+    x = np.arange(len(nras))
+    width = 0.25
+
+    fig, ax = plt.subplots()
+
+    rects1 = ax.bar(x, p2p_times, width, label=p2p_version, color="r")
+    rects2 = ax.bar(x + width, collective_times, width, label=collective_version, color="g")
+
+    ax.set_xlabel("Matrix sizes [NRA][NCA][NCB]")
+    ax.set_ylabel("Time [s]")
+    ax.set_title(f"Average times of matrix multiplication with {nproc} processes \n after 100 runs")
+    labels = [f"NRA:{nra}\nNCA:{nca}\nNCB:{ncb}" for nra, nca, ncb in zip(nras, ncas, ncbs)]
+    ax.set_xticks(x + width / 2)
+    ax.set_xticklabels(labels)
+
+    ax.bar_label(rects1)
+    ax.bar_label(rects2)
+
+    ax.legend()
+    plt.show()
+
 def main():
 
+    results2 = measure_version("COLLECTIVE")
     results = measure_version("P2P")
+    
 
     if rank == MASTER:
         for result in results:
-            print(result, end="\n\n")
+            print(result, end="\n")
+        print("\n")
+        for result in results2:
+            print(result, end="\n")
+    
+    if rank == MASTER:
+        createGraph(results, results2)
 
 
 
