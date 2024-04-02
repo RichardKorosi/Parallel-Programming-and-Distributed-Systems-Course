@@ -3,7 +3,7 @@ from mpi4py import MPI
 import time
 import matplotlib.pyplot as plt
 
-"""This file is implementation of the fourth/seventh assignment of the PPDS."""
+"""This file is implementation of the 4th (week 7) assignment of the PPDS."""
 
 __author__ = "Richard Körösi"
 
