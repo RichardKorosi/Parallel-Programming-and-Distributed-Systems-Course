@@ -175,7 +175,6 @@ def measure_version(version):
     {"nra": 512, "nca": 50, "ncb": 70},
     {"nra": 1024, "nca": 50, "ncb": 70},
     {"nra": 4086, "nca": 20, "ncb": 70},
-    {"nra": 2048, "nca": 80, "ncb": 90},
     {"nra": 4086, "nca": 50, "ncb": 50}.
     Function returns a list of dictionaries containing
     the matrix sizes, average time of matrix multiplication,
@@ -189,7 +188,6 @@ def measure_version(version):
               {"nra": 512, "nca": 50, "ncb": 70},
               {"nra": 1024, "nca": 50, "ncb": 70},
               {"nra": 4086, "nca": 20, "ncb": 70},
-              {"nra": 2048, "nca": 80, "ncb": 90},
               {"nra": 4086, "nca": 50, "ncb": 50}
               ]
     results = []
