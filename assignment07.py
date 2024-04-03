@@ -27,7 +27,7 @@ def compute_matrix_multiplication(rows, ncb, nca, c_loc, a_loc, b):
     a_loc -- local matrix A
     B -- matrix B
     """
-    print(f"{rank}: Performing matrix multiplication...")
+    # print(f"{rank}: Performing matrix multiplication...")
     for i in range(rows):
         for j in range(ncb):
             for k in range(nca):
@@ -49,10 +49,10 @@ def p2p_version(nra, nca, ncb):
     nca -- number of columns of matrix A
     ncb -- number of columns of matrix B
     """
-    print(f"{rank}: Starting parallel matrix multiplication "
-          f"example using P2P communication...")
-    print(f"{rank}: Using matrix sizes A[{nra}][{nca}], "
-          f"B[{nca}][{ncb}], C[{nra}][{ncb}]")
+    # print(f"{rank}: Starting parallel matrix multiplication "
+    #       f"example using P2P communication...")
+    # print(f"{rank}: Using matrix sizes A[{nra}][{nca}], "
+    #       f"B[{nca}][{ncb}], C[{nra}][{ncb}]")
 
     avg_rows = nra // nproc
     extras = nra % nproc
@@ -60,7 +60,7 @@ def p2p_version(nra, nca, ncb):
     offset = 0
 
     if rank == MASTER:
-        print(f"{rank}: Initializing matrices A and B.")
+        # print(f"{rank}: Initializing matrices A and B.")
         a = (np.array([i + j for j in range(nra) for i in range(nca)])
              .reshape(nra, nca))
         b = (np.array([i * j for j in range(nca) for i in range(ncb)])
@@ -96,12 +96,12 @@ def p2p_version(nra, nca, ncb):
                 continue
             c[offset:(offset + rows_for_process)] = comm.recv(source=proc)
             offset += rows_for_process
-        print(f"{rank}: Here is the result matrix:")
-        print(c)
+        # print(f"{rank}: Here is the result matrix:")
+        # print(c)
     else:
         comm.send(c_loc, dest=MASTER)
 
-    print(f"{rank}: Done.")
+    # print(f"{rank}: Done.")
 
 
 def collective_version(nra, nca, ncb):
@@ -119,15 +119,15 @@ def collective_version(nra, nca, ncb):
     nca -- number of columns of matrix A
     ncb -- number of columns of matrix B
     """
-    print(f"{rank}: Starting parallel matrix multiplication example "
-          f"using collective communication...")
-    print(f"{rank}: Using matrix sizes A[{nra}][{nca}], "
-          f"B[{nca}][{ncb}], C[{nra}][{ncb}]")
+    # print(f"{rank}: Starting parallel matrix multiplication example "
+    #       f"using collective communication...")
+    # print(f"{rank}: Using matrix sizes A[{nra}][{nca}], "
+    #       f"B[{nca}][{ncb}], C[{nra}][{ncb}]")
 
     a = None
     b = None
     if rank == MASTER:
-        print(f"{rank}: Initializing matrices A and B.")
+        # print(f"{rank}: Initializing matrices A and B.")
         a = (np.array([i + j for j in range(nra) for i in range(nca)])
              .reshape(nra, nca))
         a = np.array_split(a, nproc)
@@ -144,10 +144,10 @@ def collective_version(nra, nca, ncb):
     c = comm.gather(c_loc, root=MASTER)
     if rank == MASTER:
         c = np.array([ss for s in c for ss in s])
-        print(f"{rank}: Here is the result matrix:")
-        print(c)
-
-    print(f"{rank}: Done.")
+    #     print(f"{rank}: Here is the result matrix:")
+    #     print(c)
+    #
+    # print(f"{rank}: Done.")
 
 
 def measure_version(version):
@@ -181,7 +181,7 @@ def measure_version(version):
         ncb = matrix["ncb"]
 
         times = []
-        for _ in range(10):
+        for _ in range(100):
             if version == "P2P":
                 start_time = time.time()
                 p2p_version(nra, nca, ncb)
