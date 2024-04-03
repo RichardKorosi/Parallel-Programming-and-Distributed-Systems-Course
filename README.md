@@ -117,6 +117,12 @@ if rank == MASTER:
     print(C)
 ```
 Následne sa pomocou `comm.gather(root=MASTER)` dáta pošlú a zozbierajú v pracovnom uzle `MASTER`, ktorý ich následne spracuje pre a vypíše do konzoly.
+### 1) Overenie funkčnosti
+![image](https://github.com/RichardKorosi/Korosi-111313-PPDS2024/assets/99643046/dfc42359-dd2a-47bd-88f1-d04a6fa9ece9)
+Obrázok nad textom ukazuje, že nové riešenia dostávajú rovnaký výsledok ako predošlé (pre prehľadnosť bolo `mat_parsg.py` vynechané a porovnávanie bolo vytvorené len voči pôvodnému riešeniu `mat_par.py`). Tento prípad bol pri vybraní pracovných uzlov, ktorých počet delil bezozvyšku počet riadkov matice `A`. Obrázok pod textom ukazuje prípad, kedy tento jav neplatí a aj tak sa nám v nových riešeniach podarilo dostať správny výsledok.
+![image](https://github.com/RichardKorosi/Korosi-111313-PPDS2024/assets/99643046/2288a71c-eaea-499b-aaae-013a1e495b09)
+
+
 
 ## Analýza výsledkov
 ## Zdroje
