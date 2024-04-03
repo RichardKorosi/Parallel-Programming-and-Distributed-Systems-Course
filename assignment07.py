@@ -246,7 +246,7 @@ def create_graph(p2p_results, collective_results):
     ax.set_xlabel("Matrix sizes [NRA][NCA][NCB]")
     ax.set_ylabel("Time [s]")
     ax.set_title(f"Average times of matrix multiplication"
-                 f" with {nproc} processes \n after 100 runs")
+                 f" with {nproc} processes \n after 50 runs")
     labels = [f"NRA:{nra}\nNCA:{nca}\nNCB:{ncb}"
               for nra, nca, ncb in zip(nras, ncas, ncbs)]
     ax.set_xticks(x + width / 2)
