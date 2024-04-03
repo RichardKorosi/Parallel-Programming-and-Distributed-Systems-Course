@@ -117,9 +117,9 @@ if rank == MASTER:
     print(c)
 ```
 Následne sa pomocou `comm.gather(root=MASTER)` dáta pošlú a zozbierajú v pracovnom uzle `MASTER`, ktorý ich následne spracuje pre a vypíše do konzoly.
-### 3) Overenie funkčnosti
+### 3) Výpisy z konzoly
 ![image](https://github.com/RichardKorosi/Korosi-111313-PPDS2024/assets/99643046/dfc42359-dd2a-47bd-88f1-d04a6fa9ece9)
-Obrázok nad textom ukazuje, že nové riešenia dostávajú rovnaký výsledok ako predošlé (pre prehľadnosť bolo `mat_parsg.py` vynechané a porovnávanie bolo vytvorené len voči pôvodnému riešeniu `mat_par.py`). Tento prípad bol pri vybraní pracovných uzlov, ktorých počet delil bezozvyšku počet riadkov matice `A`. Obrázok pod textom ukazuje prípad, kedy tento jav neplatí a aj tak sa nám v nových riešeniach podarilo dostať správny výsledok.
+Obrázok nad textom ukazuje, novo implementované riešenia a pôvodné riešenie (pre prehľadnosť bolo `mat_parsg.py` vynechané). Tento prípad bol pri vybraní pracovných uzlov, ktorých počet delil bezozvyšku počet riadkov matice `A`. Obrázok pod textom ukazuje prípad, kedy tento jav neplatí.
 ![image](https://github.com/RichardKorosi/Korosi-111313-PPDS2024/assets/99643046/2288a71c-eaea-499b-aaae-013a1e495b09)
 Poznámka: Vo finálnom riešení sú všetky pôvodné printy zakomentované. Dôvodom je lepšia čitatelnosť výstupu pre analýzu a porovnanie. V tejto časti boli printy využité na vizualizáciu priebehu programu rovnako ako v vzorovom riešení `mat_par.py` (viď. zdroje). 
 
@@ -145,24 +145,31 @@ if rank == MASTER:
 Keďže všetky pracovné uzly vykonajú funkciu `measure_version()`, v ktorej sa volajú naše implementované funkcie, tak si musíme určiť, že chceme využiť MASTERove získané dáta z experimentu.
 Príklad výpisu výsledkov experimentu:
 ```
-PS C:\Users\koros\SKOLA\PPDS\Zadania\Korosi-111313-PPDS2024> mpiexec -n 7 python .\assignment07.py
-{'nra': 128, 'nca': 30, 'ncb': 40, 'time': 0.031030654907226562, 'version': 'P2P', 'nproc': 7}      
-{'nra': 256, 'nca': 30, 'ncb': 40, 'time': 0.05512404441833496, 'version': 'P2P', 'nproc': 7}       
-{'nra': 512, 'nca': 50, 'ncb': 70, 'time': 0.32484912872314453, 'version': 'P2P', 'nproc': 7}       
-{'nra': 1024, 'nca': 50, 'ncb': 70, 'time': 0.6418969631195068, 'version': 'P2P', 'nproc': 7}       
-{'nra': 4086, 'nca': 20, 'ncb': 70, 'time': 0.981243371963501, 'version': 'P2P', 'nproc': 7}        
-{'nra': 2048, 'nca': 80, 'ncb': 90, 'time': 2.6427648067474365, 'version': 'P2P', 'nproc': 7}       
-{'nra': 4086, 'nca': 80, 'ncb': 80, 'time': 4.881694078445435, 'version': 'P2P', 'nproc': 7}        
+PS C:\Users\koros\SKOLA\PPDS\Zadania\Korosi-111313-PPDS2024> mpiexec -n 7  python .\assignment07.py
+{'nra': 256, 'nca': 20, 'ncb': 20, 'time': 0.024013333320617676, 'version': 'P2P', 'nproc': 7}
+{'nra': 256, 'nca': 40, 'ncb': 10, 'time': 0.02342719554901123, 'version': 'P2P', 'nproc': 7}
+{'nra': 512, 'nca': 50, 'ncb': 20, 'time': 0.10638868808746338, 'version': 'P2P', 'nproc': 7}
+{'nra': 512, 'nca': 40, 'ncb': 30, 'time': 0.12710588932037353, 'version': 'P2P', 'nproc': 7}
+{'nra': 512, 'nca': 20, 'ncb': 50, 'time': 0.1071474552154541, 'version': 'P2P', 'nproc': 7}
 
 
-{'nra': 128, 'nca': 30, 'ncb': 40, 'time': 0.02863597869873047, 'version': 'COLLECTIVE', 'nproc': 7}
-{'nra': 256, 'nca': 30, 'ncb': 40, 'time': 0.06014394760131836, 'version': 'COLLECTIVE', 'nproc': 7}
-{'nra': 512, 'nca': 50, 'ncb': 70, 'time': 0.2995631694793701, 'version': 'COLLECTIVE', 'nproc': 7} 
-{'nra': 1024, 'nca': 50, 'ncb': 70, 'time': 0.6102156639099121, 'version': 'COLLECTIVE', 'nproc': 7}
-{'nra': 4086, 'nca': 20, 'ncb': 70, 'time': 1.0003795623779297, 'version': 'COLLECTIVE', 'nproc': 7}
-{'nra': 2048, 'nca': 80, 'ncb': 90, 'time': 2.4952588081359863, 'version': 'COLLECTIVE', 'nproc': 7}
-{'nra': 4086, 'nca': 80, 'ncb': 80, 'time': 4.370857238769531, 'version': 'COLLECTIVE', 'nproc': 7} 
+{'nra': 256, 'nca': 20, 'ncb': 20, 'time': 0.02033309459686279, 'version': 'COLLECTIVE', 'nproc': 7}
+{'nra': 256, 'nca': 40, 'ncb': 10, 'time': 0.02083247184753418, 'version': 'COLLECTIVE', 'nproc': 7}
+{'nra': 512, 'nca': 50, 'ncb': 20, 'time': 0.09581642627716064, 'version': 'COLLECTIVE', 'nproc': 7}
+{'nra': 512, 'nca': 40, 'ncb': 30, 'time': 0.11310394287109375, 'version': 'COLLECTIVE', 'nproc': 7}
+{'nra': 512, 'nca': 20, 'ncb': 50, 'time': 0.10066853046417236, 'version': 'COLLECTIVE', 'nproc': 7}
 ```
+Na základe nižšie zobrazených obrázkov si môžeme všimnúť, že verzia s kolektívnou komunikáciou je Častejšie časovo efektívnejšia ako verzia s P2P. Taktiež si môžeme všimnúť fakt, že viac pracovných uzlov neznamená automaticky lepší čas. Najlepšie výlsedky boli dosiahnuté pri nastavení `nporc = 7`. Následne pri ďalšom zvyšovaní pracovných uzlov sa priemerný čas výpočtov zvyšoval.\
+Pri zvolení `nproc = 2` si môžeme všimnúť, že obe verzie boli približne rovnako časovo efektívne. Následne pri zvyšovaní počtu `nproc` na väčších maticiach vidno, že tam je verzia s kolektívnou komunikáciou rýchlejšia, zatiaľ čo pri menších maticiach sa javí byť pomalšia.
+![image](https://github.com/RichardKorosi/Korosi-111313-PPDS2024/assets/99643046/c40187ce-d208-464f-af94-2f8ab854e5e7)
+![image](https://github.com/RichardKorosi/Korosi-111313-PPDS2024/assets/99643046/90026373-a942-4a17-bba3-08299e533775)
+![image](https://github.com/RichardKorosi/Korosi-111313-PPDS2024/assets/99643046/fb401a1b-fdc5-4c6a-a7c2-dcb83188d543)
+![image](https://github.com/RichardKorosi/Korosi-111313-PPDS2024/assets/99643046/cd86a1bb-cb7d-42f1-b479-0e150689a8fa)
+![image](https://github.com/RichardKorosi/Korosi-111313-PPDS2024/assets/99643046/54836178-968a-48ca-bd29-74a2d429c3a0)
+
+
+
+
 
 ## Zdroje
 Inšpirácie, využité časti kódu a podobne:
