@@ -168,11 +168,13 @@ def measure_version(version):
     Keyword arguments:
     version -- the version of the matrix multiplication algorithm to be used
     """
-    matrix = [{"nra": 128, "nca": 60, "ncb": 28},
-              {"nra": 256, "nca": 120, "ncb": 56},
-              {"nra": 512, "nca": 240, "ncb": 112},
-              {"nra": 240, "nca": 120, "ncb": 112},
-              {"nra": 512, "nca": 112, "ncb": 240},
+    matrix = [{"nra": 128, "nca": 30, "ncb": 40},
+              {"nra": 256, "nca": 30, "ncb": 40},
+              {"nra": 512, "nca": 50, "ncb": 70},
+              {"nra": 1024, "nca": 50, "ncb": 70},
+              {"nra": 4086, "nca": 20, "ncb": 70},
+              {"nra": 2048, "nca": 80, "ncb": 90},
+              {"nra": 4086, "nca": 80, "ncb": 80}
               ]
     results = []
     for matrix in matrix:
