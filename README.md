@@ -159,7 +159,7 @@ PS C:\Users\koros\SKOLA\PPDS\Zadania\Korosi-111313-PPDS2024> mpiexec -n 7  pytho
 {'nra': 512, 'nca': 40, 'ncb': 30, 'time': 0.11310394287109375, 'version': 'COLLECTIVE', 'nproc': 7}
 {'nra': 512, 'nca': 20, 'ncb': 50, 'time': 0.10066853046417236, 'version': 'COLLECTIVE', 'nproc': 7}
 ```
-Na základe nižšie zobrazených obrázkov si môžeme všimnúť, že verzia s kolektívnou komunikáciou je Častejšie časovo efektívnejšia ako verzia s P2P. Taktiež si môžeme všimnúť fakt, že viac pracovných uzlov neznamená automaticky lepší čas. Najlepšie výlsedky boli dosiahnuté pri nastavení `nporc = 7`. Následne pri ďalšom zvyšovaní pracovných uzlov sa priemerný čas výpočtov zvyšoval.\
+Na základe nižšie zobrazených obrázkov si môžeme všimnúť, že verzia s kolektívnou komunikáciou je častejšie časovo efektívnejšia ako verzia s P2P. Taktiež si môžeme všimnúť fakt, že viac pracovných uzlov neznamená automaticky lepší čas. Najlepšie výlsedky boli dosiahnuté pri nastavení `nporc = 7`. Následne pri ďalšom zvyšovaní pracovných uzlov sa priemerný čas výpočtov zvyšoval.\
 Pri zvolení `nproc = 2` si môžeme všimnúť, že obe verzie boli približne rovnako časovo efektívne. Následne pri zvyšovaní počtu `nproc` na väčších maticiach vidno, že tam je verzia s kolektívnou komunikáciou rýchlejšia, zatiaľ čo pri menších maticiach sa javí byť pomalšia.
 ![image](https://github.com/RichardKorosi/Korosi-111313-PPDS2024/assets/99643046/c40187ce-d208-464f-af94-2f8ab854e5e7)
 ![image](https://github.com/RichardKorosi/Korosi-111313-PPDS2024/assets/99643046/90026373-a942-4a17-bba3-08299e533775)
