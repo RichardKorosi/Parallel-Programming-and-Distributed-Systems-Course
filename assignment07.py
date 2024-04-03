@@ -183,7 +183,7 @@ def measure_version(version):
         ncb = matrix["ncb"]
 
         times = []
-        for _ in range(100):
+        for _ in range(50):
             if version == "P2P":
                 start_time = time.time()
                 p2p_version(nra, nca, ncb)
