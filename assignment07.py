@@ -27,7 +27,8 @@ def p2p_version(nra, nca, ncb):
     nca -- number of columns of matrix A
     ncb -- number of columns of matrix B"""
 
-    print(f"{rank}: Starting parallel matrix multiplication example...")
+    print(f"{rank}: Starting parallel matrix multiplication "
+          f"example using P2P communication...")
     print(f"{rank}: Using matrix sizes A[{nra}][{nca}], "
           f"B[{nca}][{ncb}], C[{nra}][{ncb}]")
 
@@ -102,7 +103,8 @@ def collective_version(nra, nca, ncb):
     nca -- number of columns of matrix A
     ncb -- number of columns of matrix B"""
 
-    print(f"{rank}: Starting parallel matrix multiplication example...")
+    print(f"{rank}: Starting parallel matrix multiplication example "
+          f"using collective communication...")
     print(f"{rank}: Using matrix sizes A[{nra}][{nca}], "
           f"B[{nca}][{ncb}], C[{nra}][{ncb}]")
 
