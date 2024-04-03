@@ -31,26 +31,26 @@ offset = 0
 
 if rank == MASTER:
     print(f"{rank}: Initializing matrices A and B.")
-    A = (np.array([i + j for j in range(nra) for i in range(nca)])
+    a = (np.array([i + j for j in range(nra) for i in range(nca)])
          .reshape(nra, nca))
-    B = (np.array([i * j for j in range(nca) for i in range(ncb)])
+    b = (np.array([i * j for j in range(nca) for i in range(ncb)])
          .reshape(nca, ncb))
     rows = avg_rows + 1 if extras else avg_rows
 
     for proc in range(nproc):
         rows_for_process = avg_rows + 1 if proc < extras else avg_rows
         if proc == MASTER:
-            A_loc = A[offset:(offset + rows_for_process)]
+            a_loc = a[offset:(offset + rows_for_process)]
             offset += rows_for_process
             continue
-        comm.send(A[offset:(offset + rows_for_process)], dest=proc)
+        comm.send(a[offset:(offset + rows_for_process)], dest=proc)
         offset += rows_for_process
 else:
-    A_loc = comm.recv()
-    rows = A_loc.shape[0]
-    B = None
+    a_loc = comm.recv()
+    rows = a_loc.shape[0]
+    b = None
 
-B = comm.bcast(B, root=MASTER)
+b = comm.bcast(b, root=MASTER)
 ```
 Na rozdiel od pôvodneho riešenia nové riešenie využíva okrem `rows` aj `avg_rows`, `extras` a `offset`. Premenná `avg_rows` predstavuje priemerný počet riadkov pre pracovný uzol, `extras` predstavuje počet riadkov, ktoré by sa pri rovnomernom rozdelení medzi pracovné uzly nikam nedostali, `offset` sa využíva pre správne indexovanie v matici A.
 Princíp fungovania implementácie distribúcie podmatíc je v novom riešení nasledovný:
@@ -62,20 +62,20 @@ Princíp fungovania implementácie distribúcie podmatíc je v novom riešení n
 
 ```python
 if rank == MASTER:
-    C = np.zeros((nra, ncb), dtype=int)
+    c = np.zeros((nra, ncb), dtype=int)
     offset = 0
     for proc in range(nproc):
         rows_for_process = avg_rows + 1 if proc < extras else avg_rows
         if proc == MASTER:
-            C[offset:(offset + rows_for_process)] = C_loc
+            c[offset:(offset + rows_for_process)] = c_loc
             offset += rows_for_process
             continue
-        C[offset:(offset + rows_for_process)] = comm.recv(source=proc)
+        c[offset:(offset + rows_for_process)] = comm.recv(source=proc)
         offset += rows_for_process
     print(f"{rank}: Here is the result matrix:")
-    print(C)
+    print(c)
 else:
-    comm.send(C_loc, dest=MASTER)
+    comm.send(c_loc, dest=MASTER)
 ```
 Druhý útržok z kódu, ktorý bol upravený funguje následovne:
 1) MASTER si vytvorí celú, nulami naplnenú maticu `C`, ktorá reprezentuje výsledok výpočtu.
@@ -86,19 +86,19 @@ Druhý útržok z kódu, ktorý bol upravený funguje následovne:
 Implementácia verzie kolektívnej komunikácie spočívala v upravení poskytnutého súboru `mat_parsg.py` (viď. zdroje). A úlohou bolo umožniť výber ľubovoľného počtu pracovných uzlov, nie len počtu, ktorý by delil počet riadkov matice A bezo zvyšku. Riešenie bolo inšpirované poskytnutým riešením v jazyku C (viď. zdroje). Nasledujúce časti kódu predstavujú už upravenú verziu.
 
 ```python
-A = None
-B = None
+a = None
+b = None
 if rank == MASTER:
     print(f"{rank}: Initializing matrices A and B.")
-    A = (np.array([i + j for j in range(nra) for i in range(nca)])
+    a = (np.array([i + j for j in range(nra) for i in range(nca)])
          .reshape(nra, nca))
-    A = np.array_split(A, nproc)
-    B = (np.array([i * j for j in range(nca) for i in range(ncb)])
+    a = np.array_split(a, nproc)
+    b = (np.array([i * j for j in range(nca) for i in range(ncb)])
          .reshape(nca, ncb))
 
-A_loc = comm.scatter(A, root=MASTER)
-B = comm.bcast(B, root=MASTER)
-rows = A_loc.shape[0]
+a_loc = comm.scatter(a, root=MASTER)
+b = comm.bcast(b, root=MASTER)
+rows = a_loc.shape[0]
 ```
 Táto verzia riešenia nebola inšpirovaná verziou poskytnutou v jazyku C nakoľko tá obsahovala akurát P2P riešenie. Namiesto toho využíva numpy funkciu `array_split()`, ktorá dokáže rovnomerne rozdeliť maticu `A` s tým, že riadky navyše rozdelí rovnakým spôsobom ako v našom predošlom riešení.
 Príklad fungovania `array_split` (príklad bol prevzatý a upravený z dokumentácie numpy, viď. zdroje):
@@ -110,17 +110,18 @@ Príklad fungovania `array_split` (príklad bol prevzatý a upravený z dokument
 ```
 Po rovnomernom rozdelení matice `A` sa pomocou `comm.scatter()` rozošle každému pracovnému uzlu časť matice `A` a následne pomocou `comm.bcast()` celá matica `B`. Uzol teda môže vykonať násobenie matíc na jeho podprobléme. Každý uzol si však najprv musí overiť, koľko riadková matica `A_loc` mu prišla. To vykoná pomocou príkazu `A_loc.shape[0]`.
 ```python
-C = comm.gather(C_loc, root=MASTER)
+c = comm.gather(c_loc, root=MASTER)
 if rank == MASTER:
-    C = np.array([ss for s in C for ss in s])
+    c = np.array([ss for s in c for ss in s])
     print(f"{rank}: Here is the result matrix:")
-    print(C)
+    print(c)
 ```
 Následne sa pomocou `comm.gather(root=MASTER)` dáta pošlú a zozbierajú v pracovnom uzle `MASTER`, ktorý ich následne spracuje pre a vypíše do konzoly.
-### 1) Overenie funkčnosti
+### 3) Overenie funkčnosti
 ![image](https://github.com/RichardKorosi/Korosi-111313-PPDS2024/assets/99643046/dfc42359-dd2a-47bd-88f1-d04a6fa9ece9)
 Obrázok nad textom ukazuje, že nové riešenia dostávajú rovnaký výsledok ako predošlé (pre prehľadnosť bolo `mat_parsg.py` vynechané a porovnávanie bolo vytvorené len voči pôvodnému riešeniu `mat_par.py`). Tento prípad bol pri vybraní pracovných uzlov, ktorých počet delil bezozvyšku počet riadkov matice `A`. Obrázok pod textom ukazuje prípad, kedy tento jav neplatí a aj tak sa nám v nových riešeniach podarilo dostať správny výsledok.
 ![image](https://github.com/RichardKorosi/Korosi-111313-PPDS2024/assets/99643046/2288a71c-eaea-499b-aaae-013a1e495b09)
+Poznámka: Vo finálnom riešení sú všetky pôvodné printy zakomentované. Dôvodom je lepšia čitatelnosť výstupu pre analýzu a porovnanie. V tejto časti boli printy využité na vizualizáciu priebehu programu rovnako ako v vzorovom riešení `mat_par.py` (viď. zdroje). 
 
 
 
