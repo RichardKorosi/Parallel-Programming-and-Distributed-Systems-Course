@@ -55,7 +55,7 @@ b = comm.bcast(b, root=MASTER)
 Na rozdiel od pôvodneho riešenia nové riešenie využíva okrem `rows` aj `avg_rows`, `extras` a `offset`. Premenná `avg_rows` predstavuje priemerný počet riadkov pre pracovný uzol, `extras` predstavuje počet riadkov, ktoré by sa pri rovnomernom rozdelení medzi pracovné uzly nikam nedostali, `offset` sa využíva pre správne indexovanie v matici A.
 Princíp fungovania implementácie distribúcie podmatíc je v novom riešení nasledovný:
 1) MASTER vytvorí matice A a B a následne si určí hodnotu `rows` podľa toho či existujú riadky navyše (`extras`).
-2) V loope prejde každý pracovný uzol VRÁTANE samého seba a zistí koľko riadkov má daný uzol spracovať (ak by sme mali `n` extra riadkov, tak si prvých `n` uzlov zoberie o jeden riadok navyše). U samého seba si akurát sám určí `A_loc` a posunie `offset`, tak aby pri nasledujúcom kroku sa pre ďalší pracovný uzol brali riadky od riadky matice A, ktoré MASTER u seba v `A_loc` nepokryl.
+2) V loope prejde každý pracovný uzol VRÁTANE samého seba a zistí koľko riadkov má daný uzol spracovať (ak by sme mali `n` extra riadkov, tak si prvých `n` uzlov zoberie o jeden riadok navyše). U samého seba si akurát sám určí `A_loc` a posunie `offset`, tak aby pri nasledujúcom kroku sa pre ďalší pracovný uzol brali riadky od riadku matice `A`, ktoré MASTER u seba v `A_loc` nepokryl.
 3) Rovnakou logikou ako v bode 2) následne MASTER vytvára a posiela `A_loc` ostatným pracovným uzlom.
 4) Pracovné uzly, ktoré NIE SÚ MASTER sa dostanú do vetvy `else`, kde čakajú na dáta od MASTERa.
 5) Následne sa pomocou `comm.bcast()` pošle každému pracovnému uzlu matica `B`.
@@ -83,7 +83,7 @@ Druhý útržok z kódu, ktorý bol upravený funguje následovne:
 3) Ak `proc` v loope nereprezentuje MASTERa, tak MASTER dáta získa pomocou `comm.recv(source=proc)`, tieto dáta mu posielajú všetky ostatné uzly v `else` vetve. Keďže MASTER ide v loope proces za procesom, tak sa C postupne naplní ("zhora nadol").
 
 ### 2) Verzia kolektívnej komunikácie
-Implementácia verzie kolektívnej komunikácie spočívala v upravení poskytnutého súboru `mat_parsg.py` (viď. zdroje). A úlohou bolo umožniť výber ľubovoľného počtu pracovných uzlov, nie len počtu, ktorý by delil počet riadkov matice A bezo zvyšku. Riešenie bolo inšpirované poskytnutým riešením v jazyku C (viď. zdroje). Nasledujúce časti kódu predstavujú už upravenú verziu.
+Implementácia verzie kolektívnej komunikácie spočívala v upravení poskytnutého súboru `mat_parsg.py` (viď. zdroje). A úlohou bolo umožniť výber ľubovoľného počtu pracovných uzlov, nie len počtu, ktorý by delil počet riadkov matice `A` bezo zvyšku. Nasledujúce časti kódu predstavujú už upravenú verziu.
 
 ```python
 a = None
