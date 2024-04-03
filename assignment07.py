@@ -170,11 +170,13 @@ def measure_version(version):
     More specifically, this function measures the average time
     of matrix multiplication using the specified version of
     communication out of 100 runs. Measured matrix sizes are
-    {"nra": 128, "nca": 60, "ncb": 28},
-    {"nra": 256, "nca": 120, "ncb": 56},
-    {"nra": 512, "nca": 240, "ncb": 112},
-    {"nra": 240, "nca": 120, "ncb": 112},
-    {"nra": 512, "nca": 112, "ncb": 240}.
+    {"nra": 128, "nca": 30, "ncb": 40},
+    {"nra": 256, "nca": 30, "ncb": 40},
+    {"nra": 512, "nca": 50, "ncb": 70},
+    {"nra": 1024, "nca": 50, "ncb": 70},
+    {"nra": 4086, "nca": 20, "ncb": 70},
+    {"nra": 2048, "nca": 80, "ncb": 90},
+    {"nra": 4086, "nca": 50, "ncb": 50}.
     Function returns a list of dictionaries containing
     the matrix sizes, average time of matrix multiplication,
     version of communication and number of processes used.
@@ -188,7 +190,7 @@ def measure_version(version):
               {"nra": 1024, "nca": 50, "ncb": 70},
               {"nra": 4086, "nca": 20, "ncb": 70},
               {"nra": 2048, "nca": 80, "ncb": 90},
-              {"nra": 4086, "nca": 80, "ncb": 80}
+              {"nra": 4086, "nca": 50, "ncb": 50}
               ]
     results = []
     for matrix in matrix:
