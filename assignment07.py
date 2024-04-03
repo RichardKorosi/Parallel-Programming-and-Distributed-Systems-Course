@@ -1,4 +1,18 @@
-"""This file is implementation of the 4th (week 7) assignment of the PPDS."""
+"""This file is implementation of the 4th (week 7) assignment of the PPDS.
+
+Functions p2p_version, collective_version and compute_matrix_multiplication
+were inspired and modified from the following sources:
+    - https://elearn.elf.stuba.sk/moodle/mod/folder/view.php?id=27376
+        - cv.mat_parsg.py
+        - cv.mat_par.py
+    - https://kurzy.kpi.fei.tuke.sk/pp/labs/pp_mm.c
+Function collective_version was also inspired by the following source:
+    -https://numpy.org/doc/stable/reference/generated/numpy.array_split.html
+Function create_graph was inspired by the following source:
+    -https://matplotlib.org/stable/gallery/lines_bars_and_markers/barchart.html
+
+More info about the assignment can be found in the README.md document.
+"""
 
 import numpy as np
 from mpi4py import MPI
