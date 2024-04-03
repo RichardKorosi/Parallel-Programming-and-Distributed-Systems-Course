@@ -125,7 +125,45 @@ Poznámka: Vo finálnom riešení sú všetky pôvodné printy zakomentované. D
 
 
 
-## Analýza výsledkov
+## Porovnanie oboch verzií
+Táto sekcia sa zoberá porovnaním oboch implementovaných verzií. Na tento účel sa využívajú dve funkcie `measure_version()` a `create_graph()`. V jednoduchosti: vo funkcii `measure_version()` sa 50krát pre každú maticu, ktorá je definovaná priamo vo funkcii, zavolá fukcia podľa zvoleného vstupného parametru. Vždy sa pritom meria čas odkedy bola funkcia zavolaná až pokiaľ neskončí. Následne sa hodnoty spriemerujú. Funkcia následne vráti List slovníkov, ktoré obsahujú podrobnejšie dáta o experimente. 
+Funckia `create_graph()` má následne za úlohu vykrelisť graf na základe informácií o experimente, ktoré vznikajú vo funkcii `measure_version()`. Funkcia `create_graph()` bola vytvorená na základe dokumentácie knižnice matplotlib (viď. zdroje).
+```python
+results2 = measure_version("COLLECTIVE")
+results = measure_version("P2P")
+
+if rank == MASTER:
+    for result in results:
+        print(result, end="\n")
+    print("\n")
+    for result in results2:
+        print(result, end="\n")
+
+if rank == MASTER:
+    create_graph(results, results2)
+```
+Keďže všetky pracovné uzly vykonajú funkciu `measure_version()`, v ktorej sa volajú naše implementované funkcie, tak si musíme určiť, že chceme využiť MASTERove získané dáta z experimentu.
+Príklad výpisu výsledkov experimentu:
+```
+PS C:\Users\koros\SKOLA\PPDS\Zadania\Korosi-111313-PPDS2024> mpiexec -n 7 python .\assignment07.py
+{'nra': 128, 'nca': 30, 'ncb': 40, 'time': 0.031030654907226562, 'version': 'P2P', 'nproc': 7}      
+{'nra': 256, 'nca': 30, 'ncb': 40, 'time': 0.05512404441833496, 'version': 'P2P', 'nproc': 7}       
+{'nra': 512, 'nca': 50, 'ncb': 70, 'time': 0.32484912872314453, 'version': 'P2P', 'nproc': 7}       
+{'nra': 1024, 'nca': 50, 'ncb': 70, 'time': 0.6418969631195068, 'version': 'P2P', 'nproc': 7}       
+{'nra': 4086, 'nca': 20, 'ncb': 70, 'time': 0.981243371963501, 'version': 'P2P', 'nproc': 7}        
+{'nra': 2048, 'nca': 80, 'ncb': 90, 'time': 2.6427648067474365, 'version': 'P2P', 'nproc': 7}       
+{'nra': 4086, 'nca': 80, 'ncb': 80, 'time': 4.881694078445435, 'version': 'P2P', 'nproc': 7}        
+
+
+{'nra': 128, 'nca': 30, 'ncb': 40, 'time': 0.02863597869873047, 'version': 'COLLECTIVE', 'nproc': 7}
+{'nra': 256, 'nca': 30, 'ncb': 40, 'time': 0.06014394760131836, 'version': 'COLLECTIVE', 'nproc': 7}
+{'nra': 512, 'nca': 50, 'ncb': 70, 'time': 0.2995631694793701, 'version': 'COLLECTIVE', 'nproc': 7} 
+{'nra': 1024, 'nca': 50, 'ncb': 70, 'time': 0.6102156639099121, 'version': 'COLLECTIVE', 'nproc': 7}
+{'nra': 4086, 'nca': 20, 'ncb': 70, 'time': 1.0003795623779297, 'version': 'COLLECTIVE', 'nproc': 7}
+{'nra': 2048, 'nca': 80, 'ncb': 90, 'time': 2.4952588081359863, 'version': 'COLLECTIVE', 'nproc': 7}
+{'nra': 4086, 'nca': 80, 'ncb': 80, 'time': 4.370857238769531, 'version': 'COLLECTIVE', 'nproc': 7} 
+```
+
 ## Zdroje
 Inšpirácie, využité časti kódu a podobne:
 * [README template](https://github.com/matiassingers/awesome-readme)
