@@ -57,12 +57,11 @@ def main():
 
 
         buckets_gpu = []
-        no_proc = threadsperblock
-        no_splitters = no_proc - 1
+        no_splitters = threadsperblock - 1
         splitters = np.random.choice(array, no_splitters, replace=False)
         splitters = np.sort(splitters)
         buckets = create_buckets(array, splitters)
-        streams = [cuda.stream() for _ in range(no_proc)]
+        streams = [cuda.stream() for _ in range(len(buckets))]
 
         for bucket, stream in zip(buckets, streams):
             buckets_gpu.append(cuda.to_device(bucket, stream=stream))
@@ -81,11 +80,10 @@ def main():
 
     for array in [array1, array2, array3, array4]:
         time_start = time.time()
-        # sort the array not using cuda, just normal merge sort
+
         print("START:", array)
         result = np.empty(0, dtype=np.float32)
 
-        # merge sort the array not parallel not cuda
         for i in range(array.shape[0]):
             for j in range(i + 1, array.shape[0]):
                 if array[i] > array[j]:
@@ -96,6 +94,7 @@ def main():
     
     print("Times of parallel:", times_of_parallel)
     print("Times of normal:", times_of_normal)
+    print("Speedup:", [normal / parallel for normal, parallel in zip(times_of_normal, times_of_parallel)])
 
 
 if __name__ == '__main__':
