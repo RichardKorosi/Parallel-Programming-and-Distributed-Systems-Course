@@ -16,7 +16,6 @@ More info about the assignment can be found in the README.md document.
 
 import numpy as np
 from mpi4py import MPI
-import time
 import matplotlib.pyplot as plt
 
 __author__ = "Richard Körösi"
@@ -197,13 +196,13 @@ def measure_version(version):
         times = []
         for _ in range(50):
             if version == "P2P":
-                start_time = time.time()
+                start_time = MPI.Wtime()
                 p2p_version(nra, nca, ncb)
-                end_time = time.time()
+                end_time = MPI.Wtime()
             elif version == "COLLECTIVE":
-                start_time = time.time()
+                start_time = MPI.Wtime()
                 collective_version(nra, nca, ncb)
-                end_time = time.time()
+                end_time = MPI.Wtime()
             else:
                 raise ValueError("Invalid version")
             times.append(end_time - start_time)
