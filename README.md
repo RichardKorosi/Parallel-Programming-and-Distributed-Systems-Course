@@ -35,13 +35,13 @@ if rank == MASTER:
          .reshape(nra, nca))
     b = (np.array([i * j for j in range(nca) for i in range(ncb)])
          .reshape(nca, ncb))
-    rows = avg_rows + 1 if extras else avg_rows
 
     for proc in range(nproc):
         rows_for_process = avg_rows + 1 if proc < extras else avg_rows
         if proc == MASTER:
             a_loc = a[offset:(offset + rows_for_process)]
             offset += rows_for_process
+            rows = a_loc.shape[0]
             continue
         comm.send(a[offset:(offset + rows_for_process)], dest=proc)
         offset += rows_for_process
@@ -54,9 +54,9 @@ b = comm.bcast(b, root=MASTER)
 ```
 Na rozdiel od pôvodneho riešenia nové riešenie využíva okrem `rows` aj `avg_rows`, `extras` a `offset`. Premenná `avg_rows` predstavuje priemerný počet riadkov pre pracovný uzol, `extras` predstavuje počet riadkov, ktoré by sa pri rovnomernom rozdelení medzi pracovné uzly nikam nedostali, `offset` sa využíva pre správne indexovanie v matici A.
 Princíp fungovania implementácie distribúcie podmatíc je v novom riešení nasledovný:
-1) MASTER vytvorí matice A a B a následne si určí hodnotu `rows` podľa toho či existujú riadky navyše (`extras`).
-2) V loope prejde každý pracovný uzol VRÁTANE samého seba a zistí koľko riadkov má daný uzol spracovať (ak by sme mali `n` extra riadkov, tak si prvých `n` uzlov zoberie o jeden riadok navyše). U samého seba si akurát sám určí `A_loc` a posunie `offset`, tak aby pri nasledujúcom kroku sa pre ďalší pracovný uzol brali riadky od riadku matice `A`, ktoré MASTER u seba v `A_loc` nepokryl.
-3) Rovnakou logikou ako v bode 2) následne MASTER vytvára a posiela `A_loc` ostatným pracovným uzlom.
+1) MASTER vytvorí matice A a B
+2) V loope prejde každý pracovný uzol VRÁTANE samého seba a zistí koľko riadkov má daný uzol spracovať (ak by sme mali `n` extra riadkov, tak si prvých `n` uzlov zoberie o jeden riadok navyše). U samého seba si určí `a_loc` a posunie `offset` o toľko riadkov, koľko spracuje. Je to z dôvodu aby pri nasledujúcom kroku sa pre ďalší pracovný uzol brali riadky od riadku matice `A`, ktoré u seba pracovné uzly v ich `a_loc` ešte nepokryli. Následne si priradí hodnotu `rows` na základe veľkosti (počtu riadkov) matice `a_loc`, inak povedané uloží si hodnotu, koľko riadková je jeho matica `a_loc`, ktorú bude násobiť s maticou `b`. Hodnota premennej `rows` sa neskôr v kóde využíva ako vstupná premenná pre funkciu samotného výpočtu násobenia matíc.
+3) Rovnakou logikou ako v bode 2) následne MASTER vytvára a posiela `a_loc` ostatným pracovným uzlom.
 4) Pracovné uzly, ktoré NIE SÚ MASTER sa dostanú do vetvy `else`, kde čakajú na dáta od MASTERa.
 5) Následne sa pomocou `comm.bcast()` pošle každému pracovnému uzlu matica `B`.
 
@@ -79,8 +79,8 @@ else:
 ```
 Druhý útržok z kódu, ktorý bol upravený funguje následovne:
 1) MASTER si vytvorí celú, nulami naplnenú maticu `C`, ktorá reprezentuje výsledok výpočtu.
-2) Následne vstúpi do loopu, kde si na začiatku podobne ako v predchádzajúcom prípade vypočíta pre daný proces počet spracovávaných riadkov. Následne ak "kontroluje sámeho seba", tak vloží na začiatok matice C svoj výsledok `C_loc` (keďže MASTER má u nás ID=0, tak sa kontroluje ako prvý, offset na nule zaručí, že vloží svoje dáta na začiatok a premenná `rows_for_process` zaručí, že sa tam vložia všetky vypočítané riadky pracovného uzlu). Následne už len pripočíta offset.
-3) Ak `proc` v loope nereprezentuje MASTERa, tak MASTER dáta získa pomocou `comm.recv(source=proc)`, tieto dáta mu posielajú všetky ostatné uzly v `else` vetve. Keďže MASTER ide v loope proces za procesom, tak sa C postupne naplní ("zhora nadol").
+2) Následne vstúpi do loopu, kde si na začiatku, podobne ako v predchádzajúcom prípade vypočíta pre daný proces počet spracovávaných riadkov. Následne ak "kontroluje sámeho seba", tak vloží do matice `C` na správne miesto (vypočítané je na základe offsetu) svoj výsledok `c_loc`. Následne už len pripočíta offset.
+3) Ak `proc` v loope nereprezentuje MASTERa, tak MASTER dáta získa pomocou `comm.recv(source=proc)`, tieto dáta mu posielajú všetky ostatné uzly v `else` vetve. Keďže MASTER ide v loope proces za procesom (od nuly hore), tak sa C postupne naplní ("zhora nadol").
 
 ### 2) Verzia kolektívnej komunikácie
 Implementácia verzie kolektívnej komunikácie spočívala v upravení poskytnutého súboru `mat_parsg.py` (viď. zdroje). A úlohou bolo umožniť výber ľubovoľného počtu pracovných uzlov, nie len počtu, ktorý by delil počet riadkov matice `A` bezo zvyšku. Nasledujúce časti kódu predstavujú už upravenú verziu.
@@ -108,7 +108,7 @@ Príklad fungovania `array_split` (príklad bol prevzatý a upravený z dokument
 
 [array([0, 1, 2]), array([3, 4, 5]), array([6, 7]), array([8, 9])]
 ```
-Po rovnomernom rozdelení matice `A` sa pomocou `comm.scatter()` rozošle každému pracovnému uzlu časť matice `A` a následne pomocou `comm.bcast()` celá matica `B`. Uzol teda môže vykonať násobenie matíc na jeho podprobléme. Každý uzol si však najprv musí overiť, koľko riadková matica `A_loc` mu prišla. To vykoná pomocou príkazu `A_loc.shape[0]`.
+Po rovnomernom rozdelení matice `A` sa pomocou `comm.scatter()` rozošle každému pracovnému uzlu časť matice `A` a následne pomocou `comm.bcast()` celá matica `B`. Uzol teda môže vykonať násobenie matíc na jeho podprobléme. Každý uzol si však najprv musí overiť, koľko riadková matica `a_loc` mu prišla. To vykoná pomocou príkazu `a_loc.shape[0]`.
 ```python
 c = comm.gather(c_loc, root=MASTER)
 if rank == MASTER:
