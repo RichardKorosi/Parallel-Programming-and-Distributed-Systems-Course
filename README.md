@@ -138,37 +138,36 @@ if rank == MASTER:
     print("\n")
     for result in results2:
         print(result, end="\n")
-
-if rank == MASTER:
     create_graph(results, results2)
 ```
 Keďže všetky pracovné uzly vykonajú funkciu `measure_version()`, v ktorej sa volajú naše implementované funkcie, tak si musíme určiť, že chceme využiť MASTERove získané dáta z experimentu.
 Príklad výpisu výsledkov experimentu:
 ```
-PS C:\Users\koros\SKOLA\PPDS\Zadania\Korosi-111313-PPDS2024> mpiexec -n 7  python .\assignment07.py
-{'nra': 256, 'nca': 20, 'ncb': 20, 'time': 0.024013333320617676, 'version': 'P2P', 'nproc': 7}
-{'nra': 256, 'nca': 40, 'ncb': 10, 'time': 0.02342719554901123, 'version': 'P2P', 'nproc': 7}
-{'nra': 512, 'nca': 50, 'ncb': 20, 'time': 0.10638868808746338, 'version': 'P2P', 'nproc': 7}
-{'nra': 512, 'nca': 40, 'ncb': 30, 'time': 0.12710588932037353, 'version': 'P2P', 'nproc': 7}
-{'nra': 512, 'nca': 20, 'ncb': 50, 'time': 0.1071474552154541, 'version': 'P2P', 'nproc': 7}
+PS C:\Users\koros\SKOLA\PPDS\Korosi-111313-PPDS2024> mpiexec -n 7  python .\assignment07.py
+{'nra': 256, 'nca': 20, 'ncb': 20, 'time': 0.00730109500058461, 'version': 'P2P', 'nproc': 7}
+{'nra': 256, 'nca': 40, 'ncb': 10, 'time': 0.007928545999457129, 'version': 'P2P', 'nproc': 7}
+{'nra': 512, 'nca': 50, 'ncb': 20, 'time': 0.03693317600002047, 'version': 'P2P', 'nproc': 7}
+{'nra': 512, 'nca': 40, 'ncb': 30, 'time': 0.044334193999529814, 'version': 'P2P', 'nproc': 7}
+{'nra': 512, 'nca': 20, 'ncb': 50, 'time': 0.03698581200267654, 'version': 'P2P', 'nproc': 7}
+{'nra': 1024, 'nca': 20, 'ncb': 50, 'time': 0.07302651700214483, 'version': 'P2P', 'nproc': 7}
+{'nra': 2048, 'nca': 20, 'ncb': 50, 'time': 0.14567360300396104, 'version': 'P2P', 'nproc': 7}
 
 
-{'nra': 256, 'nca': 20, 'ncb': 20, 'time': 0.02033309459686279, 'version': 'COLLECTIVE', 'nproc': 7}
-{'nra': 256, 'nca': 40, 'ncb': 10, 'time': 0.02083247184753418, 'version': 'COLLECTIVE', 'nproc': 7}
-{'nra': 512, 'nca': 50, 'ncb': 20, 'time': 0.09581642627716064, 'version': 'COLLECTIVE', 'nproc': 7}
-{'nra': 512, 'nca': 40, 'ncb': 30, 'time': 0.11310394287109375, 'version': 'COLLECTIVE', 'nproc': 7}
-{'nra': 512, 'nca': 20, 'ncb': 50, 'time': 0.10066853046417236, 'version': 'COLLECTIVE', 'nproc': 7}
+{'nra': 256, 'nca': 20, 'ncb': 20, 'time': 0.006453846999211237, 'version': 'COLLECTIVE', 'nproc': 7}
+{'nra': 256, 'nca': 40, 'ncb': 10, 'time': 0.007250824999064207, 'version': 'COLLECTIVE', 'nproc': 7}
+{'nra': 512, 'nca': 50, 'ncb': 20, 'time': 0.03235899900086224, 'version': 'COLLECTIVE', 'nproc': 7}
+{'nra': 512, 'nca': 40, 'ncb': 30, 'time': 0.03858703499950934, 'version': 'COLLECTIVE', 'nproc': 7}
+{'nra': 512, 'nca': 20, 'ncb': 50, 'time': 0.03142002500360832, 'version': 'COLLECTIVE', 'nproc': 7}
+{'nra': 1024, 'nca': 20, 'ncb': 50, 'time': 0.06246568300062791, 'version': 'COLLECTIVE', 'nproc': 7}
+{'nra': 2048, 'nca': 20, 'ncb': 50, 'time': 0.12302125000278466, 'version': 'COLLECTIVE', 'nproc': 7}
 ```
-Na základe nižšie zobrazených obrázkov si môžeme všimnúť, že verzia s kolektívnou komunikáciou je častejšie časovo efektívnejšia ako verzia s P2P. Taktiež si môžeme všimnúť fakt, že viac pracovných uzlov neznamená automaticky lepší čas. Najlepšie výlsedky boli dosiahnuté pri nastavení `nporc = 7`. Následne pri ďalšom zvyšovaní pracovných uzlov sa priemerný čas výpočtov zvyšoval.\
-Pri zvolení `nproc = 2` si môžeme všimnúť, že obe verzie boli približne rovnako časovo efektívne. Následne pri zvyšovaní počtu `nproc` na väčších maticiach vidno, že tam je verzia s kolektívnou komunikáciou rýchlejšia, zatiaľ čo pri menších maticiach sa javí byť pomalšia.
-![image](https://github.com/RichardKorosi/Korosi-111313-PPDS2024/assets/99643046/c40187ce-d208-464f-af94-2f8ab854e5e7)
-![image](https://github.com/RichardKorosi/Korosi-111313-PPDS2024/assets/99643046/90026373-a942-4a17-bba3-08299e533775)
-![image](https://github.com/RichardKorosi/Korosi-111313-PPDS2024/assets/99643046/fb401a1b-fdc5-4c6a-a7c2-dcb83188d543)
-![image](https://github.com/RichardKorosi/Korosi-111313-PPDS2024/assets/99643046/cd86a1bb-cb7d-42f1-b479-0e150689a8fa)
-![image](https://github.com/RichardKorosi/Korosi-111313-PPDS2024/assets/99643046/54836178-968a-48ca-bd29-74a2d429c3a0)
-
-
-
+Na základe nižšie zobrazených grafov si môžeme všimnúť, že verzia s kolektívnou komunikáciou je časovo efektívnejšia ako verzia s P2P.
+Rýchlosť oboch implementácií závisí od počtu pracovných uzlov a veľkosti matíc, ktoré má program vynásobiť.
+Pri zvolení `nproc = 2` si môžeme všimnúť, že obe verzie boli približne rovnako časovo efektívne. Avšak pri zvolení väčšieho množstva pracovných uzlov je viditeľný rozdiel v časovej efektivite medzi oboma verziami implementácie (najmä pri väčších maticiach). 
+![image](https://github.com/RichardKorosi/Korosi-111313-PPDS2024/assets/99643046/9d458815-315a-4fc3-aa9b-c7ef9027f1f4)
+![image](https://github.com/RichardKorosi/Korosi-111313-PPDS2024/assets/99643046/05261b7d-decc-4e25-af9d-78b2451bc777)
+![image](https://github.com/RichardKorosi/Korosi-111313-PPDS2024/assets/99643046/3b94f40e-032a-4a6f-9fbe-22f50cd54a30)
+![image](https://github.com/RichardKorosi/Korosi-111313-PPDS2024/assets/99643046/dae8d8bd-9211-4438-a20c-ca6211f7e58a)
 
 
 ## Zdroje
