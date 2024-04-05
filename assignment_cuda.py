@@ -28,30 +28,48 @@ def create_buckets(array, splitters):
 
 @cuda.jit
 def my_kernel(io_array):
-    pass
+    pos = cuda.grid(1)
+    if pos < io_array.size:
+        for i in range(pos + 1, io_array.size):
+            if io_array[pos] > io_array[i]:
+                io_array[pos], io_array[i] = io_array[i], io_array[pos]
+
+
 
 
 def main():
-    len1, len2, len3 = 6, 6, 6
+    len1, len2, len3 = 10000, 100000, 700000
     array1 = create_unordered_array(len1)
     array2 = create_unordered_array(len2)
     array3 = create_unordered_array(len3)
 
     
     for array in [array1, array2, array3]:
-        no_proc = 3
+        print("START:", array)
+        result = np.empty(0, dtype=np.float32)
+        threadsperblock = 32
+        blockspergrid = math.ceil(array.shape[0] / threadsperblock)
+
+
+        buckets_gpu = []
+        no_proc = threadsperblock
         no_splitters = no_proc - 1
         splitters = np.random.choice(array, no_splitters, replace=False)
         splitters = np.sort(splitters)
         buckets = create_buckets(array, splitters)
-        print(array)
-        print(splitters)
-        print(buckets)
-        print("-------------------")
+        streams = [cuda.stream() for _ in range(no_proc)]
 
-        # my_kernel[blockspergrid, threadsperblock](data_mem)
-        # data = data_mem.copy_to_host()
-        # print(data)
+        for bucket, stream in zip(buckets, streams):
+            buckets_gpu.append(cuda.to_device(bucket, stream=stream))
+        
+        for bucket, stream in zip(buckets_gpu, streams):
+            my_kernel[blockspergrid, threadsperblock, stream](bucket)
+
+        for bucket, stream in zip(buckets_gpu, streams):
+            result = np.append(result, bucket.copy_to_host(stream=stream))
+
+        
+        print("SORTED:", result, "\n\n\n")
 
 
 if __name__ == '__main__':
