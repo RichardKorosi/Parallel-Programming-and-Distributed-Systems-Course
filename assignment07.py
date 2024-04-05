@@ -173,7 +173,9 @@ def measure_version(version):
     {"nra": 256, "nca": 40, "ncb": 10},
     {"nra": 512, "nca": 50, "ncb": 20},
     {"nra": 512, "nca": 40, "ncb": 30},
-    {"nra": 512, "nca": 20, "ncb": 50}.
+    {"nra": 512, "nca": 20, "ncb": 50},
+    {"nra": 1024, "nca": 20, "ncb": 50},
+    {"nra": 2048, "nca": 20, "ncb": 50}.
     Function returns a list of dictionaries containing
     the matrix sizes, average time of matrix multiplication,
     version of communication and number of processes used.
