@@ -79,13 +79,13 @@ def p2p_version(nra, nca, ncb):
              .reshape(nra, nca))
         b = (np.array([i * j for j in range(nca) for i in range(ncb)])
              .reshape(nca, ncb))
-        rows = avg_rows + 1 if extras else avg_rows
 
         for proc in range(nproc):
             rows_for_process = avg_rows + 1 if proc < extras else avg_rows
             if proc == MASTER:
                 a_loc = a[offset:(offset + rows_for_process)]
                 offset += rows_for_process
+                rows = a_loc.shape[0]
                 continue
             comm.send(a[offset:(offset + rows_for_process)], dest=proc)
             offset += rows_for_process
