@@ -1,6 +1,7 @@
 import math
 import numpy as np
 from numba import cuda
+import time
 import warnings
 from numba.core.errors import NumbaPerformanceWarning
 
@@ -38,13 +39,17 @@ def my_kernel(io_array):
 
 
 def main():
-    len1, len2, len3 = 10000, 100000, 700000
+    len1, len2, len3, len4 = 10000, 20000, 50000, 32
     array1 = create_unordered_array(len1)
     array2 = create_unordered_array(len2)
     array3 = create_unordered_array(len3)
+    array4 = create_unordered_array(len4)
+    times_of_parallel = []
+    times_of_normal = []
 
     
-    for array in [array1, array2, array3]:
+    for array in [array1, array2, array3, array4]:
+        time_start = time.time()
         print("START:", array)
         result = np.empty(0, dtype=np.float32)
         threadsperblock = 32
@@ -70,6 +75,27 @@ def main():
 
         
         print("SORTED:", result, "\n\n\n")
+        time_end = time.time()
+        times_of_parallel.append(time_end - time_start)
+
+
+    for array in [array1, array2, array3, array4]:
+        time_start = time.time()
+        # sort the array not using cuda, just normal merge sort
+        print("START:", array)
+        result = np.empty(0, dtype=np.float32)
+
+        # merge sort the array not parallel not cuda
+        for i in range(array.shape[0]):
+            for j in range(i + 1, array.shape[0]):
+                if array[i] > array[j]:
+                    array[i], array[j] = array[j], array[i]
+        print("SORTED:", array, "\n\n\n")
+        time_end = time.time()
+        times_of_normal.append(time_end - time_start)
+    
+    print("Times of parallel:", times_of_parallel)
+    print("Times of normal:", times_of_normal)
 
 
 if __name__ == '__main__':
