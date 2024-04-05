@@ -194,7 +194,7 @@ def measure_version(version):
         ncb = matrix["ncb"]
 
         times = []
-        for _ in range(50):
+        for _ in range(100):
             if version == "P2P":
                 start_time = MPI.Wtime()
                 p2p_version(nra, nca, ncb)
@@ -243,7 +243,7 @@ def create_graph(p2p_results, collective_results):
     ax.set_xlabel("Matrix sizes [NRA][NCA][NCB]")
     ax.set_ylabel("Time [s]")
     ax.set_title(f"Average times of matrix multiplication"
-                 f" with {nproc} processes \n after 50 runs")
+                 f" with {nproc} processes \n after 100 runs")
     labels = [f"NRA:{nra}\nNCA:{nca}\nNCB:{ncb}"
               for nra, nca, ncb in zip(nras, ncas, ncbs)]
     ax.set_xticks(x + width / 2)
@@ -274,8 +274,6 @@ def main():
         print("\n")
         for result in results2:
             print(result, end="\n")
-
-    if rank == MASTER:
         create_graph(results, results2)
 
 
