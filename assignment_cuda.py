@@ -4,6 +4,7 @@ from numba import cuda
 import time
 import warnings
 from numba.core.errors import NumbaPerformanceWarning
+import matplotlib.pyplot as plt
 
 warnings.filterwarnings("ignore", category=NumbaPerformanceWarning)
 
@@ -25,6 +26,35 @@ def create_buckets(array, splitters):
             buckets[b_i] = np.append(buckets[b_i], element)
             
     return buckets
+
+
+def create_graph(experiment_parallel, experiment_normal):
+    array_len = [result["array_len"] for result in experiment_parallel]
+    no_buckets = [result["no_buckets"] for result in experiment_parallel]
+
+    time_para = [result["time"] for result in experiment_parallel]
+    time_normal = [result["time"] for result in experiment_normal]
+
+    x = np.arange(len(array_len))
+    width = 0.35
+
+    fig, ax = plt.subplots()
+
+    rects1 = ax.bar(x - width/2, time_para, width, label='Parallel', color="r")
+    rects2 = ax.bar(x + width/2, time_normal, width, label='Normal', color="g")
+
+    ax.set_xlabel("Array Length / Number of Buckets")
+    ax.set_ylabel("Time [s]")
+    ax.set_title("Comparison of Parallel and Normal Experiments")
+    labels = [f"Len:{len}\nBuckets:{buckets}" for len, buckets in zip(array_len, no_buckets)]
+    ax.set_xticks(x)
+    ax.set_xticklabels(labels)
+
+    ax.bar_label(rects1, padding=3)
+    ax.bar_label(rects2, padding=3)
+
+    ax.legend()
+    plt.show()
 
 
 @cuda.jit
@@ -98,6 +128,8 @@ def main():
         print(experiment)
     for experiment in experiments_normal:
         print(experiment)
+
+    create_graph(experimetns_parallel, experiments_normal)
     
 
 
