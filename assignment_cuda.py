@@ -44,8 +44,8 @@ def main():
     array2 = create_unordered_array(len2)
     array3 = create_unordered_array(len3)
     array4 = create_unordered_array(len4)
-    times_of_parallel = []
-    times_of_normal = []
+    experimetns_parallel = []
+    experiments_normal = []
 
     
     for array in [array1, array2, array3, array4]:
@@ -75,7 +75,8 @@ def main():
         
         print("SORTED:", result, "\n\n\n")
         time_end = time.time()
-        times_of_parallel.append(time_end - time_start)
+        experiment = {"array_len": len(array), "no_buckets": len(buckets), "time": (time_end - time_start)}
+        experimetns_parallel.append(experiment)
 
 
     for array in [array1, array2, array3, array4]:
@@ -90,11 +91,14 @@ def main():
                     array[i], array[j] = array[j], array[i]
         print("SORTED:", array, "\n\n\n")
         time_end = time.time()
-        times_of_normal.append(time_end - time_start)
+        experiment = {"array_len": len(array), "no_buckets": len(buckets), "time": (time_end - time_start)}
+        experiments_normal.append(experiment)
+
+    for experiment in experimetns_parallel:
+        print(experiment)
+    for experiment in experiments_normal:
+        print(experiment)
     
-    print("Times of parallel:", times_of_parallel)
-    print("Times of normal:", times_of_normal)
-    print("Speedup:", [normal / parallel for normal, parallel in zip(times_of_normal, times_of_parallel)])
 
 
 if __name__ == '__main__':
