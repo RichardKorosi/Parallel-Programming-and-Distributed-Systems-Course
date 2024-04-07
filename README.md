@@ -83,7 +83,7 @@ Druhý útržok z kódu, ktorý bol upravený funguje následovne:
 3) Ak `proc` v loope nereprezentuje MASTERa, tak MASTER dáta získa pomocou `comm.recv(source=proc)`, tieto dáta mu posielajú všetky ostatné uzly v `else` vetve. Keďže MASTER ide v loope proces za procesom (od nuly hore), tak sa C postupne naplní ("zhora nadol").
 
 ### 2) Verzia kolektívnej komunikácie
-Implementácia verzie kolektívnej komunikácie spočívala v upravení poskytnutého súboru `mat_parsg.py` (viď. zdroje). A úlohou bolo umožniť výber ľubovoľného počtu pracovných uzlov, nie len počtu, ktorý by delil počet riadkov matice `A` bezo zvyšku. Nasledujúce časti kódu predstavujú už upravenú verziu.
+Druhou úlohou v zadaní bolo využiť metódy kolektívnej komunikácie scatter()/gather() nemiesto komunikácie P2P. A podobne ako v predchádzajúcej časti umožniť výber ľubovoľného počtu pracovných uzlov, nie len počtu, ktorý by delil počet riadkov matice `A` bezo zvyšku. Implementácia verzie kolektívnej komunikácie spočívala v upravení poskytnutého súboru `mat_parsg.py` (viď. zdroje), poskytnutá verzia nedovolovala výber ľubovoľného počtu pracovných uzlov. Nasledujúce časti kódu predstavujú už upravenú verziu.
 
 ```python
 a = None
@@ -100,7 +100,7 @@ a_loc = comm.scatter(a, root=MASTER)
 b = comm.bcast(b, root=MASTER)
 rows = a_loc.shape[0]
 ```
-Táto verzia riešenia nebola inšpirovaná verziou poskytnutou v jazyku C nakoľko tá obsahovala akurát P2P riešenie. Namiesto toho využíva numpy funkciu `array_split()`, ktorá dokáže rovnomerne rozdeliť maticu `A` s tým, že riadky navyše rozdelí rovnakým spôsobom ako v našom predošlom riešení.
+Táto verzia riešenia nebola inšpirovaná verziou poskytnutou v jazyku C. Namiesto toho využíva numpy funkciu `array_split()`, ktorá dokáže rovnomerne rozdeliť maticu `A` s tým, že riadky navyše rozdelí rovnakým spôsobom ako v našom predošlom riešení.
 Príklad fungovania `array_split` (príklad bol prevzatý a upravený z dokumentácie numpy, viď. zdroje):
 ```python
 >>> x = np.arange(10)
@@ -116,7 +116,7 @@ if rank == MASTER:
     print(f"{rank}: Here is the result matrix:")
     print(c)
 ```
-Následne sa pomocou `comm.gather(root=MASTER)` dáta pošlú a zozbierajú v pracovnom uzle `MASTER`, ktorý ich následne spracuje pre a vypíše do konzoly.
+Následne sa pomocou `comm.gather(root=MASTER)` dáta pošlú a zozbierajú v pracovnom uzle `MASTER` (myslené tak, že každý pracovný uzol pošle MASTERovi dáta), ktorý ich následne spracuje pre a vypíše do konzoly.
 ### 3) Výpisy z konzoly
 ![image](https://github.com/RichardKorosi/Korosi-111313-PPDS2024/assets/99643046/dfc42359-dd2a-47bd-88f1-d04a6fa9ece9)
 Obrázok nad textom ukazuje, novo implementované riešenia a pôvodné riešenie (pre prehľadnosť bolo `mat_parsg.py` vynechané). Tento prípad bol pri vybraní pracovných uzlov, ktorých počet delil bezozvyšku počet riadkov matice `A`. Obrázok pod textom ukazuje prípad, kedy tento jav neplatí.
@@ -126,7 +126,7 @@ Poznámka: Vo finálnom riešení sú všetky pôvodné printy zakomentované. D
 
 
 ## Porovnanie oboch verzií
-Táto sekcia sa zoberá porovnaním oboch implementovaných verzií. Na tento účel sa využívajú dve funkcie `measure_version()` a `create_graph()`. V jednoduchosti: vo funkcii `measure_version()` sa 50krát pre každú maticu, ktorá je definovaná priamo vo funkcii, zavolá fukcia podľa zvoleného vstupného parametru. Vždy sa pritom meria čas odkedy bola funkcia zavolaná až pokiaľ neskončí. Následne sa hodnoty spriemerujú. Funkcia následne vráti List slovníkov, ktoré obsahujú podrobnejšie dáta o experimente. 
+Táto sekcia sa zoberá porovnaním oboch implementovaných verzií. Na tento účel sa využívajú dve funkcie `measure_version()` a `create_graph()`. V jednoduchosti: vo funkcii `measure_version()` sa 100krát pre každú maticu, ktorá je definovaná priamo vo funkcii, zavolá fukcia podľa zvoleného vstupného parametru. Vždy sa pritom meria čas odkedy bola funkcia zavolaná až pokiaľ neskončí. Následne sa hodnoty spriemerujú. Funkcia následne vráti List slovníkov, ktoré obsahujú podrobnejšie dáta o experimente. 
 Funckia `create_graph()` má následne za úlohu vykrelisť graf na základe informácií o experimente, ktoré vznikajú vo funkcii `measure_version()`. Funkcia `create_graph()` bola vytvorená na základe dokumentácie knižnice matplotlib (viď. zdroje).
 ```python
 results2 = measure_version("COLLECTIVE")
