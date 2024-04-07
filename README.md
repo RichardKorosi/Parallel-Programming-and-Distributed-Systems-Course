@@ -167,7 +167,8 @@ Pri zvolení `nproc = 2` si môžeme všimnúť, že obe verzie boli približne 
 ![image](https://github.com/RichardKorosi/Korosi-111313-PPDS2024/assets/99643046/9d458815-315a-4fc3-aa9b-c7ef9027f1f4)
 ![image](https://github.com/RichardKorosi/Korosi-111313-PPDS2024/assets/99643046/05261b7d-decc-4e25-af9d-78b2451bc777)
 ![image](https://github.com/RichardKorosi/Korosi-111313-PPDS2024/assets/99643046/3b94f40e-032a-4a6f-9fbe-22f50cd54a30)
-![image](https://github.com/RichardKorosi/Korosi-111313-PPDS2024/assets/99643046/dae8d8bd-9211-4438-a20c-ca6211f7e58a)
+![image](https://github.com/RichardKorosi/Korosi-111313-PPDS2024/assets/99643046/0b754d4c-a295-4d46-a23d-28468b1a90f4)
+
 
 
 ## Zdroje
