@@ -74,40 +74,44 @@ def my_kernel(io_array):
 
 
 def main():
+    no_experimtens = 10
+    cuda_cores = 7168
     array1 = np.random.rand(100).astype(np.float32)
     array2 = np.random.rand(1000).astype(np.float32)
     array3 = np.random.rand(10000).astype(np.float32)
-    # array4 = np.random.rand(100000).astype(np.float32)
     experimetns_parallel = []
     sorted_in_parallel = []
     experiments_normal = []
     sorted_in_normal = []
 
     for array in [array1, array2, array3]:
-        time_start = time.time()
-        result = np.empty(0, dtype=np.float32)
-        # threadsperblock = 32
-        # blockspergrid = math.ceil(array.shape[0] / threadsperblock)
+        avg_time = 0
+        for i in range(no_experimtens + 1):
+            time_start = time.time()
+            result = np.empty(0, dtype=np.float32)
 
-        buckets_gpu = []
-        no_splitters = len(array) // 10
-        splitters = np.random.choice(array, no_splitters, replace=False)
-        splitters = np.sort(splitters)
-        buckets = create_buckets(array, splitters)
-        streams = [cuda.stream() for _ in range(len(buckets))]
+            buckets_gpu = []
+            no_splitters = min(56-1, array.shape[0])
+            splitters = np.random.choice(array, no_splitters, replace=False)
+            splitters = np.sort(splitters)
+            buckets = create_buckets(array, splitters)
+            streams = [cuda.stream() for _ in range(len(buckets))]
 
-        for bucket, stream in zip(buckets, streams):
-            buckets_gpu.append(cuda.to_device(bucket, stream=stream))
+            for bucket, stream in zip(buckets, streams):
+                buckets_gpu.append(cuda.to_device(bucket, stream=stream))
 
-        for bucket, stream in zip(buckets_gpu, streams):
-            my_kernel[1, 1, stream](bucket)
+            for bucket, stream in zip(buckets_gpu, streams):
+                my_kernel[1, 1, stream](bucket)
 
-        for bucket, stream in zip(buckets_gpu, streams):
-            result = np.append(result, bucket.copy_to_host(stream=stream))
+            for bucket, stream in zip(buckets_gpu, streams):
+                result = np.append(result, bucket.copy_to_host(stream=stream))
 
-        time_end = time.time()
+            time_end = time.time()
+            if i != 0:
+                avg_time += time_end - time_start
+
         experiment = {"array_len": len(array), "no_buckets": len(buckets),
-                      "time": (time_end - time_start)}
+                      "time": (avg_time / no_experimtens)}
         experimetns_parallel.append(experiment)
         sorted_in_parallel.append(result)
         print("DONE PARALLEL")
@@ -115,11 +119,15 @@ def main():
     print("\n\n")
 
     for array in [array1, array2, array3]:
-        time_start = time.time()
-        array = series_bubble_sort(array)
-        time_end = time.time()
+        avg_time = 0
+        for i in range(no_experimtens + 1):
+            time_start = time.time()
+            array = series_bubble_sort(array)
+            time_end = time.time()
+            if i != 0:
+                avg_time += time_end - time_start
         experiment = {"array_len": len(array), "no_buckets": len(buckets),
-                      "time": (time_end - time_start)}
+                      "time": (avg_time / no_experimtens)}
         experiments_normal.append(experiment)
         sorted_in_normal.append(array)
         print("DONE NORMAL")
