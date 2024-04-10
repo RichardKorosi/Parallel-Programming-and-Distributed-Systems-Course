@@ -1,4 +1,5 @@
-import math
+"""This file is implementation of the 5th (week 8) assignment of the PPDS."""
+
 import numpy as np
 from numba import cuda
 import time
@@ -22,8 +23,9 @@ def create_buckets(array, splitters):
             b_i += 1
         else:
             buckets[b_i] = np.append(buckets[b_i], element)
-            
+
     return buckets
+
 
 def create_graph(experiment_parallel, experiment_normal):
     array_len = [result["array_len"] for result in experiment_parallel]
@@ -43,7 +45,8 @@ def create_graph(experiment_parallel, experiment_normal):
     ax.set_xlabel("Array Length / Number of Buckets")
     ax.set_ylabel("Time [s]")
     ax.set_title("Comparison of Parallel and Normal Experiments")
-    labels = [f"Len:{len}\nBuckets:{buckets}" for len, buckets in zip(array_len, no_buckets)]
+    labels = [f"Len:{len}\nBuckets:{buckets}" for len,
+              buckets in zip(array_len, no_buckets)]
     ax.set_xticks(x)
     ax.set_xticklabels(labels)
 
@@ -53,6 +56,7 @@ def create_graph(experiment_parallel, experiment_normal):
     ax.legend()
     plt.show()
 
+
 def series_bubble_sort(array):
     for i in range(array.shape[0]):
         for j in range(i + 1, array.shape[0]):
@@ -60,14 +64,13 @@ def series_bubble_sort(array):
                 array[i], array[j] = array[j], array[i]
     return array
 
+
 @cuda.jit
 def my_kernel(io_array):
     for i in range(io_array.size):
         for j in range(i + 1, io_array.size):
             if io_array[i] > io_array[j]:
                 io_array[i], io_array[j] = io_array[j], io_array[i]
-
-
 
 
 def main():
@@ -80,7 +83,6 @@ def main():
     experiments_normal = []
     sorted_in_normal = []
 
-    
     for array in [array1, array2, array3]:
         time_start = time.time()
         result = np.empty(0, dtype=np.float32)
@@ -96,7 +98,7 @@ def main():
 
         for bucket, stream in zip(buckets, streams):
             buckets_gpu.append(cuda.to_device(bucket, stream=stream))
-        
+
         for bucket, stream in zip(buckets_gpu, streams):
             my_kernel[1, 1, stream](bucket)
 
@@ -104,7 +106,8 @@ def main():
             result = np.append(result, bucket.copy_to_host(stream=stream))
 
         time_end = time.time()
-        experiment = {"array_len": len(array), "no_buckets": len(buckets), "time": (time_end - time_start)}
+        experiment = {"array_len": len(array), "no_buckets": len(buckets),
+                      "time": (time_end - time_start)}
         experimetns_parallel.append(experiment)
         sorted_in_parallel.append(result)
         print("DONE PARALLEL")
@@ -115,7 +118,8 @@ def main():
         time_start = time.time()
         array = series_bubble_sort(array)
         time_end = time.time()
-        experiment = {"array_len": len(array), "no_buckets": len(buckets), "time": (time_end - time_start)}
+        experiment = {"array_len": len(array), "no_buckets": len(buckets),
+                      "time": (time_end - time_start)}
         experiments_normal.append(experiment)
         sorted_in_normal.append(array)
         print("DONE NORMAL")
@@ -131,7 +135,6 @@ def main():
         print(np.all(sorted_array[:-1] <= sorted_array[1:]))
 
     create_graph(experimetns_parallel, experiments_normal)
-    
 
 
 if __name__ == '__main__':
