@@ -11,6 +11,19 @@ warnings.filterwarnings("ignore", category=NumbaPerformanceWarning)
 
 
 def create_buckets(array, splitters):
+    """Create buckets of the array based on the splitters.
+
+    More specifically, this function creates buckets of the array based
+    on the splitters. Buckets are not sorted. The first bucket contains
+    all the elements that are smaller than the first splitter.
+    Second one contains all the elements that are smaller
+    than the second splitter etc. The last bucket contains all the
+    elements that are greater than the last splitter.
+
+    Keyword arguments:
+    array -- the array to be sorted
+    splitters -- the values that will be used to split the array
+    """
     no_buckets = len(splitters) + 1
     buckets = [np.empty(0, dtype=np.float32) for _ in range(no_buckets)]
 
@@ -27,12 +40,18 @@ def create_buckets(array, splitters):
     return buckets
 
 
-def create_graph(experiment_parallel, experiment_normal):
+def create_graph(experiment_parallel, experiment_series):
+    """Create a bar graph of measured results of the experiment.
+
+    Keyword arguments:
+    experiment_parallel -- the results of the parallel experiment
+    experiment_series -- the results of the series experiment
+    """
     array_len = [result["array_len"] for result in experiment_parallel]
     no_buckets = [result["no_buckets"] for result in experiment_parallel]
 
     time_para = [result["time"] for result in experiment_parallel]
-    time_normal = [result["time"] for result in experiment_normal]
+    time_series = [result["time"] for result in experiment_series]
 
     x = np.arange(len(array_len))
     width = 0.35
@@ -40,7 +59,7 @@ def create_graph(experiment_parallel, experiment_normal):
     fig, ax = plt.subplots()
 
     rects1 = ax.bar(x - width/2, time_para, width, label='Parallel', color="r")
-    rects2 = ax.bar(x + width/2, time_normal, width, label='Normal', color="g")
+    rects2 = ax.bar(x + width/2, time_series, width, label='Normal', color="g")
 
     ax.set_xlabel("Array Length / Number of Buckets")
     ax.set_ylabel("Time [s]")
@@ -58,6 +77,11 @@ def create_graph(experiment_parallel, experiment_normal):
 
 
 def series_bubble_sort(array):
+    """Sort the array using bubble sort algorithm.
+
+    Keyword arguments:
+    array -- the array to be sorted
+    """
     for i in range(array.shape[0]):
         for j in range(i + 1, array.shape[0]):
             if array[i] > array[j]:
@@ -67,6 +91,11 @@ def series_bubble_sort(array):
 
 @cuda.jit
 def my_kernel(io_array):
+    """Sort the array using bubble sort algorithm using GPU.
+
+    Keyword arguments:
+    io_array -- the array to be sorted
+    """
     for i in range(io_array.size):
         for j in range(i + 1, io_array.size):
             if io_array[i] > io_array[j]:
@@ -74,15 +103,22 @@ def my_kernel(io_array):
 
 
 def main():
+    """Execute the main function of the program.
+
+    More specifically, in this function arrays of different
+    lengths are created and sorted using parallel and series
+    bubble sort. Sorting is also timed and the results of
+    the experiments are printed and displayed in a bar graph.
+    """
     no_experimtens = 10
-    cuda_cores = 7168
+    # cuda_cores = 7168
     array1 = np.random.rand(100).astype(np.float32)
     array2 = np.random.rand(1000).astype(np.float32)
     array3 = np.random.rand(10000).astype(np.float32)
     experimetns_parallel = []
     sorted_in_parallel = []
-    experiments_normal = []
-    sorted_in_normal = []
+    experiments_series = []
+    sorted_in_series = []
 
     for array in [array1, array2, array3]:
         avg_time = 0
@@ -128,21 +164,21 @@ def main():
                 avg_time += time_end - time_start
         experiment = {"array_len": len(array), "no_buckets": len(buckets),
                       "time": (avg_time / no_experimtens)}
-        experiments_normal.append(experiment)
-        sorted_in_normal.append(array)
+        experiments_series.append(experiment)
+        sorted_in_series.append(array)
         print("DONE NORMAL")
 
     for experiment in experimetns_parallel:
         print(experiment)
-    for experiment in experiments_normal:
+    for experiment in experiments_series:
         print(experiment)
 
     for sorted_array in sorted_in_parallel:
         print(np.all(sorted_array[:-1] <= sorted_array[1:]))
-    for sorted_array in sorted_in_normal:
+    for sorted_array in sorted_in_series:
         print(np.all(sorted_array[:-1] <= sorted_array[1:]))
 
-    create_graph(experimetns_parallel, experiments_normal)
+    create_graph(experimetns_parallel, experiments_series)
 
 
 if __name__ == '__main__':
