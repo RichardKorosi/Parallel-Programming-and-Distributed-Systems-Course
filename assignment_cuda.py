@@ -1,4 +1,20 @@
-"""This file is implementation of the 5th (week 8) assignment of the PPDS."""
+"""This file is implementation of the 5th (week 8) assignment of the PPDS.
+
+The solutions of this assignment was inspired by the following source(s):
+    - https://en.wikipedia.org/wiki/Samplesort
+    - https://github.com/tj314/ppds-seminars/tree/ppds2024/seminar8
+        - 02-cv-multi-kernel_streams.py
+Function create_buckets was explained in documentation and inspired
+    by the following source(s):
+    - https://www.w3schools.com/python/gloss_python_for_else.asp
+Functions series_bubble_sort and my_kernel were made 
+    with the help of the following source(s):
+    - https://www.geeksforgeeks.org/bubble-sort/
+Function create_graph was inspired by the following source(s):
+    -https://matplotlib.org/stable/gallery/lines_bars_and_markers/barchart.html
+
+More info about the assignment can be found in the README.md document.
+"""
 
 import numpy as np
 from numba import cuda
