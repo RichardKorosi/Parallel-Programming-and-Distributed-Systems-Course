@@ -137,10 +137,12 @@ def main():
     """
     no_experimtens = 1
     # cuda_cores = 7168
-    array1 = np.random.rand(100000).astype(np.float32)
+    arrayDummy = np.random.rand(2).astype(np.float32)
+    array0 = np.random.rand(10).astype(np.float32)
+    array1 = np.random.rand(100).astype(np.float32)
     array2 = np.random.rand(1000).astype(np.float32)
     array3 = np.random.rand(10000).astype(np.float32)
-    experiment_arrays = [array1, array2, array3]
+    experiment_arrays = [arrayDummy, array0, array1, array2, array3]
     experimetns_parallel = []
     sorted_in_parallel = []
     experiments_series = []
@@ -149,9 +151,8 @@ def main():
     curr_arr_index = 0
     for array in experiment_arrays:
         avg_time = 0
-        for i in range(no_experimtens + 1):
+        for _ in range(no_experimtens):
             array = np.copy(experiment_arrays[curr_arr_index])
-            time_start = time.perf_counter()
             result = np.empty(0, dtype=np.float32)
 
             buckets_gpu = []
@@ -161,6 +162,7 @@ def main():
             buckets = create_buckets(array, splitters)
             streams = [cuda.stream() for _ in range(len(buckets))]
 
+            time_start = time.perf_counter()
             for bucket, stream in zip(buckets, streams):
                 buckets_gpu.append(cuda.to_device(bucket, stream=stream))
 
@@ -171,8 +173,7 @@ def main():
                 result = np.append(result, bucket.copy_to_host(stream=stream))
 
             time_end = time.perf_counter()
-            if i != 0:
-                avg_time += time_end - time_start
+            avg_time += time_end - time_start
 
         experiment = {"array_len": len(array), "no_buckets": len(buckets),
                       "time": (avg_time / no_experimtens)}
@@ -185,13 +186,12 @@ def main():
     curr_arr_index = 0
     for array in experiment_arrays:
         avg_time = 0
-        for i in range(no_experimtens + 1):
+        for _ in range(no_experimtens):
             array = np.copy(experiment_arrays[curr_arr_index])
             time_start = time.perf_counter()
             array = series_bubble_sort(array)
             time_end = time.perf_counter()
-            if i != 0:
-                avg_time += time_end - time_start
+            avg_time += time_end - time_start
         experiment = {"array_len": len(array), "no_buckets": len(buckets),
                       "time": (avg_time / no_experimtens)}
         experiments_series.append(experiment)
@@ -199,12 +199,17 @@ def main():
         print("DONE NORMAL")
         curr_arr_index += 1
 
-    for experiment in experimetns_parallel:
+    for experiment in experimetns_parallel[1:]:
         print(experiment)
-    for experiment in experiments_series:
+    for experiment in experiments_series[1:]:
         print(experiment)
+    
+    for array in sorted_in_parallel:
+        print(np.all(array[:-1] <= array[1:]))
+    for array in sorted_in_series:
+        print(np.all(array[:-1] <= array[1:]))
 
-    create_graph(experimetns_parallel, experiments_series)
+    create_graph(experimetns_parallel[1:], experiments_series[1:])
 
 
 if __name__ == '__main__':
