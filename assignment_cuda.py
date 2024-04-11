@@ -135,20 +135,23 @@ def main():
     bubble sort. Sorting is also timed and the results of
     the experiments are printed and displayed in a bar graph.
     """
-    no_experimtens = 10
+    no_experimtens = 1
     # cuda_cores = 7168
-    array1 = np.random.rand(100).astype(np.float32)
+    array1 = np.random.rand(100000).astype(np.float32)
     array2 = np.random.rand(1000).astype(np.float32)
     array3 = np.random.rand(10000).astype(np.float32)
+    experiment_arrays = [array1, array2, array3]
     experimetns_parallel = []
     sorted_in_parallel = []
     experiments_series = []
     sorted_in_series = []
 
-    for array in [array1, array2, array3]:
+    curr_arr_index = 0
+    for array in experiment_arrays:
         avg_time = 0
         for i in range(no_experimtens + 1):
-            time_start = time.time()
+            array = np.copy(experiment_arrays[curr_arr_index])
+            time_start = time.perf_counter()
             result = np.empty(0, dtype=np.float32)
 
             buckets_gpu = []
@@ -167,7 +170,7 @@ def main():
             for bucket, stream in zip(buckets_gpu, streams):
                 result = np.append(result, bucket.copy_to_host(stream=stream))
 
-            time_end = time.time()
+            time_end = time.perf_counter()
             if i != 0:
                 avg_time += time_end - time_start
 
@@ -176,15 +179,17 @@ def main():
         experimetns_parallel.append(experiment)
         sorted_in_parallel.append(result)
         print("DONE PARALLEL")
+        curr_arr_index += 1
 
-    print("\n\n")
 
-    for array in [array1, array2, array3]:
+    curr_arr_index = 0
+    for array in experiment_arrays:
         avg_time = 0
         for i in range(no_experimtens + 1):
-            time_start = time.time()
+            array = np.copy(experiment_arrays[curr_arr_index])
+            time_start = time.perf_counter()
             array = series_bubble_sort(array)
-            time_end = time.time()
+            time_end = time.perf_counter()
             if i != 0:
                 avg_time += time_end - time_start
         experiment = {"array_len": len(array), "no_buckets": len(buckets),
@@ -192,16 +197,12 @@ def main():
         experiments_series.append(experiment)
         sorted_in_series.append(array)
         print("DONE NORMAL")
+        curr_arr_index += 1
 
     for experiment in experimetns_parallel:
         print(experiment)
     for experiment in experiments_series:
         print(experiment)
-
-    for sorted_array in sorted_in_parallel:
-        print(np.all(sorted_array[:-1] <= sorted_array[1:]))
-    for sorted_array in sorted_in_series:
-        print(np.all(sorted_array[:-1] <= sorted_array[1:]))
 
     create_graph(experimetns_parallel, experiments_series)
 
