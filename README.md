@@ -1,4 +1,4 @@
-# Korosi-111313-PPDS2024-Zadanie-04
+# Korosi-111313-PPDS2024-Zadanie-05
 ## Úlohy zadania
 1) Implementujte algoritmus samplesort pre Numba CUDA.
 2) Porovnajte paralelný samplesort so sériovým triediacim algoritmom na troch rádovo odlišných vstupoch.
