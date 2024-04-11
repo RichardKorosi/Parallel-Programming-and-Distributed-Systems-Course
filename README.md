@@ -36,6 +36,8 @@ Funkcia `create_buckets()` vytvorí o jeden bucket viac ako je splitterov. Buckt
 2) Druhý bucket obsahuje všetky prvky, ktoré sú menšie ako druhý splitter atď. 
 3) Posledný bucket obsahuje všetky prvky, ktoré sú väčšie ako posledný splitter.
 
+Princíp fungovania for...else v algoritme je taký, že ak nastane v loope `break`, tak sa else vetva algoritmu nevykoná. Tým pádom vieme zabezpečiť, že ak je element väčší ako všetky splittre (prejde bez prerušenia celý loop), tak sa dostane do else vetvy, v ktorej sa napĺňa posledný bucket (princíp fungovania viď. zdroje). 
+
 Keďže sa buckety napĺňajú postupne z poľa `array`, tak pokiaľ pole `array` nebolo zoradené (čo predpokladáme, že nebolo), tak ani buckety nebudú zoradené.
 ### Streamy
 ```python
@@ -51,20 +53,20 @@ for bucket, stream in zip(buckets_gpu, streams):
     result = np.append(result, bucket.copy_to_host(stream=stream))
 ```
 ### Sortovanie na GPU
+Zoraďovanie prvkov v bucketoch na GPU sa vykonáva už sériovo (každý bucket je zoraďovaný práve jedným jadrom). Zoraďovací algoritmus je klasický bubble sort. Nevýhodou tejto implementácie, je fakt, že sa využíva na sortovanie konkrétneho bucketu len 1 jadro. Keďže základnou vykonávaciou jednotkou je warp, ktorý obsahuje 32 jadier. To znamená, že pracuje v danom warpe len jedno jadro a zvyšok ostáva nevyužitý.
 ```python
 @cuda.jit
-def my_kernel(io_array):
-    """Sort the array using bubble sort algorithm using GPU.
-
-    Keyword arguments:
-    io_array -- the array to be sorted
-    """
-    for i in range(io_array.size):
-        for j in range(i + 1, io_array.size):
-            if io_array[i] > io_array[j]:
-                io_array[i], io_array[j] = io_array[j], io_array[i]
+def my_kernel(bucket):
+    for i in range(bucket.size):
+    swapped = False
+    for j in range(bucket.size - i - 1):
+        if bucket[j] > bucket[j + 1]:
+            bucket[j], bucket[j + 1] = bucket[j + 1], bucket[j]
+            swapped = True
+    if not swapped:
+        break
 ```
-### Porovnanie paralelného a sériového riešenia
+## Porovnanie paralelného a sériového riešenia
 
 
 
@@ -85,6 +87,8 @@ Inšpirácie, využité časti kódu a podobne:
 * [Conventional Commits guide](https://www.conventionalcommits.org/en/v1.0.0/)
 * [Matplotlib grouped bar chart with labels](https://matplotlib.org/stable/gallery/lines_bars_and_markers/barchart.html#sphx-glr-gallery-lines-bars-and-markers-barchart-py)
 * [Algoritmus Samplesort - Wikipedia](https://en.wikipedia.org/wiki/Samplesort)
+* [Algoritmus Bubblesort - GeeksForGeeks](https://www.geeksforgeeks.org/bubble-sort/)
+* [Algoritmus for...else - W3Schools](https://www.w3schools.com/python/gloss_python_for_else.asp)
 * [Využité poskytnuté skripty z cvičení](https://github.com/tj314/ppds-seminars/tree/ppds2024/seminar8)
 * [Teoretické časti boli vysvetlené na základe vedomostí získaných na prednáške a seminári na predmete PPDS](https://uim.fei.stuba.sk/predmet/i-ppds/)
 
