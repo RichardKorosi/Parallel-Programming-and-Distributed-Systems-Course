@@ -40,7 +40,7 @@ Princíp fungovania for...else v algoritme je taký, že ak nastane v loope `bre
 
 Keďže sa buckety napĺňajú postupne z poľa `array`, tak pokiaľ pole `array` nebolo zoradené (čo predpokladáme, že nebolo), tak ani buckety nebudú zoradené. Zoraďovanie jednotlivých bucketov sa v tejto implementáciu už vykonáva paralelne (viď. ďalšie kapitoly v dokumentácii).
 ### Streamy
-`TODO:XXX`
+Riešenie problému bolo implementované za pomoci streamov/prúdov, prúdy sú fronty operácií GPU, ktoré sa vykonávajú v určitom poradí. Streamy využívajú schopnosť GPU prekrývať vykonávanie jadra s operáciami kopírovania pamäte. Každý prúd predstavuje nezávislé vykonávanie príkazov voči ostatným prúdom a teda sa môžu vykonávať konkuretne/asynchrónne. Implementácia funguje na princípe, že každý bucket má vlastný stream (info o streamoch viď. zdroje). Po tejto 'inicializácii' prúdov sa posielajú dáta bucketov do GPU. Následne sa zavolá `my_kernel` s jedným vláknom (blocksPerGrid aj threadsPerBlock = 1). V `my_kernel` sa dané buckety zosortujú a následne sa v poslednom loope získa výsledok poskladaním už zosortovaných bucketov.
 ```python
 streams = [cuda.stream() for _ in range(len(buckets))]
 
@@ -70,7 +70,7 @@ def my_kernel(bucket):
 ### Zhodnotenie a postrehy z implementácie
 Nevýhodou tejto implementácie, je fakt, že sa využíva na sortovanie konkrétneho bucketu len 1 jadro. Keďže základnou vykonávaciou jednotkou je warp, ktorý obsahuje 32 jadier. To znamená, že pracuje v danom warpe len jedno jadro a zvyšok ostáva nevyužitý. Výhodou tohto riešenia však bola jednoduchá implementácia a pri experimentoch (kapitola nižšie) dokázala byť znateľne rýchlejšia ako čisto sériové sortovanie poľa.
 ## Porovnanie paralelného a sériového riešenia
-`TODO:XXX`
+
 
 
 
@@ -89,6 +89,7 @@ Inšpirácie, využité časti kódu a podobne:
 * [README template](https://github.com/matiassingers/awesome-readme)
 * [PEP 8 & PEP 257 validator](https://www.codewof.co.nz/style/python3/)
 * [Conventional Commits guide](https://www.conventionalcommits.org/en/v1.0.0/)
+* [Teória o CUDA streamoch](https://turing.une.edu.au/~cosc330/lectures/display_notes.php?lecture=22)
 * [Matplotlib grouped bar chart with labels](https://matplotlib.org/stable/gallery/lines_bars_and_markers/barchart.html#sphx-glr-gallery-lines-bars-and-markers-barchart-py)
 * [Algoritmus Samplesort - Wikipedia](https://en.wikipedia.org/wiki/Samplesort)
 * [Algoritmus Bubblesort - GeeksForGeeks](https://www.geeksforgeeks.org/bubble-sort/)
