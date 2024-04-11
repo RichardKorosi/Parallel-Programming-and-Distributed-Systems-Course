@@ -38,8 +38,9 @@ Funkcia `create_buckets()` vytvorí o jeden bucket viac ako je splitterov. Buckt
 
 Princíp fungovania for...else v algoritme je taký, že ak nastane v loope `break`, tak sa else vetva algoritmu nevykoná. Tým pádom vieme zabezpečiť, že ak je element väčší ako všetky splittre (prejde bez prerušenia celý loop), tak sa dostane do else vetvy, v ktorej sa napĺňa posledný bucket (princíp fungovania viď. zdroje). 
 
-Keďže sa buckety napĺňajú postupne z poľa `array`, tak pokiaľ pole `array` nebolo zoradené (čo predpokladáme, že nebolo), tak ani buckety nebudú zoradené.
+Keďže sa buckety napĺňajú postupne z poľa `array`, tak pokiaľ pole `array` nebolo zoradené (čo predpokladáme, že nebolo), tak ani buckety nebudú zoradené. Zoraďovanie jednotlivých bucketov sa v tejto implementáciu už vykonáva paralelne (viď. ďalšie kapitoly v dokumentácii).
 ### Streamy
+`TODO:XXX`
 ```python
 streams = [cuda.stream() for _ in range(len(buckets))]
 
@@ -53,7 +54,7 @@ for bucket, stream in zip(buckets_gpu, streams):
     result = np.append(result, bucket.copy_to_host(stream=stream))
 ```
 ### Sortovanie na GPU
-Zoraďovanie prvkov v bucketoch na GPU sa vykonáva už sériovo (každý bucket je zoraďovaný práve jedným jadrom). Zoraďovací algoritmus je klasický bubble sort. Nevýhodou tejto implementácie, je fakt, že sa využíva na sortovanie konkrétneho bucketu len 1 jadro. Keďže základnou vykonávaciou jednotkou je warp, ktorý obsahuje 32 jadier. To znamená, že pracuje v danom warpe len jedno jadro a zvyšok ostáva nevyužitý.
+Zoraďovanie prvkov v bucketoch na GPU sa vykonáva už sériovo (každý bucket je zoraďovaný práve jedným jadrom). Zoraďovací algoritmus je klasický bubble sort.
 ```python
 @cuda.jit
 def my_kernel(bucket):
@@ -66,7 +67,10 @@ def my_kernel(bucket):
     if not swapped:
         break
 ```
+### Zhodnotenie a postrehy z implementácie
+Nevýhodou tejto implementácie, je fakt, že sa využíva na sortovanie konkrétneho bucketu len 1 jadro. Keďže základnou vykonávaciou jednotkou je warp, ktorý obsahuje 32 jadier. To znamená, že pracuje v danom warpe len jedno jadro a zvyšok ostáva nevyužitý. Výhodou tohto riešenia však bola jednoduchá implementácia a pri experimentoch (kapitola nižšie) dokázala byť znateľne rýchlejšia ako čisto sériové sortovanie poľa.
 ## Porovnanie paralelného a sériového riešenia
+`TODO:XXX`
 
 
 
