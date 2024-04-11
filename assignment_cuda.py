@@ -82,24 +82,33 @@ def series_bubble_sort(array):
     Keyword arguments:
     array -- the array to be sorted
     """
-    for i in range(array.shape[0]):
-        for j in range(i + 1, array.shape[0]):
-            if array[i] > array[j]:
-                array[i], array[j] = array[j], array[i]
+    for i in range(array.size):
+        swapped = False
+        for j in range(array.size - i - 1):
+            if array[j] > array[j + 1]:
+                array[j], array[j + 1] = array[j + 1], array[j]
+                swapped = True
+        if not swapped:
+            break
+
     return array
 
 
 @cuda.jit
-def my_kernel(io_array):
+def my_kernel(bucket):
     """Sort the array using bubble sort algorithm using GPU.
 
     Keyword arguments:
-    io_array -- the array to be sorted
+    bucket -- the array to be sorted
     """
-    for i in range(io_array.size):
-        for j in range(i + 1, io_array.size):
-            if io_array[i] > io_array[j]:
-                io_array[i], io_array[j] = io_array[j], io_array[i]
+    for i in range(bucket.size):
+        swapped = False
+        for j in range(bucket.size - i - 1):
+            if bucket[j] > bucket[j + 1]:
+                bucket[j], bucket[j + 1] = bucket[j + 1], bucket[j]
+                swapped = True
+        if not swapped:
+            break
 
 
 def main():
