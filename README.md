@@ -8,9 +8,8 @@
 Nasledovná časť implementácie sa sústredí na jednu iteráciu vykonávanú v programe (pre pole `array`). Implementácia algoritmu samplesort bola inšpirovaná pseudokódom poskytnutom na Wikipedii (viď. zdroje).
 ### Vytvorenie splitterov a bucketov:
 ```python
-no_splitters = int(array.shape[0] // math.sqrt(cuda_cores))
-if no_splitters >= cuda_cores:
-    no_splitters = cuda_cores - 1
+no_splitters = min(int(array.shape[0] // math.sqrt(cuda_cores)),
+                   cuda_cores - 1)
 splitters = np.random.choice(array, no_splitters, replace=False)
 splitters = np.sort(splitters)
 buckets = create_buckets(array, splitters)
@@ -55,9 +54,8 @@ no_splitters = min(cuda_cores // 100, array.shape[0] // 100)
 Toto riešnie na prvý pohľad vyzerá už efektívne a správne, ale pri väčšsom zamyslení si môžeme všimnúť fakt, že keď dĺžka poľa presiahne počet CUDA jadier, tak sa bude využívať stále len 72 bucketov a tým pádom pri obrovských poliach by už bol tento počet nedostačujúci.
 ```py
 #Nastavenie:
-no_splitters = int(array.shape[0] // math.sqrt(cuda_cores))
-if no_splitters >= cuda_cores:
-    no_splitters = cuda_cores - 1
+no_splitters = min(int(array.shape[0] // math.sqrt(cuda_cores)),
+                   cuda_cores - 1)
 #Vysledok:
 {'array_len': 10, 'no_buckets': 1, 'time': 0.0005918999959249049}
 {'array_len': 100, 'no_buckets': 2, 'time': 0.0010583999974187464}
