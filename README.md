@@ -149,7 +149,7 @@ Pre lepšiu vizualizáciu menších polí boli experimenty pustené ešte raz be
 {'array_len': 1000, 'time': 0.08543701249946026}
 ```
 ![image](https://github.com/RichardKorosi/Korosi-111313-PPDS2024/assets/99643046/8e7c22d5-a4cc-4ed3-a9a3-58fbc55315ae)
-Môžeme si všimnúť, že pri menších poliach je paralelizmus mierne pomalší (vo paralelnej verzii sa do meraného času zarátava aj samotné posielanie/získavanie dát z GPU).
+Môžeme si všimnúť, že pri menších poliach je paralelizmus mierne pomalší (v implementácii paralelnej verzie sa do meraného času zarátava aj samotné posielanie/získavanie dát z GPU).
 
 
 ## Zdroje:
