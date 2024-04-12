@@ -22,6 +22,7 @@ import time
 import warnings
 from numba.core.errors import NumbaPerformanceWarning
 import matplotlib.pyplot as plt
+import math
 
 warnings.filterwarnings("ignore", category=NumbaPerformanceWarning)
 
@@ -136,12 +137,13 @@ def main():
     the experiments are printed and displayed in a bar graph.
     """
     no_experimtens = 1
-    # cuda_cores = 7168
+    cuda_cores = 7168
     arrayDummy = np.random.rand(2).astype(np.float32)
     array0 = np.random.rand(10).astype(np.float32)
     array1 = np.random.rand(100).astype(np.float32)
     array2 = np.random.rand(1000).astype(np.float32)
     array3 = np.random.rand(10000).astype(np.float32)
+    # array4 = np.random.rand(100000).astype(np.float32)
     experiment_arrays = [arrayDummy, array0, array1, array2, array3]
     experimetns_parallel = []
     sorted_in_parallel = []
@@ -156,7 +158,7 @@ def main():
             result = np.empty(0, dtype=np.float32)
 
             buckets_gpu = []
-            no_splitters = min(56-1, array.shape[0])
+            no_splitters = int(array.shape[0] // math.sqrt(cuda_cores))
             splitters = np.random.choice(array, no_splitters, replace=False)
             splitters = np.sort(splitters)
             buckets = create_buckets(array, splitters)
@@ -192,7 +194,7 @@ def main():
             array = series_bubble_sort(array)
             time_end = time.perf_counter()
             avg_time += time_end - time_start
-        experiment = {"array_len": len(array), "no_buckets": len(buckets),
+        experiment = {"array_len": len(array),
                       "time": (avg_time / no_experimtens)}
         experiments_series.append(experiment)
         sorted_in_series.append(array)
