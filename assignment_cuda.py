@@ -159,6 +159,8 @@ def main():
 
             buckets_gpu = []
             no_splitters = int(array.shape[0] // math.sqrt(cuda_cores))
+            if no_splitters >= cuda_cores:
+                no_splitters = cuda_cores - 1
             splitters = np.random.choice(array, no_splitters, replace=False)
             splitters = np.sort(splitters)
             buckets = create_buckets(array, splitters)
