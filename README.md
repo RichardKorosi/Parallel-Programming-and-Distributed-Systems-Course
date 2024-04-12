@@ -17,7 +17,7 @@ buckets = create_buckets(array, splitters)
 ```
 Počet splitterov a teda aj bucketov záleží od  schopností GPU (počet jadier) a veľkosti vstupného poľa (počet bucektov je vždy o 1 vyšší ako počet splitterov). Splittre sa vyberajú ako náhodné elementy z pola, ktoré chceme zoradiť. Po zoradení vybratých splitterov sa začnú vytvárať buckety.
 #### Experimenty pre získanie optimálneho počtu splitterov/bucketov:
-Prvým krokom bolo zistiť počet CUDA jadier GPU. Experimenty boli vykonávané na grafickej karte `NVDIA GeForce RTX 4070 SUPER` s 7168 CUDA jadrami. Pri experimentoch sa porovnávala časová efektivita voči sériovému triediacemu algoritmu, z 10 behov experimentov sa vytvoril priemerný čas.
+Po úspešnej implementácii paralelnej verzie sa bolo treba vrátiť k pokusu nájdenia optimálneho počtu splitterov (v prvej verzii riešenia bol počet splitterov pevne určený konštantou). Prvým krokom bolo zistiť počet CUDA jadier GPU. Experimenty boli vykonávané na grafickej karte `NVDIA GeForce RTX 4070 SUPER` s 7168 CUDA jadrami. Pri experimentoch sa zozačiatku porovnávala časová efektivita voči sériovému triediacemu algoritmu (neskôr už len medzi paralelnými riešeniami), z 10 behov experimentov sa vytvoril priemerný čas.
 ```py
 #Nastavenie:
 no_splitters = min(cuda_cores - 1, array.shape[0] - 1)
@@ -52,7 +52,7 @@ no_splitters = min(cuda_cores // 100, array.shape[0] // 100)
 {'array_len': 10000, 'no_buckets': 72, 'time': 0.026504499997827224}
 {'array_len': 100000, 'no_buckets': 72, 'time': 0.9641740999941248}   
 ```
-Toto riešnie na prvý pohľad vyzerá už efektívne a správne, ale pri väčšsom zamyslení si môžeme všimnúť fakt, že od dĺžky pola 10000 sa už bude stále využívať len 72 bucketov a tým pádom pri obrovských poliach by už bol tento počet nedostačujúci.
+Toto riešnie na prvý pohľad vyzerá už efektívne a správne, ale pri väčšsom zamyslení si môžeme všimnúť fakt, že keď dĺžka poľa presiahne počet CUDA jadier, tak sa bude využívať stále len 72 bucketov a tým pádom pri obrovských poliach by už bol tento počet nedostačujúci.
 ```py
 #Nastavenie:
 no_splitters = int(array.shape[0] // math.sqrt(cuda_cores))
@@ -65,7 +65,7 @@ if no_splitters >= cuda_cores:
 {'array_len': 10000, 'no_buckets': 119, 'time': 0.0439030000125058}
 {'array_len': 100000, 'no_buckets': 1182, 'time': 0.4538427999941632}
 ```
-Snahou teda bolo vytvoriť vzorec, ktorý by pri malých poliach vytváral čo najmenej bucketov, ale aby pri veľkých poliach neostal pri príliš málo bucketoch. Momentálne riešenie rozdeluje buckety na základe vzorca `dlzka_pola // odmocnina(pocet_cuda_jadier)`. V priemere dĺžka bucketu je okolo 84, kde ešte nedokonalosti využitého bubble sortu nie sú tak značné a na zoradenie takéhoto bucketu postačí jedno CUDA jadro. Ešte bolo treba ošetriť možnosť kebyže pole je až tak veľké, že by výsledok vyšiel väčší ako počet CUDA jadier.
+Snahou teda bolo vytvoriť vzorec, ktorý by pri malých poliach vytváral čo najmenej bucketov, ale aby pri veľkých poliach neostal pri príliš málo bucketoch. Momentálne riešenie rozdeluje buckety na základe vzorca `dlzka_pola // odmocnina(pocet_cuda_jadier)`. V priemere dĺžka bucketu je okolo 84, kde ešte nedokonalosti využitého Bubble sortu nie sú tak značné a na zoradenie takéhoto bucketu postačí jedno CUDA jadro. Ešte bolo treba ošetriť možnosť kebyže pole je až tak veľké, že by výsledok vyšiel väčší ako počet CUDA jadier.
 
 #### Tvorba bucketov:
 ```python
@@ -85,7 +85,7 @@ def create_buckets(array, splitters):
 
     return buckets
 ```
-Funkcia `create_buckets()` vytvorí o jeden bucket viac ako je splitterov. Buckty sa napĺňajú dátami z poľa, ktoré sa má zoradiť. Princíp fungovania napľňovania bucketov je nasledovný:
+Funkcia `create_buckets()` vytvorí o jeden bucket viac ako je splitterov. Buckety sa napĺňajú dátami z poľa, ktoré sa má zoradiť. Princíp fungovania napľňovania bucketov je nasledovný:
 1) Prvý bucket obsahuje všetky prvky, ktoré sú menšie ako prvý splitter.
 2) Druhý bucket obsahuje všetky prvky, ktoré sú menšie ako druhý splitter atď. 
 3) Posledný bucket obsahuje všetky prvky, ktoré sú väčšie ako posledný splitter.
@@ -94,7 +94,7 @@ Princíp fungovania for...else v algoritme je taký, že ak nastane v loope `bre
 
 Keďže sa buckety napĺňajú postupne z poľa `array`, tak pokiaľ pole `array` nebolo zoradené (čo predpokladáme, že nebolo), tak ani buckety nebudú zoradené. Zoraďovanie jednotlivých bucketov sa v tejto implementáciu už vykonáva paralelne (viď. ďalšie kapitoly v dokumentácii).
 ### Streamy:
-Riešenie problému bolo implementované za pomoci streamov/prúdov, prúdy sú fronty operácií GPU, ktoré sa vykonávajú v určitom poradí. Streamy využívajú schopnosť GPU prekrývať vykonávanie jadra s operáciami kopírovania pamäte. Každý prúd predstavuje nezávislé vykonávanie príkazov voči ostatným prúdom a teda sa môžu vykonávať konkuretne/asynchrónne. Implementácia funguje na princípe, že každý bucket má vlastný stream (info o streamoch viď. zdroje). Po tejto 'inicializácii' prúdov sa posielajú dáta bucketov do GPU. Následne sa zavolá `my_kernel` s jedným vláknom (blocksPerGrid aj threadsPerBlock = 1). V `my_kernel` sa dané buckety zosortujú a následne sa v poslednom loope získa výsledok poskladaním už zosortovaných bucketov.
+Riešenie problému bolo implementované za pomoci streamov/prúdov, prúdy sú fronty operácií GPU, ktoré sa vykonávajú v určitom poradí. Streamy využívajú schopnosť GPU prekrývať vykonávanie jadra s operáciami kopírovania pamäte. Každý prúd predstavuje nezávislé vykonávanie príkazov voči ostatným prúdom a teda sa môžu vykonávať konkuretne/asynchrónne. Implementácia funguje na princípe, že každý bucket má vlastný stream (info o streamoch viď. zdroje). Po tejto 'inicializácii' prúdov sa posielajú dáta bucketov do GPU. Následne sa zavolá `my_kernel` s jedným vláknom (blocksPerGrid aj threadsPerBlock = 1). V `my_kernel` sa dané buckety zosortujú a následne sa v poslednom loope získa výsledok poskladaním už zosortovaných bucketov (implementácia streamov bola prevzatá a inšpirovaná implementáciou využitou na cvičení PPDS, viď. zdroje).
 ```python
 streams = [cuda.stream() for _ in range(len(buckets))]
 
@@ -108,7 +108,7 @@ for bucket, stream in zip(buckets_gpu, streams):
     result = np.append(result, bucket.copy_to_host(stream=stream))
 ```
 ### Sortovanie na GPU:
-Zoraďovanie prvkov v bucketoch na GPU sa vykonáva už sériovo (každý bucket je zoraďovaný práve jedným jadrom). Zoraďovací algoritmus je klasický bubble sort. Keďže sa v tejto implementácii už na GPU buckety sortujú sériovo, tak nie je potrebné volať `my_kernel` s `threadsPerBlock` a `blocksPerGrid` s väčšou hodnotou ako 1.
+Zoraďovanie prvkov v bucketoch na GPU sa vykonáva už sériovo (každý bucket je zoraďovaný práve jedným jadrom). Zoraďovací algoritmus je klasický Bubble sort. Keďže sa v tejto implementácii už na GPU buckety sortujú sériovo, tak nie je potrebné volať `my_kernel` s `threadsPerBlock` a `blocksPerGrid` s väčšou hodnotou ako 1.
 ```python
 @cuda.jit
 def my_kernel(bucket):
@@ -122,9 +122,9 @@ def my_kernel(bucket):
         break
 ```
 ### Zhodnotenie a postrehy z implementácie:
-Nevýhodou tejto implementácie, je fakt, že sa využíva na sortovanie konkrétneho bucketu len 1 jadro. Keďže základnou vykonávaciou jednotkou je warp, ktorý obsahuje 32 jadier. To znamená, že pracuje v danom warpe len jedno jadro a zvyšok ostáva nevyužitý. Výhodou tohto riešenia však bola jednoduchá implementácia a pri experimentoch (kapitola nižšie) dokázala byť znateľne rýchlejšia ako čisto sériové sortovanie poľa. 
+Nevýhodou tejto implementácie, je fakt, že sa využíva na sortovanie konkrétneho bucketu len 1 jadro. Keďže základnou vykonávaciou jednotkou CUDA programov je warp, ktorý obsahuje 32 jadier. To znamená, že pracuje v danom warpe len jedno jadro a zvyšok ostáva nevyužitý. Výhodou tohto riešenia však bola jednoduchá implementácia a pri experimentoch (kapitola nižšie) dokázala byť znateľne rýchlejšia ako čisto sériové sortovanie poľa. 
 ## Porovnanie paralelného a sériového riešenia:
-Výsledné porovnanie medzi sériovým a paralelným riešením spočívalo v porovnaní časovej efektivity. Experimenty sa vykonávali v 40 behoch, pričom výsledné časy sa spriemerovali do finálneho výsledku pre daný experiment. Obe verzie implementácie dostali na zotriedenie rovnaké polia dĺžok 10,100,1000,10000.
+Výsledné porovnanie medzi sériovým triediacim algoritmom (Bubble sort) a paralelným riešením spočívalo v porovnaní časovej efektivity. Experimenty sa vykonávali v 40 behoch, pričom výsledné časy sa spriemerovali do finálneho výsledku pre daný experiment. Obe verzie implementácie dostali na zotriedenie rovnaké polia dĺžok 10,100,1000,10000.
 ```py
 {'array_len': 10, 'no_buckets': 1, 'time': 0.0004594875001203036}
 {'array_len': 100, 'no_buckets': 2, 'time': 0.0009463275004236493}
@@ -138,7 +138,7 @@ Výsledné porovnanie medzi sériovým a paralelným riešením spočívalo v po
 ![image](https://github.com/RichardKorosi/Korosi-111313-PPDS2024/assets/99643046/d797b40d-6780-44e3-8ccc-5e74990be226)
 
 
-Z experimentov jasne vyplíva, že paralelizácia urýchlila sortovanie polí, najmä pri vyšších rádoch, kde sériová implementácia bubblesortu uź jednoznačne ukazovala jej časovú (ne)efektivitu O(n^2). \
+Z experimentov jasne vyplýva, že paralelizácia urýchlila sortovanie polí, najmä pri vyšších rádoch, kde sériová implementácia Bubble sortu už jednoznačne ukazovala jej časovú (ne)efektivitu O(n^2). \
 Pre lepšiu vizualizáciu menších polí boli experimenty pustené ešte raz bez poľa s dĺžkou 10000:
 ```py
 {'array_len': 10, 'no_buckets': 1, 'time': 0.0005307524996169377}
@@ -152,27 +152,17 @@ Pre lepšiu vizualizáciu menších polí boli experimenty pustené ešte raz be
 Môžeme si všimnúť, že pri menších poliach je paralelizmus mierne pomalší (vo paralelnej verzii sa do meraného času zarátava aj samotné posielanie/získavanie dát z GPU).
 
 
-
-
-
-
-
-
-
-
-
-
-
 ## Zdroje:
 Inšpirácie, využité časti kódu a podobne:
 * [README template](https://github.com/matiassingers/awesome-readme)
 * [PEP 8 & PEP 257 validator](https://www.codewof.co.nz/style/python3/)
 * [Conventional Commits guide](https://www.conventionalcommits.org/en/v1.0.0/)
-* [Teória o CUDA streamoch](https://turing.une.edu.au/~cosc330/lectures/display_notes.php?lecture=22)
 * [Matplotlib grouped bar chart with labels](https://matplotlib.org/stable/gallery/lines_bars_and_markers/barchart.html#sphx-glr-gallery-lines-bars-and-markers-barchart-py)
-* [Algoritmus Samplesort - Wikipedia](https://en.wikipedia.org/wiki/Samplesort)
-* [Algoritmus Bubblesort - GeeksForGeeks](https://www.geeksforgeeks.org/bubble-sort/)
-* [Algoritmus for...else - W3Schools](https://www.w3schools.com/python/gloss_python_for_else.asp)
 * [Využité poskytnuté skripty z cvičení](https://github.com/tj314/ppds-seminars/tree/ppds2024/seminar8)
+* [Algoritmus Samplesort - Wikipedia](https://en.wikipedia.org/wiki/Samplesort)
+* [Algoritmus Bubble sort - GeeksForGeeks](https://www.geeksforgeeks.org/bubble-sort/)
+* [Algoritmus for...else - W3Schools](https://www.w3schools.com/python/gloss_python_for_else.asp)
+* [Teória o CUDA streamoch](https://turing.une.edu.au/~cosc330/lectures/display_notes.php?lecture=22)
+* [Teória a scripty boli inšpirované prednáškou z PPDS](https://elearn.elf.stuba.sk/moodle/pluginfile.php/77339/mod_resource/content/2/2024-08.cuda.pdf)
 * [Teoretické časti boli vysvetlené na základe vedomostí získaných na prednáške a seminári na predmete PPDS](https://uim.fei.stuba.sk/predmet/i-ppds/)
 
