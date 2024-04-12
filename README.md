@@ -122,7 +122,32 @@ def my_kernel(bucket):
 ### Zhodnotenie a postrehy z implementácie:
 Nevýhodou tejto implementácie, je fakt, že sa využíva na sortovanie konkrétneho bucketu len 1 jadro. Keďže základnou vykonávaciou jednotkou je warp, ktorý obsahuje 32 jadier. To znamená, že pracuje v danom warpe len jedno jadro a zvyšok ostáva nevyužitý. Výhodou tohto riešenia však bola jednoduchá implementácia a pri experimentoch (kapitola nižšie) dokázala byť znateľne rýchlejšia ako čisto sériové sortovanie poľa. 
 ## Porovnanie paralelného a sériového riešenia:
+Výsledné porovnanie medzi sériovým a paralelným riešením spočívalo v porovnaní časovej efektivity. Experimenty sa vykonávali v 40 behoch, pričom výsledné časy sa spriemerovali do finálneho výsledku pre daný experiment. Obe verzie implementácie dostali na zotriedenie rovnaké polia dĺžok 10,100,1000,10000.
+```py
+{'array_len': 10, 'no_buckets': 1, 'time': 0.0004594875001203036}
+{'array_len': 100, 'no_buckets': 2, 'time': 0.0009463275004236493}
+{'array_len': 1000, 'no_buckets': 12, 'time': 0.00485933749951073}
+{'array_len': 10000, 'no_buckets': 119, 'time': 0.045963677499821644}
+{'array_len': 10, 'time': 7.124998955987394e-06}
+{'array_len': 100, 'time': 0.0008197649996873225}
+{'array_len': 1000, 'time': 0.08887066500028595}
+{'array_len': 10000, 'time': 8.926703257500412}
+```
+![image](https://github.com/RichardKorosi/Korosi-111313-PPDS2024/assets/99643046/d797b40d-6780-44e3-8ccc-5e74990be226)
 
+
+Z experimentov jasne vyplíva, že paralelizácia urýchlila sortovanie polí, najmä pri vyšších rádoch, kde sériová implementácia bubblesortu uź jednoznačne ukazovala jej časovú (ne)efektivitu O(n^2). \
+Pre lepšiu vizualizáciu menších polí boli experimenty pustené ešte raz bez poľa s dĺžkou 10000:
+```py
+{'array_len': 10, 'no_buckets': 1, 'time': 0.0005307524996169377}
+{'array_len': 100, 'no_buckets': 2, 'time': 0.0010458650009240954}
+{'array_len': 1000, 'no_buckets': 12, 'time': 0.005803657499927795}
+{'array_len': 10, 'time': 8.042499030125327e-06}
+{'array_len': 100, 'time': 0.000728022500697989}
+{'array_len': 1000, 'time': 0.08543701249946026}
+```
+![image](https://github.com/RichardKorosi/Korosi-111313-PPDS2024/assets/99643046/8e7c22d5-a4cc-4ed3-a9a3-58fbc55315ae)
+Môžeme si všimnúť, že pri menších poliach je paralelizmus mierne pomalší (vo paralelnej verzii sa do meraného času zarátava aj samotné posielanie/získavanie dát z GPU).
 
 
 
