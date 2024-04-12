@@ -8,7 +8,9 @@
 Nasledovná časť implementácie sa sústredí na jednu iteráciu vykonávanú v programe (pre pole `array`). Implementácia algoritmu samplesort bola inšpirovaná pseudokódom poskytnutom na Wikipedii (viď. zdroje).
 ### Vytvorenie splitterov a bucketov:
 ```python
-no_splitters = min(56-1, array.shape[0])
+no_splitters = int(array.shape[0] // math.sqrt(cuda_cores))
+if no_splitters >= cuda_cores:
+    no_splitters = cuda_cores - 1
 splitters = np.random.choice(array, no_splitters, replace=False)
 splitters = np.sort(splitters)
 buckets = create_buckets(array, splitters)
