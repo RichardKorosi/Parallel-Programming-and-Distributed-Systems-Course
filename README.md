@@ -30,7 +30,7 @@ no_splitters = min(cuda_cores - 1, array.shape[0] - 1)
 {'array_len': 1000, 'time': 0.08627961999736726}
 {'array_len': 10000, 'time': 8.752622479999264}
 ```
-Vyššie zobrazené riešenie už na prvý pohľad vyzerá neoptimálne. Toto riešenie využíva na menších poliach na každý jeden prvok pola jeden bucket a teda jadrá ani nemajú čo triediť a tým pádom toto riešenie akurát stráca čas zbytočným posielaním dát bucketov do/z GPU. Taktiež si môžeme všimnúť, že daná implementácia je efektívnejšia než klasický sériový sort až pri väčších poliach, kde už neplatí `1 jadro = 1 bucket`.
+Vyššie zobrazené riešenie už na prvý pohľad vyzerá neoptimálne. Toto riešenie využíva na menších poliach na každý jeden prvok pola jeden bucket a teda jadrá ani nemajú čo triediť a tým pádom toto riešenie akurát stráca čas zbytočným posielaním dát bucketov do/z GPU. Taktiež si môžeme všimnúť, že daná implementácia je efektívnejšia než klasický sériový sort až pri väčších poliach, kde už neplatí `pocet_bucketov = dlzka_pola`.
 ```py
 #Nastavenie:
 no_splitters = min(cuda_cores // 4, array.shape[0] // 4)
