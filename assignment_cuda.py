@@ -7,7 +7,7 @@ The solutions of this assignment was inspired by the following source(s):
 Function create_buckets was explained in documentation and inspired
     by the following source(s):
     - https://www.w3schools.com/python/gloss_python_for_else.asp
-Functions series_bubble_sort and my_kernel were made 
+Functions series_bubble_sort and my_kernel were made
     with the help of the following source(s):
     - https://www.geeksforgeeks.org/bubble-sort/
 Function create_graph was inspired by the following source(s):
@@ -76,11 +76,11 @@ def create_graph(experiment_parallel, experiment_series):
     fig, ax = plt.subplots()
 
     rects1 = ax.bar(x - width/2, time_para, width, label='Parallel', color="r")
-    rects2 = ax.bar(x + width/2, time_series, width, label='Normal', color="g")
+    rects2 = ax.bar(x + width/2, time_series, width, label='Series', color="g")
 
     ax.set_xlabel("Array Length / Number of Buckets")
     ax.set_ylabel("Time [s]")
-    ax.set_title("Comparison of Parallel and Normal Experiments")
+    ax.set_title("Comparison of Parallel and Series Experiments")
     labels = [f"Len:{len}\nBuckets:{buckets}" for len,
               buckets in zip(array_len, no_buckets)]
     ax.set_xticks(x)
@@ -138,13 +138,13 @@ def main():
     """
     no_experimtens = 1
     cuda_cores = 7168
-    arrayDummy = np.random.rand(2).astype(np.float32)
+    array_dummy = np.random.rand(2).astype(np.float32)
     array0 = np.random.rand(10).astype(np.float32)
     array1 = np.random.rand(100).astype(np.float32)
     array2 = np.random.rand(1000).astype(np.float32)
     array3 = np.random.rand(10000).astype(np.float32)
     # array4 = np.random.rand(100000).astype(np.float32)
-    experiment_arrays = [arrayDummy, array0, array1, array2, array3]
+    experiment_arrays = [array_dummy, array0, array1, array2, array3]
     experimetns_parallel = []
     sorted_in_parallel = []
     experiments_series = []
@@ -158,9 +158,8 @@ def main():
             result = np.empty(0, dtype=np.float32)
 
             buckets_gpu = []
-            no_splitters = int(array.shape[0] // math.sqrt(cuda_cores))
-            if no_splitters >= cuda_cores:
-                no_splitters = cuda_cores - 1
+            no_splitters = min(int(array.shape[0] // math.sqrt(cuda_cores)),
+                               cuda_cores - 1)
             splitters = np.random.choice(array, no_splitters, replace=False)
             splitters = np.sort(splitters)
             buckets = create_buckets(array, splitters)
@@ -186,7 +185,6 @@ def main():
         print("DONE PARALLEL")
         curr_arr_index += 1
 
-
     curr_arr_index = 0
     for array in experiment_arrays:
         avg_time = 0
@@ -200,14 +198,14 @@ def main():
                       "time": (avg_time / no_experimtens)}
         experiments_series.append(experiment)
         sorted_in_series.append(array)
-        print("DONE NORMAL")
+        print("DONE SERIES")
         curr_arr_index += 1
 
     for experiment in experimetns_parallel[1:]:
         print(experiment)
     for experiment in experiments_series[1:]:
         print(experiment)
-    
+
     for array in sorted_in_parallel:
         print(np.all(array[:-1] <= array[1:]))
     for array in sorted_in_series:
