@@ -50,10 +50,12 @@ no_splitters = min(cuda_cores // 100, array.shape[0] // 100)
 {'array_len': 10000, 'no_buckets': 72, 'time': 0.026504499997827224}
 {'array_len': 100000, 'no_buckets': 72, 'time': 0.9641740999941248}   
 ```
-Toto riešnie na prvý pohľad vyzerá už efektívne a správne, ale pri väčšsom zamyslení si môžeme domyslieť fakt, že od dĺžky pola 10000 sa už bude stále využívať len 72 bucketov a tým pádom pri obrovských poliach by už bol tento počet nedostačujúci.
+Toto riešnie na prvý pohľad vyzerá už efektívne a správne, ale pri väčšsom zamyslení si môžeme všimnúť fakt, že od dĺžky pola 10000 sa už bude stále využívať len 72 bucketov a tým pádom pri obrovských poliach by už bol tento počet nedostačujúci.
 ```py
 #Nastavenie:
 no_splitters = int(array.shape[0] // math.sqrt(cuda_cores))
+if no_splitters >= cuda_cores:
+    no_splitters = cuda_cores - 1
 #Vysledok:
 {'array_len': 10, 'no_buckets': 1, 'time': 0.0005918999959249049}
 {'array_len': 100, 'no_buckets': 2, 'time': 0.0010583999974187464}
@@ -61,7 +63,7 @@ no_splitters = int(array.shape[0] // math.sqrt(cuda_cores))
 {'array_len': 10000, 'no_buckets': 119, 'time': 0.0439030000125058}
 {'array_len': 100000, 'no_buckets': 1182, 'time': 0.4538427999941632}
 ```
-Snahou teda bolo vytvoriť vzorec, ktorý by pri malých poliach vytváral čo najmenej bucketov, ale aby pri veľkých poliach neostal pri príliš málo bucketoch. Momentálne riešenie rozdeluje buckety na základe vzorca `dlzka_pola // odmocnina(pocet_cuda_jadier)`. V priemere dĺžka bucketu je okolo 84, kde ešte nedokonalosti využitého bubble sortu nie sú tak značné a na zoradenie takéhoto bucketu postačí jedno CUDA jadro.
+Snahou teda bolo vytvoriť vzorec, ktorý by pri malých poliach vytváral čo najmenej bucketov, ale aby pri veľkých poliach neostal pri príliš málo bucketoch. Momentálne riešenie rozdeluje buckety na základe vzorca `dlzka_pola // odmocnina(pocet_cuda_jadier)`. V priemere dĺžka bucketu je okolo 84, kde ešte nedokonalosti využitého bubble sortu nie sú tak značné a na zoradenie takéhoto bucketu postačí jedno CUDA jadro. Ešte bolo treba ošetriť možnosť kebyže pole je až tak veľké, že by výsledok vyšiel väčší ako počet CUDA jadier.
 
 #### Tvorba bucketov:
 ```python
