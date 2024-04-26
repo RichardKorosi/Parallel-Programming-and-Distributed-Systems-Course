@@ -26,11 +26,11 @@ class Scheduler:
 
     def start(self):
         while True:
-            data = ''.join(random.choices(string.ascii_lowercase + string.digits, k=6)) + random.choice(['!', '?', '.'])
+            data = ''.join(random.choices(string.ascii_lowercase + string.digits, k=3)) + random.choice(['!', '?', '.'])
             sleep(0.2)
 
             print(f'{Fore.WHITE}' + '-'*50)
-            for job in self.jobs:
+            for job in self.jobs[:]:
                 try:
                     current_job = job
                     job.send(data)
