@@ -84,6 +84,8 @@ def digits_vs_chars():
         if digits > chars:
             print(f'{Fore.LIGHTMAGENTA_EX}T3: Digits won! {text}')
             break
+        elif digits == chars:
+            print(f'{Fore.LIGHTMAGENTA_EX}T3: It is a draw! {text}')
         else:
             print(f'{Fore.LIGHTMAGENTA_EX}T3: Characters won! {text}')
 
