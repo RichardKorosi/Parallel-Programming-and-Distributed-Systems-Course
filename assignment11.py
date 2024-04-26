@@ -2,7 +2,7 @@ from typing import Callable
 import random
 import string
 from time import sleep
-from colorama import Fore, Style
+from colorama import Fore
 
 def consumer(func: Callable) -> Callable:
     def wrapper(*args, **kw):
@@ -19,24 +19,27 @@ def consumer(func: Callable) -> Callable:
 class Scheduler:
     def __init__(self):
         self.jobs = []
-        print('Scheduler is ready!')
+        print(f'{Fore.RED}----Scheduler is ready!----')
 
     def add_job(self, it):
        self.jobs.append(it)
 
     def start(self):
         while True:
+            data = ''.join(random.choices(string.ascii_lowercase + string.digits, k=6)) + random.choice(['!', '?', '.'])
             sleep(0.2)
-            try:
-                data = ''.join(random.choices(string.ascii_lowercase + string.digits, k=10)) + random.choice(['!', '?', '.'])
-                for job in self.jobs:
+
+            print(f'{Fore.WHITE}' + '-'*50)
+            for job in self.jobs:
+                try:
                     current_job = job
                     job.send(data)
-                print('---')
-            except StopIteration:
-                self.jobs.remove(current_job)
-                print(f'\n{Fore.RED}Coprogram {current_job.__name__} has finished!\n')
+                except StopIteration:
+                    self.jobs.remove(current_job)
+                    print(f'{Fore.RED}----Coprogram {current_job.__name__} has finished!----')
+                    continue
             if not self.jobs:
+                print(f'{Fore.WHITE}' + '-'*50)
                 break
 
 @consumer
