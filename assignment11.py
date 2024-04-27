@@ -24,22 +24,22 @@ def consumer(func: Callable) -> Callable:
 
 
 class Scheduler:
-    """Scheduler class for the coroutines."""
+    """Scheduler class for the coprograms."""
 
     def __init__(self):
         """Initialize the scheduler.
 
-        Create an empty list for the coroutines.
+        Create an empty list for the coprograms.
         And inform the user that the scheduler is ready.
         """
         self.jobs = []
         print(f'{Fore.RED}----Scheduler is ready!----')
 
     def add_job(self, it):
-        """Add coroutine to the scheduler.
+        """Add coprogram to the scheduler.
 
         Keyword arguments:
-        it -- coroutine to be added
+        it -- coprogram to be added
         """
         self.jobs.append(it)
 
@@ -47,7 +47,7 @@ class Scheduler:
         """Start the scheduler.
 
         More specifically, it generates random data and sends it to the
-        coroutines in the infinite loop. When all coroutines are finished,
+        coprograms in the infinite loop. When all coprograms are finished,
         the scheduler stops.
         """
         while True:
@@ -76,7 +76,7 @@ def two_strings_fight():
 
     More specifically, after the second yield function compares
     the two strings based on their ASCII values and prints the result.
-    If second string wins, the coroutine finishes.
+    If second string wins, the coprogram finishes.
     """
     while True:
         text1 = yield
@@ -105,7 +105,7 @@ def get_type():
 
     More specifically, this function determines the type of the
     sentence based on the last character of the sentence.
-    After 10th sentence, the coroutine finishes.
+    After 10th sentence, the coprogram finishes.
     """
     x = 0
     while x < 10:
@@ -127,7 +127,7 @@ def digits_vs_chars():
     """Compare the number of digits and characters in the sentence.
 
     More specifically, this function compares amount of digits and
-    characters in the sentence. If digits win, the coroutine finishes.
+    characters in the sentence. If digits win, the coprogram finishes.
     """
     while True:
         text = yield
