@@ -12,6 +12,8 @@ Metóda `start()` v nekonečnom loope generuje dáta (stringy), s ktorými násl
 danému koprogramu dáta. Taktiež ošetruje aj `StopIteration` výnimku, ktorá nastane pri ukončení koprogramu, v takom prípade vymaže daný koprogram z listu, cez ktorý iteruje.
 Ak je list už prázdny (každý koprogram už skončil), tak sa celý loop `breakne`.
 ### Koprogramy:
+Princíp fungovania všetkých implementovaných koprogramov je nasledovný: V každom koprograme sa nachádza `while` cyklus, ktorý sa začína príkazom `yield`, na ktorom preruší svoje vykonávanie až pokiaľ neobdrží dáta z plánovača pomocou `.send()`. Loopy koprogramov trvajú pokiaľ sa nesplní špecifická podmienka. 
+
 Prvý koprogram `two_strings_fight()` v sebe obsahuje 2 `yieldy`. Porovnávanie nastáva vždy po tom ako koprogram dostane novú dvojicu stringov ( a vypočíta si súčty ASCII hodnôt v stringoch). Po obdržaní druhého stringu koprogram porovná hodnoty
 a následne ak druhý string má väčšiu hodnotu, tak sa koprogram ukončí.
 ```py
