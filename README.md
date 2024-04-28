@@ -71,3 +71,48 @@ def digits_vs_chars():
         else:
             print(f'{Fore.LIGHTMAGENTA_EX}Job3: Characters won! {text}')
 ```
+## Výpis konzoly
+Každá iterácia/kolo je oddelená pomlčkami. 
+![image](https://github.com/RichardKorosi/Korosi-111313-PPDS2024/assets/99643046/cf2298dc-adc8-47e8-8282-78807539b48c)
+```
+----Scheduler is ready!----
+--------------------------------------------------
+Job1: First contestant is: d2mkq7prfg!    
+Job2: This is an order! d2mkq7prfg! (1/10)
+Job3: Characters won! d2mkq7prfg!
+--------------------------------------------------
+Job1: Second contestant is: 8u2ch1kzl0?
+Job1: Contestant one won! d2mkq7prfg! [998] vs 8u2ch1kzl0? [923]
+Job2: This is a question! 8u2ch1kzl0? (2/10)
+Job3: Characters won! 8u2ch1kzl0?
+--------------------------------------------------
+Job1: First contestant is: x512hpzho1!    
+Job2: This is an order! x512hpzho1! (3/10)
+Job3: Characters won! x512hpzho1!
+--------------------------------------------------
+Job1: Second contestant is: fkcy4vyl0i!
+Job1: Contestant two won! x512hpzho1! [907] vs fkcy4vyl0i! [1014]
+----Coprogram two_strings_fight has finished!----
+Job2: This is an order! fkcy4vyl0i! (4/10)
+Job3: Characters won! fkcy4vyl0i!
+--------------------------------------------------
+Job2: This is a statement! af6cejpnz0. (5/10)
+Job3: Characters won! af6cejpnz0.
+--------------------------------------------------
+Job2: This is a statement! 9bwyazlyf4. (6/10)
+Job3: Characters won! 9bwyazlyf4.
+--------------------------------------------------
+Job2: This is a question! o5vkb2gojz? (7/10)
+Job3: Characters won! o5vkb2gojz?
+--------------------------------------------------
+Job2: This is an order! nux406i505! (8/10)     
+Job3: Digits won! nux406i505!
+----Coprogram digits_vs_chars has finished!----
+--------------------------------------------------
+Job2: This is a statement! 1m4660vb37. (9/10)
+--------------------------------------------------
+Job2: This is an order! j2qkbn7u4m! (10/10)       
+----Coprogram get_type has finished!----
+--------------------------------------------------
+```
+
