@@ -64,7 +64,7 @@ class Scheduler:
                 except StopIteration:
                     self.jobs.remove(current_job)
                     print(f'{Fore.RED}----Coprogram {current_job.__name__}'
-                          f'has finished!----')
+                          f' has finished!----')
             if not self.jobs:
                 print(f'{Fore.WHITE}' + '-' * 50)
                 break
