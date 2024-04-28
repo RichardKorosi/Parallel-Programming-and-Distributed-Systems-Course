@@ -6,52 +6,13 @@
 4) Dokumentácia: stručne slovne vysvetlite implementáciu.
 ## Implementácia:
 ### Plánovač:
-Implementácia zadania spočívala vo vytvorení classy `Scheduler`, ktorá v nekonečnom loope dookola (round-robin štýlom) posiela dáta koprogramom.
-```py
-# Main funkcia
-def main():
-    scheduler = Scheduler()
-    job1 = two_strings_fight()
-    job2 = get_type()
-    job3 = digits_vs_chars()
-    scheduler.add_job(job1)
-    scheduler.add_job(job2)
-    scheduler.add_job(job3)
-    scheduler.start()
-```
-```py
-# Scheduler metody
-def __init__(self):
-    self.jobs = []
+Implementácia zadania spočívala vo vytvorení classy `Scheduler`, ktorá v nekonečnom loope dookola (round-robin štýlom) posiela dáta koprogramom. List koprogramov, ktoré sa majú spúšťať sa napĺňa pomocou metódy `add_job()`, ktorá sa volá v `main()` funkcii, po naplnení listu sa následne volá metóda `start()`, ktorá spúšťa plánovač.
 
-def add_job(self, it):
-    self.jobs.append(it)
-
-def start(self):
-    while True:
-        rand = random.choices(string.ascii_lowercase + string.digits, k=10)
-        data = ''.join(rand)
-        data += random.choice(['!', '?', '.'])
-        sleep(0.2)
-
-        print(f'{Fore.WHITE}' + '-' * 50)
-        for job in self.jobs[:]:
-            try:
-                current_job = job
-                job.send(data)
-            except StopIteration:
-                self.jobs.remove(current_job)
-                print(f'{Fore.RED}----Coprogram {current_job.__name__}'
-                      f'has finished!----')
-        if not self.jobs:
-            print(f'{Fore.WHITE}' + '-' * 50)
-            break
-```
-Metóda `start` v nekonečnom loope generuje dáta (stringy), s ktorými následne koprogramy pracujú. Prechádza cez každý ešte neukončený koprogram a pomocou `.send(data)`
+Metóda `start()` v nekonečnom loope generuje dáta (stringy), s ktorými následne koprogramy pracujú. Prechádza cez každý ešte neukončený koprogram a pomocou `.send(data)`
 danému koprogramu dáta. Taktiež ošetruje aj `StopIteration` výnimku, ktorá nastane pri ukončení koprogramu, v takom prípade vymaže daný koprogram z listu, cez ktorý iteruje.
 Ak je list už prázdny (každý koprogram už skončil), tak sa celý loop `breakne`.
 ### Koprogramy:
-Prvý koprogram v sebe obsahuje 2 `yieldy`. Porovnávanie nastáva vždy po tom ako koprogram dostane novú dvojicu stringov ( a vypočíta si súčty ASCII hodnôt v stringoch). Po obdržaní druhého stringu koprogram porovná hodnoty
+Prvý koprogram `two_strings_fight()` v sebe obsahuje 2 `yieldy`. Porovnávanie nastáva vždy po tom ako koprogram dostane novú dvojicu stringov ( a vypočíta si súčty ASCII hodnôt v stringoch). Po obdržaní druhého stringu koprogram porovná hodnoty
 a následne ak druhý string má väčšiu hodnotu, tak sa koprogram ukončí.
 ```py
 @consumer
@@ -75,4 +36,38 @@ def two_strings_fight():
             print(f'{Fore.LIGHTCYAN_EX}Job1: Contestant two won! '
                   f'{text1} [{sum1}] vs {text2} [{sum2}]')
             break
+```
+Druhý koprogram `get_type()` zisťuje o akú "vetu" sa jedná (otázka, rozkaz, oznam). Má inú ukončovaciu podmienku a len jeden `yield`. Tento koprogram sa narozdiel od predchádzajúceho ukončí vždy po 10 vykonaných iteráciách.
+```py
+@consumer
+def get_type():
+    x = 0
+    while x < 10:
+        text = yield
+        if "!" in text:
+            print(f'{Fore.LIGHTGREEN_EX}Job2: This is an order! '
+                  f'{text} ({x + 1}/10)')
+        elif "?" in text:
+            print(f'{Fore.LIGHTGREEN_EX}Job2: This is a question! '
+                  f'{text} ({x + 1}/10)')
+        elif "." in text:
+            print(f'{Fore.LIGHTGREEN_EX}Job2: This is a statement! '
+                  f'{text} ({x + 1}/10)')
+        x += 1
+```
+Posledný implementovaný koprogram `digits_vs_chars()` porovnáva pomer vygenerovaných číslic a písmen v obdržanom stringu. Ak sa v stringu nachádza viac číslic ako písmen, koprogram sa ukončí.
+```py
+@consumer
+def digits_vs_chars():
+    while True:
+        text = yield
+        digits = sum(c.isdigit() for c in text)
+        chars = sum(c.isalpha() for c in text)
+        if digits > chars:
+            print(f'{Fore.LIGHTMAGENTA_EX}Job3: Digits won! {text}')
+            break
+        elif digits == chars:
+            print(f'{Fore.LIGHTMAGENTA_EX}Job3: It is a draw! {text}')
+        else:
+            print(f'{Fore.LIGHTMAGENTA_EX}Job3: Characters won! {text}')
 ```
