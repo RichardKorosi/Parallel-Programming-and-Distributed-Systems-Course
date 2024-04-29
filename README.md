@@ -11,11 +11,16 @@ Implementácia zadania spočívala vo vytvorení classy `Scheduler`, ktorá v ne
 Metóda `start()` v nekonečnom loope generuje dáta (stringy), s ktorými následne koprogramy pracujú. Prechádza cez každý ešte neukončený koprogram a pomocou `.send(data)`
 danému koprogramu dáta. Taktiež ošetruje aj `StopIteration` výnimku, ktorá nastane pri ukončení koprogramu, v takom prípade vymaže daný koprogram z listu, cez ktorý iteruje.
 Ak je list už prázdny (každý koprogram už skončil), tak sa celý loop `breakne`.
+
+### Dekorátor `@consumer`:
+Aby nebolo potrebné pred každým prvým použitím generátorového iterátora volať funkciu `next()`, tak súčasťou implementácie je aj prebraný dekorátor z prednášky a cvík (viď. zdroje).
+
 ### Koprogramy:
 Princíp fungovania všetkých implementovaných koprogramov je nasledovný: V každom koprograme sa nachádza `while` cyklus, ktorý sa začína príkazom `yield`, na ktorom preruší svoje vykonávanie až pokiaľ neobdrží dáta z plánovača pomocou `.send()`. Loopy koprogramov trvajú pokiaľ sa nesplní špecifická podmienka. 
 
 Prvý koprogram `two_strings_fight()` v sebe obsahuje 2 `yieldy`. Porovnávanie nastáva vždy po tom ako koprogram dostane novú dvojicu stringov ( a vypočíta si súčty ASCII hodnôt v stringoch). Po obdržaní druhého stringu koprogram porovná hodnoty
 a následne ak druhý string má väčšiu hodnotu, tak sa koprogram ukončí.
+
 ```py
 @consumer
 def two_strings_fight():
@@ -117,4 +122,13 @@ Job2: This is an order! j2qkbn7u4m! (10/10)
 ----Coprogram get_type has finished!----
 --------------------------------------------------
 ```
+
+## Zdroje:
+Inšpirácie, využité časti kódu a podobne:
+* [README template](https://github.com/matiassingers/awesome-readme)
+* [PEP 8 & PEP 257 validator](https://www.codewof.co.nz/style/python3/)
+* [Conventional Commits guide](https://www.conventionalcommits.org/en/v1.0.0/)
+* [Skripty a teória z predmetu](https://elearn.elf.stuba.sk/moodle/course/view.php?id=699)
+* [Inšpirácia koprogramov](https://github.com/tj314/ppds-seminars/blob/ppds2024/lecture11/07-coroutine.py)
+* [Consumer dekorátor](https://elearn.elf.stuba.sk/moodle/pluginfile.php/77428/mod_resource/content/0/2024-11.async.pdf)
 
