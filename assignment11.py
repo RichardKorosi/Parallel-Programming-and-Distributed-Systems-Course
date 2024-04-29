@@ -1,9 +1,9 @@
 """This file is implementation of the 'eleventh' assignment of the PPDS.
 
 The solutions of this assignment was inspired by the following source(s):
-    - https://github.com/tj314/ppds-seminars/blob/ppds2024/lecture11/07-coroutine.py
+https://github.com/tj314/ppds-seminars/blob/ppds2024/lecture11/07-coroutine.py
 Function cunsumer was taken from the following source(s):
-    - https://github.com/tj314/ppds-seminars/blob/ppds2024/seminar11/03-grep.py
+https://github.com/tj314/ppds-seminars/blob/ppds2024/seminar11/03-grep.py
 
 More info about the assignment can be found in the README.md document.
 """
