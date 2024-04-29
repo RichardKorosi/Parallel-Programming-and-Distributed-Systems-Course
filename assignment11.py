@@ -1,4 +1,12 @@
-"""This file is implementation of the 'eleventh' assignment of the PPDS."""
+"""This file is implementation of the 'eleventh' assignment of the PPDS.
+
+The solutions of this assignment was inspired by the following source(s):
+    - https://github.com/tj314/ppds-seminars/blob/ppds2024/lecture11/07-coroutine.py
+Function cunsumer was taken from the following source(s):
+    - https://github.com/tj314/ppds-seminars/blob/ppds2024/seminar11/03-grep.py
+
+More info about the assignment can be found in the README.md document.
+"""
 
 __author__ = "Richard Körösi"
 
@@ -10,7 +18,7 @@ from colorama import Fore
 
 
 def consumer(func: Callable) -> Callable:
-    """Create decorator for the consumer functions."""
+    """Call `next` automatically on a generator."""
 
     def wrapper(*args, **kw):
         it = func(*args, **kw)
