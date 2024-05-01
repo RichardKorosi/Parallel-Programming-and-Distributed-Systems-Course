@@ -1,9 +1,9 @@
 """This file is implementation of the 'eleventh' assignment of the PPDS.
 
-The solutions of this assignment was inspired by the following source(s):
-https://github.com/tj314/ppds-seminars/blob/ppds2024/lecture11/07-coroutine.py
+The solution of this assignment was inspired by the following source(s):
+https://shorturl.at/cAD68
 Function cunsumer was taken from the following source(s):
-https://github.com/tj314/ppds-seminars/blob/ppds2024/seminar11/03-grep.py
+https://shorturl.at/bosU0
 
 More info about the assignment can be found in the README.md document.
 """
@@ -55,8 +55,8 @@ class Scheduler:
         """Start the scheduler.
 
         More specifically, it generates random data and sends it to the
-        coprograms in the infinite loop. When all coprograms are finished,
-        the scheduler stops.
+        coprograms in the infinite loop. When all coprograms are
+        finished, the scheduler stops.
         """
         while True:
             rand = random.choices(string.ascii_lowercase + string.digits, k=10)
@@ -83,8 +83,8 @@ def two_strings_fight():
     """Compare two strings based on their ASCII values.
 
     More specifically, after the second yield function compares
-    the two strings based on their ASCII values and prints the result.
-    If second string wins, the coprogram finishes.
+    the two strings based on their ASCII values and prints the
+    result. If second string wins, the coprogram finishes.
     """
     while True:
         text1 = yield
