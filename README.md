@@ -1,16 +1,47 @@
 # Korosi-111313-PPDS2024-Zadanie-11
 ## Úlohy zadania:
 1) Implementujte plánovač pre koprogramy založené na rozšírených generátoroch (round-robin plánovanie).
-2) Plánovač by mal reagovať na ukončenie koprogramu (zachytiť výnimku StopIteration) informačným výpisom.
+2) Plánovač by mal reagovať na ukončenie koprogramu (zachytiť výnimku `StopIteration`) informačným výpisom.
 3) Pripravte ukážku v main funkcii pre aspoň 3 koprogramy.
 4) Dokumentácia: stručne slovne vysvetlite implementáciu.
 ## Implementácia:
 ### Plánovač:
-Implementácia zadania spočívala vo vytvorení classy `Scheduler`, ktorá v nekonečnom loope dookola (round-robin štýlom) posiela dáta koprogramom. List koprogramov, ktoré sa majú spúšťať sa napĺňa pomocou metódy `add_job()`, ktorá sa volá v `main()` funkcii, po naplnení listu sa následne volá metóda `start()`, ktorá spúšťa plánovač.
+Implementácia zadania spočívala vo vytvorení classy `Scheduler`, ktorá v "nekonečnom" loope dookola (round-robin štýlom) posiela dáta koprogramom. List koprogramov, ktoré sa majú spúšťať sa napĺňa pomocou metódy `add_job()`, ktorá sa volá v `main()` funkcii, po naplnení listu sa následne volá metóda `start()`, ktorá spúšťa plánovač.
+```py
+def main():
+    scheduler = Scheduler()
+    job1 = two_strings_fight()
+    job2 = get_type()
+    job3 = digits_vs_chars()
+    scheduler.add_job(job1)
+    scheduler.add_job(job2)
+    scheduler.add_job(job3)
+    scheduler.start()
+```
 
-Metóda `start()` v nekonečnom loope generuje dáta (stringy), s ktorými následne koprogramy pracujú. Prechádza cez každý ešte neukončený koprogram a pomocou `.send(data)`
-danému koprogramu dáta. Taktiež ošetruje aj `StopIteration` výnimku, ktorá nastane pri ukončení koprogramu, v takom prípade vymaže daný koprogram z listu, cez ktorý iteruje.
+Metóda `start()` v "nekonečnom" loope generuje dáta (stringy), s ktorými následne koprogramy pracujú. Prechádza cez každý ešte neukončený koprogram a pomocou `.send(data)` posiela danému koprogramu dáta. Taktiež ošetruje aj `StopIteration` výnimku, ktorá nastane pri ukončení koprogramu, v takom prípade vymaže daný koprogram z listu, cez ktorý iteruje.
 Ak je list už prázdny (každý koprogram už skončil), tak sa celý loop `breakne`.
+```py
+def start(self):
+    while True:
+        rand = random.choices(string.ascii_lowercase + string.digits, k=10)
+        data = ''.join(rand)
+        data += random.choice(['!', '?', '.'])
+        sleep(0.2)
+
+        print(f'{Fore.WHITE}' + '-' * 50)
+        for job in self.jobs[:]:
+            try:
+                current_job = job
+                job.send(data)
+            except StopIteration:
+                self.jobs.remove(current_job)
+                print(f'{Fore.RED}----Coprogram {current_job.__name__}'
+                      f' has finished!----')
+        if not self.jobs:
+            print(f'{Fore.WHITE}' + '-' * 50)
+            break
+```
 
 ### Dekorátor `@consumer`:
 Aby nebolo potrebné pred každým prvým použitím generátorového iterátora volať funkciu `next()`, tak súčasťou implementácie je aj prebraný dekorátor z prednášky a cvík (viď. zdroje).
@@ -18,7 +49,7 @@ Aby nebolo potrebné pred každým prvým použitím generátorového iterátora
 ### Koprogramy:
 Princíp fungovania všetkých implementovaných koprogramov je nasledovný: V každom koprograme sa nachádza `while` cyklus, ktorý sa začína príkazom `yield`, na ktorom preruší svoje vykonávanie až pokiaľ neobdrží dáta z plánovača pomocou `.send()`. Loopy koprogramov trvajú pokiaľ sa nesplní špecifická podmienka. 
 
-Prvý koprogram `two_strings_fight()` v sebe obsahuje 2 `yieldy`. Porovnávanie nastáva vždy po tom ako koprogram dostane novú dvojicu stringov ( a vypočíta si súčty ASCII hodnôt v stringoch). Po obdržaní druhého stringu koprogram porovná hodnoty
+Prvý koprogram `two_strings_fight()` v sebe obsahuje 2 `yieldy`. Porovnávanie nastáva vždy po tom ako koprogram dostane novú dvojicu stringov (a vypočíta si súčty ASCII hodnôt v stringoch). Po obdržaní druhého stringu koprogram porovná hodnoty
 a následne ak druhý string má väčšiu hodnotu, tak sa koprogram ukončí.
 
 ```py
@@ -131,4 +162,5 @@ Inšpirácie, využité časti kódu a podobne:
 * [Skripty a teória z predmetu](https://elearn.elf.stuba.sk/moodle/course/view.php?id=699)
 * [Inšpirácia koprogramov](https://github.com/tj314/ppds-seminars/blob/ppds2024/lecture11/07-coroutine.py)
 * [Consumer dekorátor](https://elearn.elf.stuba.sk/moodle/pluginfile.php/77428/mod_resource/content/0/2024-11.async.pdf)
+* [Random string generátor](https://stackoverflow.com/questions/2257441/random-string-generation-with-upper-case-letters-and-digits)
 
