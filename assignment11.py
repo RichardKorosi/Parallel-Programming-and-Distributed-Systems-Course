@@ -4,6 +4,9 @@ The solution of this assignment was inspired by the following source(s):
 https://shorturl.at/cAD68
 Function cunsumer was taken from the following source(s):
 https://shorturl.at/bosU0
+Random string generator was taken and modified
+from the following source(s):
+https://shorturl.at/fkK23
 
 More info about the assignment can be found in the README.md document.
 """
