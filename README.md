@@ -19,7 +19,7 @@ def main():
     scheduler.start()
 ```
 
-Metóda `start()` vo vyššie spomínanom cykle generuje dáta (stringy), s ktorými následne koprogramy pracujú. Prechádza cez každý ešte neukončený koprogram a pomocou `.send(data)` posiela danému koprogramu dáta. Taktiež ošetruje aj `StopIteration` výnimku, ktorá nastane pri ukončení koprogramu. V takom prípade vymaže daný koprogram z listu, cez ktorý iteruje a vypíše informáciu o skončení koprogramu.
+Metóda `start()` vo vyššie spomínanom cykle generuje dáta (stringy), s ktorými následne koprogramy pracujú. Prechádza cez každý ešte neukončený koprogram a pomocou `.send(data)` posiela danému koprogramu dáta. Taktiež ošetruje aj `StopIteration` výnimku (reaguje na ukončenie koprogramu). Pri odchytení výnimky vymaže daný koprogram z listu, cez ktorý plánovač iteruje a vypíše informáciu o skončení koprogramu.
 Ak je list koprogramov prázdny (každý koprogram sa už ukončil), tak sa celý cyklus `breakne`.
 ```py
 def start(self):
