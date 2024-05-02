@@ -6,7 +6,7 @@
 4) Dokumentácia: stručne slovne vysvetlite implementáciu.
 ## Implementácia:
 ### Plánovač:
-Implementácia zadania spočívala vo vytvorení triedy `Scheduler`, ktorá v cykle dookola (round-robin štýlom) posiela dáta koprogramom. List koprogramov, ktoré sa majú spúšťať sa napĺňa pomocou metódy `add_job()`, ktorá sa volá v `main()` funkcii. Po naplnení listu sa následne volá metóda `start()`, ktorá spúšťa plánovač.
+Implementácia zadania spočívala vo vytvorení triedy `Scheduler`, ktorá v cykle dookola (round-robin štýlom) posiela dáta koprogramom. List koprogramov, ktoré sa majú spúšťať, sa napĺňa pomocou metódy `add_job()`, ktorá sa volá v `main()` funkcii. Po naplnení listu sa následne volá metóda `start()`, ktorá spúšťa plánovač.
 ```py
 def main():
     scheduler = Scheduler()
