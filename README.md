@@ -6,7 +6,7 @@
 4) Dokumentácia: stručne slovne vysvetlite implementáciu.
 ## Implementácia:
 ### Plánovač:
-Implementácia zadania spočívala vo vytvorení classy `Scheduler`, ktorá v "nekonečnom" loope dookola (round-robin štýlom) posiela dáta koprogramom. List koprogramov, ktoré sa majú spúšťať sa napĺňa pomocou metódy `add_job()`, ktorá sa volá v `main()` funkcii, po naplnení listu sa následne volá metóda `start()`, ktorá spúšťa plánovač.
+Implementácia zadania spočívala vo vytvorení triedy `Scheduler`, ktorá v cykle dookola (round-robin štýlom) posiela dáta koprogramom. List koprogramov, ktoré sa majú spúšťať sa napĺňa pomocou metódy `add_job()`, ktorá sa volá v `main()` funkcii, po naplnení listu sa následne volá metóda `start()`, ktorá spúšťa plánovač.
 ```py
 def main():
     scheduler = Scheduler()
@@ -19,8 +19,8 @@ def main():
     scheduler.start()
 ```
 
-Metóda `start()` v "nekonečnom" loope generuje dáta (stringy), s ktorými následne koprogramy pracujú. Prechádza cez každý ešte neukončený koprogram a pomocou `.send(data)` posiela danému koprogramu dáta. Taktiež ošetruje aj `StopIteration` výnimku, ktorá nastane pri ukončení koprogramu, v takom prípade vymaže daný koprogram z listu, cez ktorý iteruje.
-Ak je list už prázdny (každý koprogram už skončil), tak sa celý loop `breakne`.
+Metóda `start()` vo vyššie spomínanom cykle generuje dáta (stringy), s ktorými následne koprogramy pracujú. Prechádza cez každý ešte neukončený koprogram a pomocou `.send(data)` posiela danému koprogramu dáta. Taktiež ošetruje aj `StopIteration` výnimku, ktorá nastane pri ukončení koprogramu. V takom prípade vymaže daný koprogram z listu, cez ktorý iteruje a vypíše informáciu o skončení koprogramu.
+Ak je list koprogramov prázdny (každý koprogram sa už ukončil), tak sa celý cyklus `breakne`.
 ```py
 def start(self):
     while True:
@@ -47,9 +47,9 @@ def start(self):
 Aby nebolo potrebné pred každým prvým použitím generátorového iterátora volať funkciu `next()`, tak súčasťou implementácie je aj prebraný dekorátor z prednášky a cvík (viď. zdroje).
 
 ### Koprogramy:
-Princíp fungovania všetkých implementovaných koprogramov je nasledovný: V každom koprograme sa nachádza `while` cyklus, ktorý sa začína príkazom `yield`, na ktorom preruší svoje vykonávanie až pokiaľ neobdrží dáta z plánovača pomocou `.send()`. Loopy koprogramov trvajú pokiaľ sa nesplní špecifická podmienka. 
+Princíp fungovania všetkých implementovaných koprogramov je nasledovný: V každom koprograme sa nachádza `while` cyklus, ktorý sa začína príkazom `yield`, na ktorom preruší svoje vykonávanie až pokiaľ neobdrží dáta z plánovača pomocou `.send()`. Cykly koprogramov trvajú pokiaľ sa nesplní špecifická podmienka. 
 
-Prvý koprogram `two_strings_fight()` v sebe obsahuje 2 `yieldy`. Porovnávanie nastáva vždy po tom ako koprogram dostane novú dvojicu stringov (a vypočíta si súčty ASCII hodnôt v stringoch). Po obdržaní druhého stringu koprogram porovná hodnoty a následne ak druhý string má väčšiu hodnotu, tak koprogram `breakne` svoj loop a ukončí sa.
+Prvý koprogram `two_strings_fight()` v sebe obsahuje 2 `yieldy`. Porovnávanie nastáva vždy po tom ako koprogram dostane novú dvojicu stringov (a vypočíta si súčty ASCII hodnôt v stringoch). Po obdržaní druhého stringu koprogram porovná hodnoty a následne ak druhý string má väčšiu hodnotu, tak koprogram `breakne` svoj cyklus a ukončí sa.
 
 ```py
 @consumer
@@ -92,7 +92,7 @@ def get_type():
                   f'{text} ({x + 1}/10)')
         x += 1
 ```
-Posledný implementovaný koprogram `digits_vs_chars()` porovnáva pomer vygenerovaných číslic a písmen v obdržanom stringu. Ak sa v stringu nachádza viac číslic ako písmen, koprogram `breakne` svoj `while` loop a ukončí sa.
+Posledný implementovaný koprogram `digits_vs_chars()` porovnáva pomer vygenerovaných číslic a písmen v obdržanom stringu. Ak sa v stringu nachádza viac číslic ako písmen, koprogram `breakne` svoj `while` cyklus a ukončí sa.
 ```py
 @consumer
 def digits_vs_chars():
