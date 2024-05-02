@@ -49,8 +49,7 @@ Aby nebolo potrebné pred každým prvým použitím generátorového iterátora
 ### Koprogramy:
 Princíp fungovania všetkých implementovaných koprogramov je nasledovný: V každom koprograme sa nachádza `while` cyklus, ktorý sa začína príkazom `yield`, na ktorom preruší svoje vykonávanie až pokiaľ neobdrží dáta z plánovača pomocou `.send()`. Loopy koprogramov trvajú pokiaľ sa nesplní špecifická podmienka. 
 
-Prvý koprogram `two_strings_fight()` v sebe obsahuje 2 `yieldy`. Porovnávanie nastáva vždy po tom ako koprogram dostane novú dvojicu stringov (a vypočíta si súčty ASCII hodnôt v stringoch). Po obdržaní druhého stringu koprogram porovná hodnoty
-a následne ak druhý string má väčšiu hodnotu, tak sa koprogram ukončí.
+Prvý koprogram `two_strings_fight()` v sebe obsahuje 2 `yieldy`. Porovnávanie nastáva vždy po tom ako koprogram dostane novú dvojicu stringov (a vypočíta si súčty ASCII hodnôt v stringoch). Po obdržaní druhého stringu koprogram porovná hodnoty a následne ak druhý string má väčšiu hodnotu, tak koprogram `breakne` svoj loop a ukončí sa.
 
 ```py
 @consumer
@@ -75,7 +74,7 @@ def two_strings_fight():
                   f'{text1} [{sum1}] vs {text2} [{sum2}]')
             break
 ```
-Druhý koprogram `get_type()` zisťuje o akú "vetu" sa jedná (otázka, rozkaz, oznam). Má inú ukončovaciu podmienku a len jeden `yield`. Tento koprogram sa narozdiel od predchádzajúceho ukončí vždy po 10 vykonaných iteráciách.
+Druhý koprogram `get_type()` zisťuje o akú "vetu" sa jedná (otázka, rozkaz, oznam). Má inú ukončovaciu podmienku a len jeden `yield`. Tento koprogram, narozdiel od predchádzajúceho, sa ukončí vždy po 10 vykonaných iteráciách.
 ```py
 @consumer
 def get_type():
@@ -93,7 +92,7 @@ def get_type():
                   f'{text} ({x + 1}/10)')
         x += 1
 ```
-Posledný implementovaný koprogram `digits_vs_chars()` porovnáva pomer vygenerovaných číslic a písmen v obdržanom stringu. Ak sa v stringu nachádza viac číslic ako písmen, koprogram sa ukončí.
+Posledný implementovaný koprogram `digits_vs_chars()` porovnáva pomer vygenerovaných číslic a písmen v obdržanom stringu. Ak sa v stringu nachádza viac číslic ako písmen, koprogram `breakne` svoj `while` loop a ukončí sa.
 ```py
 @consumer
 def digits_vs_chars():
