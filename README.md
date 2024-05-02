@@ -74,7 +74,7 @@ def two_strings_fight():
                   f'{text1} [{sum1}] vs {text2} [{sum2}]')
             break
 ```
-Druhý koprogram `get_type()` zisťuje o akú "vetu" sa jedná (otázka, rozkaz, oznam). Má inú ukončovaciu podmienku a len jeden `yield`. Tento koprogram, narozdiel od predchádzajúceho, sa ukončí vždy po 10 vykonaných iteráciách.
+Druhý koprogram `get_type()` zisťuje o akú "vetu" sa jedná (otázka, rozkaz, oznam). Má inú ukončovaciu podmienku a len jeden `yield`. Tento koprogram sa ukončí (narozdiel od predchádzajúceho) vždy po 10 vykonaných iteráciách.
 ```py
 @consumer
 def get_type():
