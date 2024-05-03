@@ -19,12 +19,15 @@ warnings.filterwarnings("ignore", category=NumbaPerformanceWarning)
 
 
 @cuda.jit
-def cuda_kernel(dp_cuda, anti_diagonal, i):
+def cuda_kernel(dp_cuda, anti_diagonal, elements_for_thread, i):
     pos = cuda.grid(1)
-    if pos < len(anti_diagonal):
-        x = anti_diagonal[pos][0]
-        y = anti_diagonal[pos][1]
-        dp_cuda[x, y] = i
+    length = len(anti_diagonal)
+    start = pos * elements_for_thread
+    end = min(start + elements_for_thread, length)
+
+    for i in range(start, end):
+        x, y = anti_diagonal[i]
+        dp_cuda[x, y] = pos + 1
 
 
 def main():
@@ -41,7 +44,6 @@ def cuda_lcs(s1, s2):
     dp = np.zeros((len(x_string) + 1, len(y_string) + 1), dtype=np.int32)
     dp_cuda = cuda.to_device(dp)
     no_anti_diagonal = len(x_string) + len(y_string) - 1
-    threads_per_block = 1024
     blocks_per_grid = 1
     elements_for_thread = 2
 
@@ -49,8 +51,9 @@ def cuda_lcs(s1, s2):
         x = min(i, len(x_string))
         y = i - x + 1
         anti_diagonal = get_anti_diagonal(x, y, dp)
-
-        cuda_kernel[1, 8](dp_cuda, anti_diagonal, i)
+        threads_per_block = math.ceil(len(anti_diagonal) / elements_for_thread)
+        cuda_kernel[blocks_per_grid, threads_per_block](dp_cuda, anti_diagonal,
+                                                        elements_for_thread, i)
 
     dp_result = dp_cuda.copy_to_host()
 
