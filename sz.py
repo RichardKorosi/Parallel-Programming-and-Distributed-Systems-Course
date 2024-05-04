@@ -40,7 +40,21 @@ def main():
     string1 = "stone"
     string2 = "longest"
 
+    source1 = "**textje********skoro***citatelny******unich"
+    source2 = "text*v*tejtoknihe****ma*po***usc*****koniec**robot*rozum"
+    source3 = "f*te**xt**sa*je***sko*rio**tu*"
+
+    source1b = "textjeskorocitatelnyunich"
+    source2b = "textvtejtoknihemapousckoniecrobotrozum"
+    source3b = "ftextsajeskoriotu"
+
     cuda_lcs(string1, string2)
+    print()
+    cuda_lcs(source1b, source2b)
+    print()
+    cuda_lcs(source1b, source3b)
+    print()
+    cuda_lcs(source2b, source3b)
 
 
 def cuda_lcs(s1, s2):
@@ -76,7 +90,8 @@ def cuda_lcs(s1, s2):
     col_string = bytes(col_string).decode('utf-8')
     row_string = bytes(row_string).decode('utf-8')
 
-    print(dp_result)
+    # print(dp_result)
+    # print(dp_result[-1, -1])
     get_result(dp_result, col_string, row_string)
 
 
@@ -94,14 +109,21 @@ def get_result(dp, row_string, col_string):
     col = len(col_string)
     result = ""
     while row > 0 and col > 0:
-        if dp[row, col] == dp[row, col - 1]:
+        if dp[row, col - 1] > dp[row - 1, col]:
             col -= 1
-        else:
-            result = row_string[row - 1] + result
+
+        elif dp[row, col - 1] < dp[row - 1, col]:
             row -= 1
-            col -= 1
-    print("LCS is:", result)
-    print("Length of LCS is:", len(result))
+
+        elif dp[row, col - 1] == dp[row - 1, col]:
+            if dp[row, col] == dp[row - 1, col]:
+                row -= 1
+            else:
+                result = row_string[row - 1] + result
+                row -= 1
+                col -= 1
+
+    print(result)
 
 
 if __name__ == '__main__':
