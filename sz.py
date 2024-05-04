@@ -30,7 +30,7 @@ def cuda_kernel(dp, col_string, row_string, anti_diagonal, elements_for_thread):
         # in CUDA row and col are reversed
         row = anti_diagonal[i][0]
         col = anti_diagonal[i][1]
-        if col_string[col - 1] == row_string[row - 1]:
+        if col_string[col - 1] == row_string[row - 1] and col_string[col - 1] != 42:
             dp[col, row] = dp[col - 1, row - 1] + 1
         else:
             dp[col, row] = max(dp[col - 1, row], dp[col, row - 1])
@@ -44,6 +44,8 @@ def main():
     source2 = "text*v*tejtoknihe****ma*po***usc*****koniec**robot*rozum"
     source3 = "f*te**xt**sa*je***sko*rio**tu*"
 
+    print(list(source1.encode('utf-8')))
+
     source1b = "textjeskorocitatelnyunich"
     source2b = "textvtejtoknihemapousckoniecrobotrozum"
     source3b = "ftextsajeskoriotu"
@@ -55,6 +57,13 @@ def main():
     cuda_lcs(source1b, source3b)
     print()
     cuda_lcs(source2b, source3b)
+    print()
+    cuda_lcs(source1, source2)
+    print()
+    cuda_lcs(source1, source3)
+    print()
+    cuda_lcs(source2, source3)
+    print()
 
 
 def cuda_lcs(s1, s2):
@@ -90,8 +99,6 @@ def cuda_lcs(s1, s2):
     col_string = bytes(col_string).decode('utf-8')
     row_string = bytes(row_string).decode('utf-8')
 
-    # print(dp_result)
-    # print(dp_result[-1, -1])
     get_result(dp_result, col_string, row_string)
 
 
@@ -123,7 +130,7 @@ def get_result(dp, row_string, col_string):
                 row -= 1
                 col -= 1
 
-    print(result)
+    print(result, len(result))
 
 
 if __name__ == '__main__':
