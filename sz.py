@@ -20,16 +20,16 @@ warnings.filterwarnings("ignore", category=NumbaPerformanceWarning)
 
 
 @cuda.jit
-def cuda_kernel(dp, shorter, longer, anti_diagonal, elements_for_thread):
+def cuda_kernel(dp, col_string, row_string, anti_diagonal, elements_for_thread):
     pos = cuda.grid(1)
     length = len(anti_diagonal)
     start = pos * elements_for_thread
     end = min(start + elements_for_thread, length)
 
     for i in range(start, end):
-        col = anti_diagonal[i][1]
         row = anti_diagonal[i][0]
-        if shorter[col - 1] == longer[row - 1]:
+        col = anti_diagonal[i][1]
+        if col_string[col - 1] == row_string[row - 1]:
             dp[col, row] = dp[col - 1, row - 1] + 1
         else:
             dp[col, row] = max(dp[col - 1, row], dp[col, row - 1])
@@ -43,25 +43,25 @@ def main():
 
 
 def cuda_lcs(s1, s2):
-    shorter = s1 if len(s1) < len(s2) else s2
-    longer = s2 if len(s1) < len(s2) else s1
+    col_string = s1 if len(s1) < len(s2) else s2
+    row_string = s2 if len(s1) < len(s2) else s1
 
-    print("shorter:", shorter)
-    print("longer:", longer)
+    print("col_string:", col_string)
+    print("row_string:", row_string)
 
-    shorter = list(shorter.encode('utf-8'))
-    longer = list(longer.encode('utf-8'))
-    dp = np.zeros((len(shorter) + 1, len(longer) + 1), dtype=np.int32)
+    col_string = list(col_string.encode('utf-8'))
+    row_string = list(row_string.encode('utf-8'))
+    dp = np.zeros((len(col_string) + 1, len(row_string) + 1), dtype=np.int32)
 
     dp_cuda = cuda.to_device(dp)
-    shorter_cuda = cuda.to_device(shorter)
-    longer_cuda = cuda.to_device(longer)
+    col_string_cuda = cuda.to_device(col_string)
+    row_string_cuda = cuda.to_device(row_string)
 
-    no_anti_diagonal = len(shorter) + len(longer) - 1
+    no_anti_diagonal = len(col_string) + len(row_string) - 1
     blocks_per_grid = 1
 
     for i in range(1, no_anti_diagonal + 1):
-        col = min(i, len(shorter))
+        col = min(i, len(col_string))
         row = i - col + 1
         anti_diagonal = get_anti_diagonal(row, col, dp)
 
@@ -69,14 +69,14 @@ def cuda_lcs(s1, s2):
         threads_per_block = math.ceil(len(anti_diagonal) / elements_for_thread)
 
         (cuda_kernel[blocks_per_grid, threads_per_block]
-         (dp_cuda, shorter_cuda, longer_cuda, anti_diagonal, elements_for_thread))
+         (dp_cuda, col_string_cuda, row_string_cuda, anti_diagonal, elements_for_thread))
 
     dp_result = dp_cuda.copy_to_host()
-    shorter = bytes(shorter).decode('utf-8')
-    longer = bytes(longer).decode('utf-8')
+    col_string = bytes(col_string).decode('utf-8')
+    row_string = bytes(row_string).decode('utf-8')
 
     print(dp_result)
-    get_result(dp_result, shorter, longer)
+    get_result(dp_result, col_string, row_string)
 
 
 def get_anti_diagonal(row, col, dp):
@@ -88,7 +88,7 @@ def get_anti_diagonal(row, col, dp):
     return np.array(anti_diagonal, dtype=np.int32)
 
 
-def get_result(dp, shorter, longer):
+def get_result(dp, col_string, row_string):
     pass
 
 
