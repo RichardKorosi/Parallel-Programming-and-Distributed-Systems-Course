@@ -27,6 +27,7 @@ def cuda_kernel(dp, col_string, row_string, anti_diagonal, elements_for_thread):
     end = min(start + elements_for_thread, length)
 
     for i in range(start, end):
+        # in CUDA row and col are reversed
         row = anti_diagonal[i][0]
         col = anti_diagonal[i][1]
         if col_string[col - 1] == row_string[row - 1]:
@@ -88,8 +89,19 @@ def get_anti_diagonal(row, col, dp):
     return np.array(anti_diagonal, dtype=np.int32)
 
 
-def get_result(dp, col_string, row_string):
-    pass
+def get_result(dp, row_string, col_string):
+    row = len(row_string)
+    col = len(col_string)
+    result = ""
+    while row > 0 and col > 0:
+        if dp[row, col] == dp[row, col - 1]:
+            col -= 1
+        else:
+            result = row_string[row - 1] + result
+            row -= 1
+            col -= 1
+    print("LCS is:", result)
+    print("Length of LCS is:", len(result))
 
 
 if __name__ == '__main__':
