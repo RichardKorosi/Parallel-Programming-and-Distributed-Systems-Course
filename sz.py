@@ -128,5 +128,23 @@ def get_result(dp, row_string, col_string):
     return result, len(result)
 
 
+def sequence_lcs(s1, s2):
+    col_string = s1 if len(s1) < len(s2) else s2
+    row_string = s2 if len(s1) < len(s2) else s1
+
+    dp = np.zeros((len(col_string) + 1, len(row_string) + 1), dtype=np.int32)
+
+    for i in range(1, len(col_string) + 1):
+        for j in range(1, len(row_string) + 1):
+            if col_string[i - 1] == row_string[j - 1] and col_string[i - 1] != "*":
+                dp[i][j] = dp[i - 1][j - 1] + 1
+            else:
+                dp[i][j] = max(dp[i - 1][j], dp[i][j - 1])
+
+    result = get_result(dp, col_string, row_string)
+
+    return result
+
+
 if __name__ == '__main__':
     main()
