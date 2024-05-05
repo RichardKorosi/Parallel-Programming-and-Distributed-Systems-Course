@@ -41,25 +41,7 @@ def main():
 
     list_of_jobs = [(source1, source2), (source1, source3), (source2, source3)]
 
-    if rank == MASTER:
-        final_result = []
-        time_start = time.time()
-
-    for i in range(3):
-        if rank == i:
-            result = cuda_lcs(list_of_jobs[i][0], list_of_jobs[i][1])
-
-            if rank == MASTER:
-                final_result.append(result)
-                for j in range(1, nproc):
-                    result = comm.recv(source=j)
-                    final_result.append(result)
-            else:
-                comm.send(result, dest=MASTER)
-
-    if rank == MASTER:
-        print("Max Length:", min(final_result, key=lambda x: x[1]))
-        print("Time:", time.time() - time_start)
+    parallel_experiment(list_of_jobs)
 
     if rank == MASTER:
         sequence_experiment(list_of_jobs)
@@ -148,6 +130,28 @@ def sequence_experiment(list_of_jobs):
         final_result.append(result)
     print("Max Length:", min(final_result, key=lambda x: x[1]))
     print("Time:", time.time() - time_start)
+
+
+def parallel_experiment(list_of_jobs):
+    if rank == MASTER:
+        final_result = []
+        time_start = time.time()
+
+    for i in range(3):
+        if rank == i:
+            result = cuda_lcs(list_of_jobs[i][0], list_of_jobs[i][1])
+
+            if rank == MASTER:
+                final_result.append(result)
+                for j in range(1, nproc):
+                    result = comm.recv(source=j)
+                    final_result.append(result)
+            else:
+                comm.send(result, dest=MASTER)
+
+    if rank == MASTER:
+        print("Max Length:", min(final_result, key=lambda x: x[1]))
+        print("Time:", time.time() - time_start)
 
 
 if __name__ == '__main__':
