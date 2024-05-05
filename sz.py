@@ -13,10 +13,10 @@ from numba.core.errors import NumbaPerformanceWarning
 warnings.filterwarnings("ignore", category=NumbaPerformanceWarning)
 
 
-# MASTER = 0
-# comm = MPI.COMM_WORLD
-# rank = comm.Get_rank()
-# nproc = comm.Get_size()
+MASTER = 0
+comm = MPI.COMM_WORLD
+rank = comm.Get_rank()
+nproc = comm.Get_size()
 
 
 @cuda.jit
@@ -27,11 +27,10 @@ def cuda_kernel(dp, col_string, row_string, start_col, start_row, elements_for_t
     for i in range(elements_for_thread):
         if col < 1 or row > len(dp[0]):
             break
-        if col_string[col - 1] == row_string[row - 1]:
+        if col_string[col - 1] == row_string[row - 1] and col_string[col - 1] != 42:
             dp[col, row] = dp[col - 1, row - 1] + 1
         else:
             dp[col, row] = max(dp[col - 1, row], dp[col, row - 1])
-        # dp[col, row] = pos + 1
         col -= 1
         row += 1
 
@@ -39,42 +38,38 @@ def cuda_kernel(dp, col_string, row_string, start_col, start_row, elements_for_t
 def main():
     source1 = "**textje********skoro***citatelny******unich" * 100
     source2 = "text*v*tejtoknihe****ma*po***usc*****koniec**robot*rozum" * 100
-    source2 = "f*te**xt**sa*je***sko*rio**tu*"
+    source3 = "f*te**xt**sa*je***sko*rio**tu*" * 100
 
-    source1 = "textjeskorocitatelnyunich" * 100
-    source2 = "ftextsajeskoriotu" * 100
-    # source1= "longest"
-    # source2= "stone"
+    list_of_jobs = [(source1, source2), (source1, source3), (source2, source3)]
 
-    # list_of_jobs = [(source1, source2), (source1, source3), (source2, source3)]
-    #
-    # if rank == MASTER:
-    #     final_result = []
-    #
-    # for i in range(3):
-    #     if rank == i:
-    #         result = cuda_lcs(list_of_jobs[i][0], list_of_jobs[i][1])
-    #
-    #         if rank == MASTER:
-    #             final_result.append(result)
-    #             for j in range(1, nproc):
-    #                 result = comm.recv(source=j)
-    #                 final_result.append(result)
-    #         else:
-    #             comm.send(result, dest=MASTER)
-    #
-    # if rank == MASTER:
-    #     print("Max Length:", max(final_result, key=lambda x: x[1]))
+    if rank == MASTER:
+        final_result = []
+        time_start = time.time()
 
-    time_start = time.time()
-    result = cuda_lcs(source1, source2)
-    print(result)
-    print("Time:", time.time() - time_start)
+    for i in range(3):
+        if rank == i:
+            result = cuda_lcs(list_of_jobs[i][0], list_of_jobs[i][1])
 
-    time_start = time.time()
-    result2 = sequence_lcs(source1, source2)
-    print(result2)
-    print("Time:", time.time() - time_start)
+            if rank == MASTER:
+                final_result.append(result)
+                for j in range(1, nproc):
+                    result = comm.recv(source=j)
+                    final_result.append(result)
+            else:
+                comm.send(result, dest=MASTER)
+
+    if rank == MASTER:
+        print("Max Length:", max(final_result, key=lambda x: x[1]))
+        print("Time:", time.time() - time_start)
+
+    if rank == MASTER:
+        final_result = []
+        time_start = time.time()
+        for i in range(3):
+            result = sequence_lcs(list_of_jobs[i][0], list_of_jobs[i][1])
+            final_result.append(result)
+        print("Max Length:", max(final_result, key=lambda x: x[1]))
+        print("Time:", time.time() - time_start)
 
 
 def cuda_lcs(s1, s2):
@@ -103,7 +98,6 @@ def cuda_lcs(s1, s2):
          (dp_cuda, col_string_cuda, row_string_cuda, col, row, elements_for_thread))
 
     dp_result = dp_cuda.copy_to_host()
-    print(dp_result.transpose())
     col_string = bytes(col_string).decode('utf-8')
     row_string = bytes(row_string).decode('utf-8')
 
