@@ -38,13 +38,41 @@ def main():
     source1 = "**textje********skoro***citatelny******unich" * 100
     source2 = "text*v*tejtoknihe****ma*po***usc*****koniec**robot*rozum" * 100
     source3 = "f*te**xt**sa*je***sko*rio**tu*" * 100
+    
+    experiment_parallel = []
+    experiment_sequence = []
 
     list_of_jobs = [(source1, source2), (source1, source3), (source2, source3)]
 
-    parallel_experiment(list_of_jobs)
+    if rank == MASTER:
+        times = []
+    for i in range(1+1):
+        if rank == MASTER:
+            time_start = time.perf_counter()
+        parallel_experiment(list_of_jobs)
+        if rank == MASTER:
+            times.append(time.perf_counter() - time_start)
 
     if rank == MASTER:
-        sequence_experiment(list_of_jobs)
+        avg_time = sum(times[1:]) / (len(times) - 1)
+        print(avg_time)
+        dimensions = f"{len(source1)}x{len(source2)}x{len(source3)}"
+        experiment_parallel.append({"dimensions": dimensions, "time": avg_time})
+
+    if rank == MASTER:
+        times = []
+        for i in range(1+1):
+            time_start = time.perf_counter()
+            sequence_experiment(list_of_jobs)
+            times.append(time.perf_counter() - time_start)
+
+        avg_time = sum(times[1:]) / (len(times) - 1)
+        print(avg_time)
+        dimensions = f"{len(source1)}x{len(source2)}x{len(source3)}"
+        experiment_sequence.append({"dimensions": dimensions, "time": avg_time})
+
+    if rank == MASTER:
+        create_graph(experiment_parallel, experiment_sequence)
 
 
 def cuda_lcs(s1, s2):
@@ -65,7 +93,7 @@ def cuda_lcs(s1, s2):
     threads_per_block = 256
     blocks_per_grid = math.floor(cuda_cores / (threads_per_block * 3))
     elements_for_thread = 20
-    print("CUDA Cores available for one MPI process:", threads_per_block * blocks_per_grid)
+    # print("CUDA Cores available for one MPI process:", threads_per_block * blocks_per_grid)
 
     for i in range(1, no_anti_diagonal + 1):
         col = min(i, len(col_string))
@@ -124,18 +152,15 @@ def sequence_lcs(s1, s2):
 
 def sequence_experiment(list_of_jobs):
     final_result = []
-    time_start = time.time()
     for i in range(3):
         result = sequence_lcs(list_of_jobs[i][0], list_of_jobs[i][1])
         final_result.append(result)
-    print("Max Length:", min(final_result, key=lambda x: x[1]))
-    print("Time:", time.time() - time_start)
+    # print("Max Length:", min(final_result, key=lambda x: x[1]))
 
 
 def parallel_experiment(list_of_jobs):
     if rank == MASTER:
         final_result = []
-        time_start = time.time()
 
     for i in range(3):
         if rank == i:
@@ -149,9 +174,35 @@ def parallel_experiment(list_of_jobs):
             else:
                 comm.send(result, dest=MASTER)
 
-    if rank == MASTER:
-        print("Max Length:", min(final_result, key=lambda x: x[1]))
-        print("Time:", time.time() - time_start)
+    # if rank == MASTER:
+    #     print("Max Length:", min(final_result, key=lambda x: x[1]))
+
+
+def create_graph(experiment_parallel, experiment_sequence):
+    dimensions = [result["dimensions"] for result in experiment_parallel]
+    time_para = [result["time"] for result in experiment_parallel]
+    time_sequence = [result["time"] for result in experiment_sequence]
+
+    x = np.arange(len(dimensions))
+    width = 0.35
+
+    fig, ax = plt.subplots()
+
+    rects1 = ax.bar(x - width / 2, time_para, width, label='Parallel', color="r")
+    rects2 = ax.bar(x + width / 2, time_sequence, width, label='Series', color="g")
+
+    ax.set_xlabel("XDD")
+    ax.set_ylabel("Time [s]")
+    ax.set_title("Comparison of Parallel and Sequence Experiments")
+    ax.set_xticks(x)
+    ax.set_xticklabels(dimensions)
+    ax.legend()
+
+    ax.bar_label(rects1, padding=3)
+    ax.bar_label(rects2, padding=3)
+
+    ax.legend()
+    plt.show()
 
 
 if __name__ == '__main__':
