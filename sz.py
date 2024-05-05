@@ -24,24 +24,27 @@ def cuda_kernel(dp, col_string, row_string, start_col, start_row, elements_for_t
     pos = cuda.grid(1)
     col = start_col - pos * elements_for_thread
     row = start_row + pos * elements_for_thread
-    print("START:", pos, row, col)
     for i in range(elements_for_thread):
-        if col < 1 or row > len(dp):
+        if col < 1 or row > len(dp[0]):
             break
-        dp[col, row] = pos + 1
+        if col_string[col - 1] == row_string[row - 1]:
+            dp[col, row] = dp[col - 1, row - 1] + 1
+        else:
+            dp[col, row] = max(dp[col - 1, row], dp[col, row - 1])
+        # dp[col, row] = pos + 1
         col -= 1
         row += 1
-    print()
-
 
 
 def main():
-    source1 = "**textje********skoro***citatelny******unich" * 1
-    source2 = "text*v*tejtoknihe****ma*po***usc*****koniec**robot*rozum" * 1
-    source3 = "f*te**xt**sa*je***sko*rio**tu*"
+    source1 = "**textje********skoro***citatelny******unich" * 100
+    source2 = "text*v*tejtoknihe****ma*po***usc*****koniec**robot*rozum" * 100
+    source2 = "f*te**xt**sa*je***sko*rio**tu*"
 
-    source1 = "stone"
-    source2 = "longest"
+    source1 = "textjeskorocitatelnyunich" * 100
+    source2 = "ftextsajeskoriotu" * 100
+    # source1= "longest"
+    # source2= "stone"
 
     # list_of_jobs = [(source1, source2), (source1, source3), (source2, source3)]
     #
@@ -68,10 +71,10 @@ def main():
     print(result)
     print("Time:", time.time() - time_start)
 
-    # time_start = time.time()
-    # result2 = sequence_lcs(source1, source2)
-    # print(result2)
-    # print("Time:", time.time() - time_start)
+    time_start = time.time()
+    result2 = sequence_lcs(source1, source2)
+    print(result2)
+    print("Time:", time.time() - time_start)
 
 
 def cuda_lcs(s1, s2):
@@ -92,9 +95,9 @@ def cuda_lcs(s1, s2):
         col = min(i, len(col_string))
         row = i - col + 1
 
-        blocks_per_grid = 1
-        threads_per_block = 2
-        elements_for_thread = 3
+        blocks_per_grid = 32
+        threads_per_block = 1024
+        elements_for_thread = 1
 
         (cuda_kernel[blocks_per_grid, threads_per_block]
          (dp_cuda, col_string_cuda, row_string_cuda, col, row, elements_for_thread))
