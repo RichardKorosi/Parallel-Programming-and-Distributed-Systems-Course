@@ -12,7 +12,6 @@ from numba.core.errors import NumbaPerformanceWarning
 
 warnings.filterwarnings("ignore", category=NumbaPerformanceWarning)
 
-
 MASTER = 0
 comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
@@ -36,9 +35,9 @@ def cuda_kernel(dp, col_string, row_string, start_col, start_row, elements_for_t
 
 
 def main():
-    source1 = "**textje********skoro***citatelny******unich"
-    source2 = "text*v*tejtoknihe****ma*po***usc*****koniec**robot*rozum"
-    source3 = "f*te**xt**sa*je***sko*rio**tu*"
+    source1 = "**textje********skoro***citatelny******unich" * 100
+    source2 = "text*v*tejtoknihe****ma*po***usc*****koniec**robot*rozum" * 100
+    source3 = "f*te**xt**sa*je***sko*rio**tu*" * 100
 
     list_of_jobs = [(source1, source2), (source1, source3), (source2, source3)]
 
@@ -59,19 +58,11 @@ def main():
                 comm.send(result, dest=MASTER)
 
     if rank == MASTER:
-        print(final_result)
         print("Max Length:", min(final_result, key=lambda x: x[1]))
         print("Time:", time.time() - time_start)
 
     if rank == MASTER:
-        final_result = []
-        time_start = time.time()
-        for i in range(3):
-            result = sequence_lcs(list_of_jobs[i][0], list_of_jobs[i][1])
-            final_result.append(result)
-        print(final_result)
-        print("Max Length:", min(final_result, key=lambda x: x[1]))
-        print("Time:", time.time() - time_start)
+        sequence_experiment(list_of_jobs)
 
 
 def cuda_lcs(s1, s2):
@@ -91,8 +82,8 @@ def cuda_lcs(s1, s2):
 
     threads_per_block = 256
     blocks_per_grid = math.floor(cuda_cores / (threads_per_block * 3))
-    elements_for_thread = 100
-    print(threads_per_block, blocks_per_grid, elements_for_thread)
+    elements_for_thread = 20
+    print("CUDA Cores available for one MPI process:", threads_per_block * blocks_per_grid)
 
     for i in range(1, no_anti_diagonal + 1):
         col = min(i, len(col_string))
@@ -147,6 +138,16 @@ def sequence_lcs(s1, s2):
     result = get_result(dp, col_string, row_string)
 
     return result
+
+
+def sequence_experiment(list_of_jobs):
+    final_result = []
+    time_start = time.time()
+    for i in range(3):
+        result = sequence_lcs(list_of_jobs[i][0], list_of_jobs[i][1])
+        final_result.append(result)
+    print("Max Length:", min(final_result, key=lambda x: x[1]))
+    print("Time:", time.time() - time_start)
 
 
 if __name__ == '__main__':
