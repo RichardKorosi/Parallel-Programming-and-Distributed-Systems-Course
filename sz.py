@@ -317,7 +317,7 @@ def create_graph(experiment_parallel, experiment_sequence,
     rects1 = ax.bar(x - width / 2, time_para, width,
                     label='Parallel', color="r")
     rects2 = ax.bar(x + width / 2, time_sequence, width,
-                    label='Series', color="g")
+                    label='Sequence', color="g")
 
     ax.set_xlabel("Length of three strings")
     ax.set_ylabel("Time [s]")
@@ -339,7 +339,7 @@ def create_graph(experiment_parallel, experiment_sequence,
     custom_lines = [Line2D([0], [0], color='r', lw=4),
                     Line2D([0], [0], color='g', lw=4),
                     Line2D([0], [0], color='w', lw=4)]
-    ax.legend(custom_lines, ['Parallel', 'Series', threads_info])
+    ax.legend(custom_lines, ['Parallel', 'Sequence', threads_info])
 
     plt.show()
 
