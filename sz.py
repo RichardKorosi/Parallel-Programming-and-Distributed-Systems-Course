@@ -35,12 +35,15 @@ def cuda_kernel(dp, col_string, row_string, start_col, start_row, elements_for_t
 
 
 def main():
-    source1 = ["**textje********skoro***citatelny******unich" * i for i in [1, 10]]
-    source2 = ["text*v*tejtoknihe****ma*po***usc*****koniec**robot*rozum" * i for i in [1, 10]]
-    source3 = ["f*te**xt**sa*je***sko*rio**tu*" * i for i in [1, 10]]
+    source1 = ["**textje********skoro***citatelny******unich" * i for i in [1, 10, 100]]
+    source2 = ["text*v*tejtoknihe****ma*po***usc*****koniec**robot*rozum" * i for i in [1, 10, 100]]
+    source3 = ["f*te**xt**sa*je***sko*rio**tu*" * i for i in [1, 10, 100]]
 
     experiment_parallel = []
     experiment_sequence = []
+    info_about_threads = {"threads": 0,
+                          "blocks_per_grid": 0,
+                          "threads_per_block": 0}
 
     for x in range(len(source1)):
         list_of_jobs = [(source1[x], source2[x]),
@@ -53,13 +56,12 @@ def main():
         for i in range(1 + 1):
             if rank == MASTER:
                 time_start = time.perf_counter()
-            parallel_experiment(list_of_jobs)
+            parallel_experiment(list_of_jobs, info_about_threads)
             if rank == MASTER:
                 times.append(time.perf_counter() - time_start)
 
         if rank == MASTER:
             avg_time = sum(times[1:]) / (len(times) - 1)
-            print(avg_time)
             dimensions = f"{len(source1[x])}x{len(source2[x])}x{len(source3[x])}"
             experiment_parallel.append({"dimensions": dimensions, "time": avg_time})
 
@@ -67,19 +69,18 @@ def main():
             times = []
             for i in range(1 + 1):
                 time_start = time.perf_counter()
-                sequence_experiment(list_of_jobs)
+                # sequence_experiment(list_of_jobs)
                 times.append(time.perf_counter() - time_start)
 
             avg_time = sum(times[1:]) / (len(times) - 1)
-            print(avg_time)
             dimensions = f"{len(source1[x])}x{len(source2[x])}x{len(source3[x])}"
             experiment_sequence.append({"dimensions": dimensions, "time": avg_time})
 
     if rank == MASTER:
-        create_graph(experiment_parallel, experiment_sequence)
+        create_graph(experiment_parallel, experiment_sequence, info_about_threads)
 
 
-def cuda_lcs(s1, s2):
+def cuda_lcs(s1, s2, info_about_threads):
     col_string = s1 if len(s1) < len(s2) else s2
     row_string = s2 if len(s1) < len(s2) else s1
     cuda_cores = 7168
@@ -96,8 +97,13 @@ def cuda_lcs(s1, s2):
 
     threads_per_block = 256
     blocks_per_grid = math.floor(cuda_cores / (threads_per_block * 3))
-    elements_for_thread = 20
+    elements_for_thread = math.ceil(no_anti_diagonal / (blocks_per_grid * threads_per_block))
     # print("CUDA Cores available for one MPI process:", threads_per_block * blocks_per_grid)
+    # print("Anti-diagonals:", no_anti_diagonal, "Blocks per grid:", blocks_per_grid, "Threads per block:", threads_per_block)
+    # print("Jobs per thread:", elements_for_thread)
+    info_about_threads["threads"] = threads_per_block * blocks_per_grid
+    info_about_threads["blocks_per_grid"] = blocks_per_grid
+    info_about_threads["threads_per_block"] = threads_per_block
 
     for i in range(1, no_anti_diagonal + 1):
         col = min(i, len(col_string))
@@ -162,13 +168,13 @@ def sequence_experiment(list_of_jobs):
     # print("Max Length:", min(final_result, key=lambda x: x[1]))
 
 
-def parallel_experiment(list_of_jobs):
+def parallel_experiment(list_of_jobs, info_about_threads):
     if rank == MASTER:
         final_result = []
 
     for i in range(3):
         if rank == i:
-            result = cuda_lcs(list_of_jobs[i][0], list_of_jobs[i][1])
+            result = cuda_lcs(list_of_jobs[i][0], list_of_jobs[i][1], info_about_threads)
 
             if rank == MASTER:
                 final_result.append(result)
@@ -182,7 +188,7 @@ def parallel_experiment(list_of_jobs):
     #     print("Max Length:", min(final_result, key=lambda x: x[1]))
 
 
-def create_graph(experiment_parallel, experiment_sequence):
+def create_graph(experiment_parallel, experiment_sequence, info_about_threads):
     dimensions = [result["dimensions"] for result in experiment_parallel]
     time_para = [result["time"] for result in experiment_parallel]
     time_sequence = [result["time"] for result in experiment_sequence]
@@ -204,6 +210,12 @@ def create_graph(experiment_parallel, experiment_sequence):
 
     ax.bar_label(rects1, padding=3)
     ax.bar_label(rects2, padding=3)
+
+    # Add information about threads
+    threads_info = f"Threads for 1 processor: {info_about_threads['threads']}\n" \
+                   f"Threads per block: {info_about_threads['threads_per_block']}\n" \
+                   f"Blocks per grid: {info_about_threads['blocks_per_grid']}"
+    ax.text(0.01, 0.99, threads_info, transform=ax.transAxes, verticalalignment='top', horizontalalignment='left')
 
     ax.legend()
     plt.show()
