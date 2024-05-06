@@ -152,5 +152,17 @@ LCS: 123 onestonestone...onestonestone
 LCS: 173 onestonestone...onestonestone
 LCS: 223 onestonestone...onestonestone
 ```
+### Analýza časov viacerých experimentov
+![image](https://github.com/RichardKorosi/Korosi-111313-PPDS2024/assets/99643046/ad912126-004d-4b86-bd3a-d802d5484d33)
+
+![image](https://github.com/RichardKorosi/Korosi-111313-PPDS2024/assets/99643046/b42c1653-0d43-402d-8b53-324bb37fef88)
+
+![image](https://github.com/RichardKorosi/Korosi-111313-PPDS2024/assets/99643046/d058daa8-d05f-4076-9733-47688d914cb8)
+
+![image](https://github.com/RichardKorosi/Korosi-111313-PPDS2024/assets/99643046/6a140805-c6f7-4da5-a68e-9552f9d1fccb)
+
+
+
+
 
 
