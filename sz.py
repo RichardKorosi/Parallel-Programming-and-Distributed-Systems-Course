@@ -72,6 +72,13 @@ def main():
     source3 = ["f*te**xt**sa*je***sko*rio**tu*"
                * i for i in [1, 5, 15, 25, 35, 45]]
 
+    source1 = ["**lo***xy**z*n***ge***w**st"
+               * i for i in [1, 5, 15, 25, 35, 45]]
+    source2 = ["st**o****ma*po***ne***"
+               * i for i in [1, 5, 15, 25, 35, 45]]
+    source3 = ["l****o**n**g**e***s*t*"
+               * i for i in [1, 5, 15, 25, 35, 45]]
+
     experiment_parallel = []
     experiment_sequence = []
     info_about_threads = {"threads": 0,
