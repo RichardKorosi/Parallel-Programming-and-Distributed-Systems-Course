@@ -86,7 +86,7 @@ def main():
         if rank == MASTER:
             times = []
 
-        for i in range(10 + 1):
+        for i in range(1 + 1):
             if rank == MASTER:
                 time_start = time.perf_counter()
             parallel_experiment(list_of_jobs, info_about_threads)
@@ -104,7 +104,7 @@ def main():
 
         if rank == MASTER:
             times = []
-            for i in range(10 + 1):
+            for i in range(1 + 1):
                 time_start = time.perf_counter()
                 sequence_experiment(list_of_jobs)
                 times.append(time.perf_counter() - time_start)
@@ -284,7 +284,12 @@ def parallel_experiment(list_of_jobs, info_about_threads):
                 comm.send(result, dest=MASTER)
 
     if rank == MASTER:
-        print("LCS:", min(final_result, key=lambda x: x[1])[1])
+        min_result = min(final_result, key=lambda x: x[1])
+        print("LCS:", min_result[1], end=" ")
+        if len(min_result[0]) <= 30:
+            print(min_result[0])
+        else:
+            print(min_result[0][:13] + '...' + min_result[0][-13:])
 
 
 def create_graph(experiment_parallel, experiment_sequence,
