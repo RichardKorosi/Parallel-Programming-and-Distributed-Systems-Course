@@ -72,12 +72,12 @@ def main():
     source3 = ["f*te**xt**sa*je***sko*rio**tu*"
                * i for i in [1, 5, 15, 25, 35, 45]]
 
-    source1 = ["**lo***xy**z*n***ge***w**st"
-               * i for i in [1, 5, 15, 25, 35, 45]]
-    source2 = ["st**o****ma*po***ne***"
-               * i for i in [1, 5, 15, 25, 35, 45]]
-    source3 = ["l****o**n**g**e***s*t*"
-               * i for i in [1, 5, 15, 25, 35, 45]]
+    # source1 = ["**lo***xy**z*n***ge***w**st"
+    #            * i for i in [1, 5, 15, 25, 35, 45]]
+    # source2 = ["st**o****ma*po***ne***"
+    #            * i for i in [1, 5, 15, 25, 35, 45]]
+    # source3 = ["l****o**n**g**e***s*t*"
+    #            * i for i in [1, 5, 15, 25, 35, 45]]
 
     experiment_parallel = []
     experiment_sequence = []
@@ -93,7 +93,7 @@ def main():
         if rank == MASTER:
             times = []
 
-        for i in range(1 + 1):
+        for i in range(5 + 1):
             if rank == MASTER:
                 time_start = time.perf_counter()
             parallel_experiment(list_of_jobs, info_about_threads)
@@ -111,7 +111,7 @@ def main():
 
         if rank == MASTER:
             times = []
-            for i in range(1 + 1):
+            for i in range(5 + 1):
                 time_start = time.perf_counter()
                 sequence_experiment(list_of_jobs)
                 times.append(time.perf_counter() - time_start)
