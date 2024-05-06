@@ -162,7 +162,7 @@ Táto časť dokumentácie slúži na zobrazenie a porovnanie výsledkov medzi p
 
 ![image](https://github.com/RichardKorosi/Korosi-111313-PPDS2024/assets/99643046/6a140805-c6f7-4da5-a68e-9552f9d1fccb)
 
-![image](https://github.com/RichardKorosi/Korosi-111313-PPDS2024/assets/99643046/615ce48a-cbb3-4cb7-be7c-960d9d3a644a)
+![image](https://github.com/RichardKorosi/Korosi-111313-PPDS2024/assets/99643046/046a021d-56c8-4fe1-94ce-f9e71534d79b)
 
 ```
 | Lengths of strings | Number of threads | Threads per block x Blocks per grid | Measured time [s] |
