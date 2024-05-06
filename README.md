@@ -153,6 +153,7 @@ LCS: 173 onestonestone...onestonestone
 LCS: 223 onestonestone...onestonestone
 ```
 ### Analýza časov viacerých experimentov
+Táto časť dokumentácie slúži na zobrazenie a porovnanie výsledkov medzi paralelným a sekvenčným prístupom pomocou grafov. Tabuľka nižšie slúži na porovnanie paralelných verzií medzi sebou. Z grafu je možné vyčítať, že pri krátkych reťazcoch je efektívnejšia sekvenčná verzia. Je to z dôvodu, že samotný výpočet trvá krátko a v paralelnej verzii sa stráca čas posielaním dát medzi pracovnými uzlami medzi sebou a CUDOU.
 ![image](https://github.com/RichardKorosi/Korosi-111313-PPDS2024/assets/99643046/ad912126-004d-4b86-bd3a-d802d5484d33)
 
 ![image](https://github.com/RichardKorosi/Korosi-111313-PPDS2024/assets/99643046/b42c1653-0d43-402d-8b53-324bb37fef88)
