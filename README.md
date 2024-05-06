@@ -104,3 +104,22 @@ def cuda_lcs(s1, s2, info_about_threads):
     result = get_result(dp_result, col_string, row_string)
     return result
 ```
+Výpočet jednej antidiagonály sa začína tým, že si CUDA jadro zistí pozíciu, od ktorej má začať. Následne postupuje podľa algoritmu, kde zisťuje či sa na aktuálnej pozícii rovnajú znaky v reťazcoch. Ak sa rovnajú (a nejde o hviezdičku), tak sa na dané políčko zapíše hodnota o 1 väčšia ako sa nachádza na políčku, ktoré je o jednu pozíciu naľavo-hore. Ak sa znaky v reťazcoch nerovnajú vyberá sa maximum z políčok, ktoré sú od aktuálneho políčka naľavo a hore. Algoritmus obsahuje aj ukončovaciu podmienku v prípade, že by posledné jadro malo zadaný väčší počet úloh ako ešte reálne ostáva do konca antidiagonály. 
+```py
+@cuda.jit
+def cuda_kernel(dp, col_string, row_string, start_col,
+                start_row, elements_for_thread):
+    pos = cuda.grid(1)
+    col = start_col - pos * elements_for_thread
+    row = start_row + pos * elements_for_thread
+    for i in range(elements_for_thread):
+        if col < 1 or row > len(dp[0]):
+            break
+        if (col_string[col - 1] == row_string[row - 1]
+                and col_string[col - 1] != 42):
+            dp[col, row] = dp[col - 1, row - 1] + 1
+        else:
+            dp[col, row] = max(dp[col - 1, row], dp[col, row - 1])
+        col -= 1
+        row += 1
+```
