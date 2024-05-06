@@ -57,9 +57,6 @@ def cuda_kernel(dp, col_string, row_string, start_col, start_row, elements_for_t
 
 
 def main():
-    source1 = ["**textje********skoro***citatelny******unich" * i for i in [1, 2, 10, 100]]
-    source2 = ["text*v*tejtoknihe****ma*po***usc*****koniec**robot*rozum" * i for i in [1, 2, 10, 100]]
-    source3 = ["f*te**xt**sa*je***sko*rio**tu*" * i for i in [1, 2, 10, 100]]
     """ Run the main function of the program.
 
     More specifically, this function runs the main function of the program.
@@ -86,7 +83,7 @@ def main():
         if rank == MASTER:
             times = []
 
-        for i in range(1 + 1):
+        for i in range(10 + 1):
             if rank == MASTER:
                 time_start = time.perf_counter()
             parallel_experiment(list_of_jobs, info_about_threads)
@@ -100,7 +97,7 @@ def main():
 
         if rank == MASTER:
             times = []
-            for i in range(1 + 1):
+            for i in range(10 + 1):
                 time_start = time.perf_counter()
                 sequence_experiment(list_of_jobs)
                 times.append(time.perf_counter() - time_start)
@@ -233,7 +230,6 @@ def sequence_experiment(list_of_jobs):
     for i in range(3):
         result = sequence_lcs(list_of_jobs[i][0], list_of_jobs[i][1])
         final_result.append(result)
-    # print("Max Length:", min(final_result, key=lambda x: x[1]))
 
 
 def parallel_experiment(list_of_jobs, info_about_threads):
@@ -266,7 +262,7 @@ def parallel_experiment(list_of_jobs, info_about_threads):
                 comm.send(result, dest=MASTER)
 
     if rank == MASTER:
-        print("Max Length:", min(final_result, key=lambda x: x[1])[1])
+        print("LCS:", min(final_result, key=lambda x: x[1])[1])
 
 
 def create_graph(experiment_parallel, experiment_sequence, info_about_threads):
