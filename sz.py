@@ -35,41 +35,45 @@ def cuda_kernel(dp, col_string, row_string, start_col, start_row, elements_for_t
 
 
 def main():
-    source1 = "**textje********skoro***citatelny******unich" * 100
-    source2 = "text*v*tejtoknihe****ma*po***usc*****koniec**robot*rozum" * 100
-    source3 = "f*te**xt**sa*je***sko*rio**tu*" * 100
-    
+    source1 = ["**textje********skoro***citatelny******unich" * i for i in [1, 10]]
+    source2 = ["text*v*tejtoknihe****ma*po***usc*****koniec**robot*rozum" * i for i in [1, 10]]
+    source3 = ["f*te**xt**sa*je***sko*rio**tu*" * i for i in [1, 10]]
+
     experiment_parallel = []
     experiment_sequence = []
 
-    list_of_jobs = [(source1, source2), (source1, source3), (source2, source3)]
+    for x in range(len(source1)):
+        list_of_jobs = [(source1[x], source2[x]),
+                        (source1[x], source3[x]),
+                        (source2[x], source3[x])]
 
-    if rank == MASTER:
-        times = []
-    for i in range(1+1):
         if rank == MASTER:
-            time_start = time.perf_counter()
-        parallel_experiment(list_of_jobs)
+            times = []
+
+        for i in range(1 + 1):
+            if rank == MASTER:
+                time_start = time.perf_counter()
+            parallel_experiment(list_of_jobs)
+            if rank == MASTER:
+                times.append(time.perf_counter() - time_start)
+
         if rank == MASTER:
-            times.append(time.perf_counter() - time_start)
+            avg_time = sum(times[1:]) / (len(times) - 1)
+            print(avg_time)
+            dimensions = f"{len(source1[x])}x{len(source2[x])}x{len(source3[x])}"
+            experiment_parallel.append({"dimensions": dimensions, "time": avg_time})
 
-    if rank == MASTER:
-        avg_time = sum(times[1:]) / (len(times) - 1)
-        print(avg_time)
-        dimensions = f"{len(source1)}x{len(source2)}x{len(source3)}"
-        experiment_parallel.append({"dimensions": dimensions, "time": avg_time})
+        if rank == MASTER:
+            times = []
+            for i in range(1 + 1):
+                time_start = time.perf_counter()
+                sequence_experiment(list_of_jobs)
+                times.append(time.perf_counter() - time_start)
 
-    if rank == MASTER:
-        times = []
-        for i in range(1+1):
-            time_start = time.perf_counter()
-            sequence_experiment(list_of_jobs)
-            times.append(time.perf_counter() - time_start)
-
-        avg_time = sum(times[1:]) / (len(times) - 1)
-        print(avg_time)
-        dimensions = f"{len(source1)}x{len(source2)}x{len(source3)}"
-        experiment_sequence.append({"dimensions": dimensions, "time": avg_time})
+            avg_time = sum(times[1:]) / (len(times) - 1)
+            print(avg_time)
+            dimensions = f"{len(source1[x])}x{len(source2[x])}x{len(source3[x])}"
+            experiment_sequence.append({"dimensions": dimensions, "time": avg_time})
 
     if rank == MASTER:
         create_graph(experiment_parallel, experiment_sequence)
@@ -191,7 +195,7 @@ def create_graph(experiment_parallel, experiment_sequence):
     rects1 = ax.bar(x - width / 2, time_para, width, label='Parallel', color="r")
     rects2 = ax.bar(x + width / 2, time_sequence, width, label='Series', color="g")
 
-    ax.set_xlabel("XDD")
+    ax.set_xlabel("Length of three strings")
     ax.set_ylabel("Time [s]")
     ax.set_title("Comparison of Parallel and Sequence Experiments")
     ax.set_xticks(x)
