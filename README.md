@@ -123,3 +123,34 @@ def cuda_kernel(dp, col_string, row_string, start_col,
         col -= 1
         row += 1
 ```
+## Analýza výsledkov
+### Overenie funkčnosti
+Overenie funkčnosti spočívalo v porovnávaní výsledkom medzi výsledkami paralelnej verzie, sekvenčnej verzie (ktorá bola implementovaná dynamickým programovaním, ale nie verziou antidiagonál) a verzie tretej strany, ktorá je dostupná na internete (viď. zdroje).
+VSTUP
+```py
+source1 = ["**textje********skoro***citatelny******unich" * i for i in [1, 5, 15, 25, 35, 45]]
+source2 = [("text*v*tejtoknihe****ma*po***usc*****koniec**robot*rozum") * i for i in [1, 5, 15, 25, 35, 45]]
+source3 = ["f*te**xt**sa*je***sko*rio**tu*" * i for i in [1, 5, 15, 25, 35, 45]]
+--------
+source1 = ["**lo***xy**z*n***ge***w**st" * i for i in [1, 5, 15, 25, 35, 45]]
+source2 = ["st**o****ma*po***ne***" * i for i in [1, 5, 15, 25, 35, 45]]
+source3 = ["l****o**n**g**e***s*t*" * i for i in [1, 5, 15, 25, 35, 45]]
+```
+Výstup
+```
+LCS: 13 textjeskorotu
+LCS: 65 textjeskorotu...textjeskorotu
+LCS: 195 textjeskorotu...textjeskorotu
+LCS: 325 textjeskorotu...textjeskorotu
+LCS: 455 textjeskorotu...textjeskorotu
+LCS: 585 textjeskorotu...textjeskorotu
+--------
+LCS: 3 one
+LCS: 23 onestonestonestonestone
+LCS: 73 onestonestone...onestonestone
+LCS: 123 onestonestone...onestonestone
+LCS: 173 onestonestone...onestonestone
+LCS: 223 onestonestone...onestonestone
+```
+
+
