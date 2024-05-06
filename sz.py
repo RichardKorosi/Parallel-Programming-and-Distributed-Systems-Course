@@ -8,13 +8,12 @@ __author__ = "Richard Körösi"
 import time
 import math
 import warnings
-import string
 
 import numpy as np
 import matplotlib.pyplot as plt
 
 from mpi4py import MPI
-from numba import cuda, core
+from numba import cuda
 from numba.core.errors import NumbaPerformanceWarning
 
 warnings.filterwarnings("ignore", category=NumbaPerformanceWarning)
