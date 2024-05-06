@@ -35,9 +35,9 @@ def cuda_kernel(dp, col_string, row_string, start_col, start_row, elements_for_t
 
 
 def main():
-    source1 = ["**textje********skoro***citatelny******unich" * i for i in [1, 10, 100]]
-    source2 = ["text*v*tejtoknihe****ma*po***usc*****koniec**robot*rozum" * i for i in [1, 10, 100]]
-    source3 = ["f*te**xt**sa*je***sko*rio**tu*" * i for i in [1, 10, 100]]
+    source1 = ["**textje********skoro***citatelny******unich" * i for i in [1, 2, 10, 100]]
+    source2 = ["text*v*tejtoknihe****ma*po***usc*****koniec**robot*rozum" * i for i in [1, 2, 10, 100]]
+    source3 = ["f*te**xt**sa*je***sko*rio**tu*" * i for i in [1, 2, 10, 100]]
 
     experiment_parallel = []
     experiment_sequence = []
@@ -69,7 +69,7 @@ def main():
             times = []
             for i in range(1 + 1):
                 time_start = time.perf_counter()
-                # sequence_experiment(list_of_jobs)
+                sequence_experiment(list_of_jobs)
                 times.append(time.perf_counter() - time_start)
 
             avg_time = sum(times[1:]) / (len(times) - 1)
@@ -98,9 +98,6 @@ def cuda_lcs(s1, s2, info_about_threads):
     threads_per_block = 256
     blocks_per_grid = math.floor(cuda_cores / (threads_per_block * 3))
     elements_for_thread = math.ceil(no_anti_diagonal / (blocks_per_grid * threads_per_block))
-    # print("CUDA Cores available for one MPI process:", threads_per_block * blocks_per_grid)
-    # print("Anti-diagonals:", no_anti_diagonal, "Blocks per grid:", blocks_per_grid, "Threads per block:", threads_per_block)
-    # print("Jobs per thread:", elements_for_thread)
     info_about_threads["threads"] = threads_per_block * blocks_per_grid
     info_about_threads["blocks_per_grid"] = blocks_per_grid
     info_about_threads["threads_per_block"] = threads_per_block
@@ -184,8 +181,8 @@ def parallel_experiment(list_of_jobs, info_about_threads):
             else:
                 comm.send(result, dest=MASTER)
 
-    # if rank == MASTER:
-    #     print("Max Length:", min(final_result, key=lambda x: x[1]))
+    if rank == MASTER:
+        print("Max Length:", min(final_result, key=lambda x: x[1])[1])
 
 
 def create_graph(experiment_parallel, experiment_sequence, info_about_threads):
@@ -206,7 +203,6 @@ def create_graph(experiment_parallel, experiment_sequence, info_about_threads):
     ax.set_title("Comparison of Parallel and Sequence Experiments")
     ax.set_xticks(x)
     ax.set_xticklabels(dimensions)
-    ax.legend()
 
     ax.bar_label(rects1, padding=3)
     ax.bar_label(rects2, padding=3)
@@ -215,9 +211,14 @@ def create_graph(experiment_parallel, experiment_sequence, info_about_threads):
     threads_info = f"Threads for 1 processor: {info_about_threads['threads']}\n" \
                    f"Threads per block: {info_about_threads['threads_per_block']}\n" \
                    f"Blocks per grid: {info_about_threads['blocks_per_grid']}"
-    ax.text(0.01, 0.99, threads_info, transform=ax.transAxes, verticalalignment='top', horizontalalignment='left')
 
-    ax.legend()
+    # Create a custom legend entry
+    from matplotlib.lines import Line2D
+    custom_lines = [Line2D([0], [0], color='r', lw=4),
+                    Line2D([0], [0], color='g', lw=4),
+                    Line2D([0], [0], color='w', lw=4)]
+    ax.legend(custom_lines, ['Parallel', 'Series', threads_info])
+
     plt.show()
 
 
