@@ -1,3 +1,11 @@
+"""This file is implementation of the FINAL assignment of the PPDS.
+
+More info about the assignment can be found in the README.md document.
+"""
+
+__author__ = "Richard Körösi"
+
+
 import time
 import math
 import warnings
@@ -20,6 +28,20 @@ nproc = comm.Get_size()
 
 @cuda.jit
 def cuda_kernel(dp, col_string, row_string, start_col, start_row, elements_for_thread):
+    """ Calculate one anti-diagonal of the DP matrix in LCS problem.
+
+    More specifically, this function calculates the values of the DP matrix
+    for one anti-diagonal. The anti-diagonal is defined by the starting
+    column and row.
+
+    Keyword arguments:
+    dp -- the DP matrix
+    col_string -- the string of the column
+    row_string -- the string of the row
+    start_col -- the starting column of the anti-diagonal
+    start_row -- the starting row of the anti-diagonal
+    elements_for_thread -- the number of elements to calculate for one thread
+    """
     pos = cuda.grid(1)
     col = start_col - pos * elements_for_thread
     row = start_row + pos * elements_for_thread
@@ -38,6 +60,17 @@ def main():
     source1 = ["**textje********skoro***citatelny******unich" * i for i in [1, 2, 10, 100]]
     source2 = ["text*v*tejtoknihe****ma*po***usc*****koniec**robot*rozum" * i for i in [1, 2, 10, 100]]
     source3 = ["f*te**xt**sa*je***sko*rio**tu*" * i for i in [1, 2, 10, 100]]
+    """ Run the main function of the program.
+
+    More specifically, this function runs the main function of the program.
+    It runs the parallel and sequence experiments for the Longest Common
+    Subsequence problem of three strings. The results are then compared
+    and a graph is created.
+    """
+
+    source1 = ["**textje********skoro***citatelny******unich" * i for i in [1, 5, 15, 25, 35, 45]]
+    source2 = ["text*v*tejtoknihe****ma*po***usc*****koniec**robot*rozum" * i for i in [1, 5, 15, 25, 35, 45]]
+    source3 = ["f*te**xt**sa*je***sko*rio**tu*" * i for i in [1, 5, 15, 25, 35, 45]]
 
     experiment_parallel = []
     experiment_sequence = []
@@ -81,6 +114,16 @@ def main():
 
 
 def cuda_lcs(s1, s2, info_about_threads):
+    """ Calculate the Longest Common Subsequence of two strings using CUDA.
+
+    This function calculates the Longest Common Subsequence of two strings
+    using the CUDA parallelization. And returns the result.
+
+    Keyword arguments:
+    s1 -- the first string
+    s2 -- the second string
+    info_about_threads -- the dictionary to store information about threads
+    """
     col_string = s1 if len(s1) < len(s2) else s2
     row_string = s2 if len(s1) < len(s2) else s1
     cuda_cores = 7168
@@ -118,6 +161,16 @@ def cuda_lcs(s1, s2, info_about_threads):
 
 
 def get_result(dp, row_string, col_string):
+    """ Get the result of the LCS problem.
+
+    More specifically, this function returns the longest common subsequence
+    of two strings. The result is calculated from the DP matrix.
+
+    Keyword arguments:
+    dp -- the DP matrix
+    row_string -- the string of the row
+    col_string -- the string of the column
+    """
     row = len(row_string)
     col = len(col_string)
     result = ""
@@ -140,6 +193,15 @@ def get_result(dp, row_string, col_string):
 
 
 def sequence_lcs(s1, s2):
+    """ Calculate the Longest Common Subsequence of two strings.
+
+    This function calculates the Longest Common Subsequence of two strings
+    using the dynamic programming approach. And returns the result.
+
+    Keyword arguments:
+    s1 -- the first string
+    s2 -- the second string
+    """
     col_string = s1 if len(s1) < len(s2) else s2
     row_string = s2 if len(s1) < len(s2) else s1
 
@@ -158,6 +220,15 @@ def sequence_lcs(s1, s2):
 
 
 def sequence_experiment(list_of_jobs):
+    """ Run the sequence experiment.
+
+    More specifically, this function runs the sequence experiment for the
+    Longest Common Subsequence problem of three strings. It runs 3 times
+    and returns the results.
+
+    Keyword arguments:
+    list_of_jobs -- the list of jobs to run the experiment
+    """
     final_result = []
     for i in range(3):
         result = sequence_lcs(list_of_jobs[i][0], list_of_jobs[i][1])
@@ -166,6 +237,19 @@ def sequence_experiment(list_of_jobs):
 
 
 def parallel_experiment(list_of_jobs, info_about_threads):
+    """ Run the parallel experiment.
+
+    More specifically, this function runs the parallel experiment for the
+    Longest Common Subsequence problem of three strings. It runs 3 times
+    and returns the results. The difference between this function and the
+    sequence_experiment function is that this function uses the CUDA
+    and MPI parallelization. 3 processors are used to run the experiment and run the
+    3 jobs in parallel.
+
+    Keyword arguments:
+    list_of_jobs -- the list of jobs to run the experiment
+    info_about_threads -- the dictionary to store information about threads
+    """
     if rank == MASTER:
         final_result = []
 
@@ -186,6 +270,16 @@ def parallel_experiment(list_of_jobs, info_about_threads):
 
 
 def create_graph(experiment_parallel, experiment_sequence, info_about_threads):
+    """ Create a graph of the experiment results.
+
+    More specifically, this function creates a graph of the experiment results.
+    The graph shows the comparison of the parallel and sequence experiments.
+
+    Keyword arguments:
+    experiment_parallel -- the results of the parallel experiment
+    experiment_sequence -- the results of the sequence experiment
+    info_about_threads -- the information about threads
+    """
     dimensions = [result["dimensions"] for result in experiment_parallel]
     time_para = [result["time"] for result in experiment_parallel]
     time_sequence = [result["time"] for result in experiment_sequence]
