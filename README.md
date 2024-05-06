@@ -20,17 +20,24 @@ Pracovný uzol 2 má za úlohu zistiť: LCS(reťazec2, reťazec3)
 ```
 Každý pracovný uzol následne pomocou CUDY počíta LCS. Paralelný výpočet LCS dvoch reťazcov spočíva na princípe počítania antidiagonál v matici `dp`. Antidiagonála sa rozdelí na menšie časti, ktoré následne môžu CUDA jadrá paralelne a nezávislo od seba počítať.
 ### MPI paralelizácia
-Vo funkcii main sa volá (5 + 1) paralelný experiment s tým, že `MASTER` pracovný uzol má na starosti taktiež meranie a zápis časov, aby sa z nich neskôr mohol spraviť priemer. Prvá iterácia pokusu následne z výsledkov vymaže, keďže pri prvom spustení CUDY sú výsledky nereprezentatívne a prvá iterácia teda slúži len ako tzv. `CUDA Warmup`.
+Vo funkcii main sa volá (5 + 1) paralelný experiment s tým, že `MASTER` pracovný uzol má na starosti taktiež meranie a zápis časov, aby sa z nich neskôr mohol spraviť priemer. Prvá iterácia pokusu sa následne z výsledkov vymaže, keďže pri prvom spustení CUDY sú výsledky nereprezentatívne a prvá iterácia teda slúži len ako tzv. `CUDA Warmup` (viď. útržok z funkcie main).
 ```py
-if rank == MASTER:
-    times = []
-
-for i in range(5 + 1):
+main():
+    ---------------------------------------------------------
     if rank == MASTER:
-        time_start = time.perf_counter()
-    parallel_experiment(list_of_jobs, info_about_threads)
+        times = []
+    
+    for i in range(5 + 1):
+        if rank == MASTER:
+            time_start = time.perf_counter()
+        parallel_experiment(list_of_jobs, info_about_threads)
+        if rank == MASTER:
+            times.append(time.perf_counter() - time_start)
+    ---------------------------------------------------------
     if rank == MASTER:
-        times.append(time.perf_counter() - time_start)
+        avg_time = sum(times[1:]) / (len(times) - 1)
+    ---------------------------------------------------------
+    ...
 ```
 Samotná funkcia `parallel_experiment()`, ktorú vykonávajú všetky 3 pracovné uzly má nasledovnú logiku: Každý pracovný uzol si zistí, ktoré nad ktorými dvoma reťazcami má počítať LCS. Ak sa jedná o `MASTER-a` tak po dokončení jeho výpočtu si uloží výsledok do premennej `final_result` a prejde do cyklu, kde sa zavolá `comm.recv`, v tomto cykle obdrží dáta od ostatných pracovných uzlov. Ak sa nejedná o `MASTER-a` tak pracovný uzol po vypočítaní LCS pomocou `comm.send` odošle výsledok `MASTER-ovi`.
 ```py
