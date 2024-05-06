@@ -39,7 +39,7 @@ main():
     ---------------------------------------------------------
     ...
 ```
-Samotná funkcia `parallel_experiment()`, ktorú vykonávajú všetky 3 pracovné uzly má nasledovnú logiku: Každý pracovný uzol si zistí, ktoré nad ktorými dvoma reťazcami má počítať LCS. Ak sa jedná o `MASTER-a` tak po dokončení jeho výpočtu si uloží výsledok do premennej `final_result` a prejde do cyklu, kde sa zavolá `comm.recv`, v tomto cykle obdrží dáta od ostatných pracovných uzlov. Ak sa nejedná o `MASTER-a` tak pracovný uzol po vypočítaní LCS pomocou `comm.send` odošle výsledok `MASTER-ovi`.
+Samotná funkcia `parallel_experiment()`, ktorú vykonávajú všetky 3 pracovné uzly má nasledovnú logiku: Každý pracovný uzol si zistí, ktoré nad ktorými dvoma reťazcami má počítať LCS. Ak sa jedná o `MASTER-a` tak po dokončení jeho výpočtu si uloží výsledok do premennej `final_result` a prejde do cyklu, kde sa zavolá `comm.recv`, v tomto cykle obdrží dáta od ostatných pracovných uzlov. Ak sa nejedná o `MASTER-a` tak pracovný uzol po vypočítaní LCS pomocou `comm.send` odošle výsledok `MASTER-ovi`. (POZNÁMKA: Podobným spôsobom sa pre rovnaké reťazce počíta LCS aj sériovo, avšak pre pokus o zachovanie stručnosti dokumentácie sa bude kapitola ohľadom implementácie zaoberať len paralelnou verziou).
 ```py
 def parallel_experiment(list_of_jobs, info_about_threads):
     if rank == MASTER:
