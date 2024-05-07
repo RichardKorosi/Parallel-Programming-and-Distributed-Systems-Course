@@ -39,7 +39,7 @@ main():
     ---------------------------------------------------------
     ...
 ```
-Samotná funkcia `parallel_experiment()`, ktorú vykonávajú všetky 3 pracovné uzly má nasledovnú logiku: Každý pracovný uzol si zistí, ktoré nad ktorými dvoma reťazcami má počítať LCS. Ak sa jedná o `MASTER-a` tak po dokončení jeho výpočtu si uloží výsledok do premennej `final_result` a prejde do cyklu, kde sa zavolá `comm.recv`, v tomto cykle obdrží dáta od ostatných pracovných uzlov. Ak sa nejedná o `MASTER-a` tak pracovný uzol po vypočítaní LCS pomocou `comm.send` odošle výsledok `MASTER-ovi`. (POZNÁMKA: Podobným spôsobom sa pre rovnaké reťazce počíta LCS aj sériovo, avšak pre pokus o zachovanie stručnosti dokumentácie sa bude kapitola ohľadom implementácie zaoberať len paralelnou verziou).
+Samotná funkcia `parallel_experiment()`, ktorú vykonávajú všetky 3 pracovné uzly má nasledovnú logiku: Každý pracovný uzol si zistí, nad ktorými dvoma reťazcami má počítať LCS. Ak sa jedná o `MASTER-a` tak po dokončení jeho výpočtu si uloží výsledok do premennej `final_result` a prejde do cyklu, kde sa zavolá `comm.recv`, v tomto cykle obdrží dáta od ostatných pracovných uzlov. Ak sa nejedná o `MASTER-a` tak pracovný uzol po vypočítaní LCS pomocou `comm.send` odošle výsledok `MASTER-ovi`. (POZNÁMKA: Podobným spôsobom sa pre rovnaké reťazce počíta LCS aj sériovo, avšak pre pokus o zachovanie stručnosti dokumentácie sa bude kapitola ohľadom implementácie zaoberať len paralelnou verziou).
 ```py
 def parallel_experiment(list_of_jobs, info_about_threads):
     if rank == MASTER:
@@ -64,7 +64,7 @@ def parallel_experiment(list_of_jobs, info_about_threads):
 ```
 
 ### CUDA paralelizácia
-Cuda paralelizácia začína prípravou dát, rozdelením CUDA jadier a poslaním dát na grafickú kartu. Reťazce sa konvertujú na zoznamy enkódovaných charakterov, aby s nimi mohla CUDA pracovať. Následne sa "reťazce" a matica "dp" pošle na grafickú kartu. Následne sa vypočíta počet antidiagonál, ktoré bude treba spracovať a taktiež sa určí počet CUDA jadier pre daný pracovný uzol. Grafická karta `Nvidia GeForce RTX 4070 Super` má 7168 CUDA jadier. Implementácia má napriamo určený počet jadier na blok (256). Avšak aby každý pracovný uzol mal k dispozícii rovnaký počet CUDA jadier tak počet blokov na gride sa počíta na základe vzorca `(cuda_cores / (threads_per_block * 3)`, kde 3 reprezentuje 3 pracovné uzly. Následne sa na základe určených jadier pre pracovný uzol vypočíta jednoduchým vzorcom rozdelí práca medzi samotné CUDA jadrá (koľko prvkov z diagonál bude musieť jedno jadro spracovať). Následne sa v cykle postupne vypočítajú všetky antidiagonály a výsledok (naplnená matica "dp") sa pošle z grafickej karty naspäť pracovnému uzlu. Pracovný uzol následne spracuje vyplnenú maticu a získa LCS za pomoci funkcie `get_result()`. 
+Cuda paralelizácia začína prípravou dát, rozdelením CUDA jadier a poslaním dát na grafickú kartu. Reťazce sa konvertujú na zoznamy enkódovaných charakterov, aby s nimi mohla CUDA pracovať. Následne sa "reťazce" a matica "dp" pošle na grafickú kartu. Následne sa vypočíta počet antidiagonál, ktoré bude treba spracovať a taktiež sa určí počet CUDA jadier pre daný pracovný uzol. Grafická karta `Nvidia GeForce RTX 4070 Super` má 7168 CUDA jadier. Implementácia má napriamo určený počet jadier na blok (256). Avšak aby každý pracovný uzol mal k dispozícii rovnaký počet CUDA jadier tak počet blokov na gride sa počíta na základe vzorca `cuda_cores / (threads_per_block * 3)`, kde 3 reprezentuje 3 pracovné uzly. Následne sa na základe určených jadier pre pracovný uzol vypočíta jednoduchým vzorcom rozdelí práca medzi samotné CUDA jadrá (koľko prvkov z antidiagonál bude musieť jedno jadro spracovať). Následne sa v cykle postupne vypočítajú všetky antidiagonály a výsledok (naplnená matica "dp") sa pošle z grafickej karty naspäť pracovnému uzlu. Pracovný uzol následne spracuje vyplnenú maticu a získa LCS za pomoci funkcie `get_result()`. 
 ```py
 def cuda_lcs(s1, s2, info_about_threads):
     col_string = s1 if len(s1) < len(s2) else s2
@@ -132,7 +132,7 @@ if rank == MASTER:
 ```
 ## Analýza výsledkov
 ### Overenie funkčnosti
-Overenie funkčnosti spočívalo v porovnávaní výsledkom medzi výsledkami paralelnej verzie, sekvenčnej verzie (ktorá bola implementovaná dynamickým programovaním, ale nie verziou antidiagonál) a verzie tretej strany, ktorá je dostupná na internete (viď. zdroje). \
+Overenie funkčnosti spočívalo v porovnávaní výsledkom medzi výsledkami paralelnej verzie, sekvenčnej verzie (ktorá bola implementovaná dynamickým programovaním, ale nie verziou antidiagonál) a verzie tretej strany, ktorá je dostupná na internete (viď. zdroje).
 #### Vstup
 ```py
 source1 = ["**textje********skoro***citatelny******unich" * i for i in [1, 5, 15, 25, 35, 45]]
