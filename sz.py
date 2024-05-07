@@ -1,5 +1,14 @@
 """This file is implementation of the FINAL assignment of the PPDS.
 
+Sources used in the implementation:
+- Theory about LCS:
+    FEI STU PPDS Lecture: https://shorturl.at/uILNR
+    University at Buffalo: https://shorturl.a
+- CUDA warm-up:
+    NVDIA Forum: https://shorturl.at/eklAF
+- Matplotlib chart:
+    Matplotlib documentation: https://shorturl.at/iuwA6
+
 More info about the assignment can be found in the README.md document.
 """
 
