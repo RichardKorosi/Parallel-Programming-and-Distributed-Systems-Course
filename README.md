@@ -123,6 +123,13 @@ def cuda_kernel(dp, col_string, row_string, start_col,
         col -= 1
         row += 1
 ```
+### Finálny výsledok
+Po vyplnení "dp" matice si každý pracovný uzol následne zistí samotnú LCS a jej dĺžku vo funkcii `get_result()`. Tento výsledok následne pracovné uzly, ktoré nie sú `MASTER`, posielajú `MASTER-ovi`. Po tom ako `MASTER` dostane aj zvyšné výsledky ostatných pracovných uzlov, vyberie minimálnu hodnotu zo všetkých troch výsledkov a to je výsledný LCS medzi troma reťazcami.
+```py
+if rank == MASTER:
+    min_result = min(final_result, key=lambda x: x[1])
+    print("LCS:", min_result[1], end=" ")
+```
 ## Analýza výsledkov
 ### Overenie funkčnosti
 Overenie funkčnosti spočívalo v porovnávaní výsledkom medzi výsledkami paralelnej verzie, sekvenčnej verzie (ktorá bola implementovaná dynamickým programovaním, ale nie verziou antidiagonál) a verzie tretej strany, ktorá je dostupná na internete (viď. zdroje).
