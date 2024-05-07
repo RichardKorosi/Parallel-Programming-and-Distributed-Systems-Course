@@ -38,9 +38,9 @@ def cuda_kernel(dp, col_string, row_string, start_col,
                 start_row, elements_for_thread):
     """Calculate one anti-diagonal of the DP matrix in LCS problem.
 
-    More specifically, this function calculates the values of the DP matrix
-    for one anti-diagonal. The anti-diagonal is defined by the starting
-    column and row.
+    More specifically, this function calculates the values
+    of the DP matrix for one anti-diagonal.
+    The anti-diagonal is defined by the starting column and row.
 
     Keyword arguments:
     dp -- the DP matrix
@@ -48,7 +48,8 @@ def cuda_kernel(dp, col_string, row_string, start_col,
     row_string -- the string of the row
     start_col -- the starting column of the anti-diagonal
     start_row -- the starting row of the anti-diagonal
-    elements_for_thread -- the number of elements to calculate for one thread
+    elements_for_thread -- the number of elements to
+                           calculate for one thread
     """
     pos = cuda.grid(1)
     col = start_col - pos * elements_for_thread
@@ -68,10 +69,10 @@ def cuda_kernel(dp, col_string, row_string, start_col,
 def main():
     """Run the main function of the program.
 
-    More specifically, this function runs the main function of the program.
-    It runs the parallel and sequence experiments for the Longest Common
-    Subsequence problem of three strings. The results are then compared
-    and a graph is created.
+    More specifically, this function runs the main
+    function of the program. It runs the parallel and sequence
+    experiments for the LCS problem of three strings.
+    The results are then compared and a graph is created.
     """
     source1 = ["**textje********skoro***citatelny******unich"
                * i for i in [1, 5, 15, 25, 35, 45]]
@@ -80,13 +81,6 @@ def main():
                * i for i in [1, 5, 15, 25, 35, 45]]
     source3 = ["f*te**xt**sa*je***sko*rio**tu*"
                * i for i in [1, 5, 15, 25, 35, 45]]
-
-    # source1 = ["**lo***xy**z*n***ge***w**st"
-    #            * i for i in [1, 5, 15, 25, 35, 45]]
-    # source2 = ["st**o****ma*po***ne***"
-    #            * i for i in [1, 5, 15, 25, 35, 45]]
-    # source3 = ["l****o**n**g**e***s*t*"
-    #            * i for i in [1, 5, 15, 25, 35, 45]]
 
     experiment_parallel = []
     experiment_sequence = []
@@ -139,15 +133,17 @@ def main():
 
 
 def cuda_lcs(s1, s2, info_about_threads):
-    """Calculate the Longest Common Subsequence of two strings using CUDA.
+    """Calculate the LCS of two strings using CUDA.
 
-    This function calculates the Longest Common Subsequence of two strings
-    using the CUDA parallelization. And returns the result.
+    This function calculates the Longest Common Subsequence
+    of two strings using the CUDA parallelization.
+    And returns the result.
 
     Keyword arguments:
     s1 -- the first string
     s2 -- the second string
-    info_about_threads -- the dictionary to store information about threads
+    info_about_threads -- the dictionary to store
+                          information about threads
     """
     col_string = s1 if len(s1) < len(s2) else s2
     row_string = s2 if len(s1) < len(s2) else s1
@@ -221,7 +217,7 @@ def get_result(dp, row_string, col_string):
 
 
 def sequence_lcs(s1, s2):
-    """Calculate the Longest Common Subsequence of two strings.
+    """Calculate the LCS of two strings.
 
     This function calculates the Longest Common Subsequence
     of two strings using the dynamic programming approach.
@@ -269,8 +265,8 @@ def sequence_experiment(list_of_jobs):
 def parallel_experiment(list_of_jobs, info_about_threads):
     """Run the parallel experiment.
 
-    More specifically, this function runs the parallel experiment for the
-    Longest Common Subsequence problem of three strings.
+    More specifically, this function runs the parallel experiment
+    for the Longest Common Subsequence problem of three strings.
     It runs 3 times and returns the results.
     The difference between this function and the
     sequence_experiment function is that this function uses the CUDA
@@ -281,7 +277,7 @@ def parallel_experiment(list_of_jobs, info_about_threads):
     Keyword arguments:
     list_of_jobs -- the list of jobs to run the experiment
     info_about_threads -- the dictionary to store
-                                        information about threads
+                          information about threads
     """
     if rank == MASTER:
         final_result = []
