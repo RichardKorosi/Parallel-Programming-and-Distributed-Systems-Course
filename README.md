@@ -199,7 +199,15 @@ Táto časť dokumentácie slúži na zobrazenie a porovnanie výsledkov medzi p
 | 1980x2520x1350    | 32                 | 32x1                                | 0.264881          |
 | 1980x2520x1350    | 16                 | 16x1                                | 0.403933          |
 ```
-
+## Zdroje
+Inšpirácie, využité časti kódu a podobne:
+* [README template](https://github.com/matiassingers/awesome-readme)
+* [PEP 8 & PEP 257 validator](https://www.codewof.co.nz/style/python3/)
+* [Conventional Commits guide](https://www.conventionalcommits.org/en/v1.0.0/)
+* [Matplotlib grouped bar chart with labels](https://matplotlib.org/stable/gallery/lines_bars_and_markers/barchart.html#sphx-glr-gallery-lines-bars-and-markers-barchart-py)
+* [Teória ohľadom LCS](https://cse.buffalo.edu/faculty/miller/Courses/CSE633/Lavanya-Nadanasabapathi-Spring-2022.pdf)
+* [Teória ohľadom LCS](https://elearn.elf.stuba.sk/moodle/pluginfile.php/77449/mod_resource/content/1/Prednaska_12.pdf)
+* [LCS online 'calculator'](https://www.cs.usfca.edu/~galles/visualization/DPLCS.html)
 
 
 
