@@ -208,6 +208,7 @@ Inšpirácie, využité časti kódu a podobne:
 * [Teória ohľadom LCS](https://cse.buffalo.edu/faculty/miller/Courses/CSE633/Lavanya-Nadanasabapathi-Spring-2022.pdf)
 * [Teória ohľadom LCS](https://elearn.elf.stuba.sk/moodle/pluginfile.php/77449/mod_resource/content/1/Prednaska_12.pdf)
 * [LCS online 'calculator'](https://www.cs.usfca.edu/~galles/visualization/DPLCS.html)
+* [CUDA Warmup](https://shorturl.at/eklAF)
 
 
 
