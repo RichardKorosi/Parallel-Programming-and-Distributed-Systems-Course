@@ -132,8 +132,8 @@ if rank == MASTER:
 ```
 ## Analýza výsledkov
 ### Overenie funkčnosti
-Overenie funkčnosti spočívalo v porovnávaní výsledkom medzi výsledkami paralelnej verzie, sekvenčnej verzie (ktorá bola implementovaná dynamickým programovaním, ale nie verziou antidiagonál) a verzie tretej strany, ktorá je dostupná na internete (viď. zdroje).
-VSTUP
+Overenie funkčnosti spočívalo v porovnávaní výsledkom medzi výsledkami paralelnej verzie, sekvenčnej verzie (ktorá bola implementovaná dynamickým programovaním, ale nie verziou antidiagonál) a verzie tretej strany, ktorá je dostupná na internete (viď. zdroje). \
+#### Vstup
 ```py
 source1 = ["**textje********skoro***citatelny******unich" * i for i in [1, 5, 15, 25, 35, 45]]
 source2 = [("text*v*tejtoknihe****ma*po***usc*****koniec**robot*rozum") * i for i in [1, 5, 15, 25, 35, 45]]
@@ -142,8 +142,12 @@ source3 = ["f*te**xt**sa*je***sko*rio**tu*" * i for i in [1, 5, 15, 25, 35, 45]]
 source1 = ["**lo***xy**z*n***ge***w**st" * i for i in [1, 5, 15, 25, 35, 45]]
 source2 = ["st**o****ma*po***ne***" * i for i in [1, 5, 15, 25, 35, 45]]
 source3 = ["l****o**n**g**e***s*t*" * i for i in [1, 5, 15, 25, 35, 45]]
+--------
+source1 = ["**x***yyyy**z*zz********" * i for i in [1, 5, 15, 25, 35, 45]]
+source2 = ["xxyyy**z*zz**x*" * i for i in [1, 5, 15, 25, 35, 45]]
+source3 = ["a**b***cd**" * i for i in [1, 5, 15, 25, 35, 45]]
 ```
-Výstup
+#### Výstup
 ```
 LCS: 13 textjeskorotu
 LCS: 65 textjeskorotu...textjeskorotu
@@ -158,6 +162,13 @@ LCS: 73 onestonestone...onestonestone
 LCS: 123 onestonestone...onestonestone
 LCS: 173 onestonestone...onestonestone
 LCS: 223 onestonestone...onestonestone
+--------
+LCS: 0 
+LCS: 0 
+LCS: 0 
+LCS: 0 
+LCS: 0 
+LCS: 0 
 ```
 ### Analýza časov viacerých experimentov
 Táto časť dokumentácie slúži na zobrazenie a porovnanie výsledkov medzi paralelným a sekvenčným prístupom pomocou grafov. Tabuľka nižšie slúži na porovnanie paralelných verzií medzi sebou. Z grafu je možné vyčítať, že pri krátkych reťazcoch je efektívnejšia sekvenčná verzia. Je to z dôvodu, že samotný výpočet trvá krátko a v paralelnej verzii sa stráca čas posielaním dát medzi pracovnými uzlami medzi sebou a CUDOU.
