@@ -1,6 +1,5 @@
 # Korosi-111313-PPDS2024-Semestralne-Zadanie
-## Úlohy zadania:
-### Opis zadania
+## Úloha zadania:
 Napíšte paralelný program, ktorý vyrieši úlohu `Longest Common Subsequence` (ďalej už len LCS) troch reťazcov. Algoritmus môže hľadať výsledný text postupne pre dvojice zdrojov, ale aj takýto spôsob výpočtu je potrebné paralelizovať. Algoritmus ignoruje charakter hviezdičky `*`.
 ### Príklad správania programu
 ```
@@ -10,7 +9,7 @@ Zdroj C: f*te**xt**sa*je***sko*rio**tu*
 Výstup: textjeskorotu
 ```
 
-## Implementácia
+## Implementácia:
 ### Zjednodušené vysvetlenie princípu fungovania implementácie
 Výsledná implementácia využíva obe možné techniky paralelizácie a teda sa používa MPI a aj CUDA. Prvá paralelizácia je implementovaná za pomoci MPI, kde každý pracovný uzol dostane za úlohu vyriešiť LCS pre dvojicu reťazcov:
 ```
@@ -130,7 +129,7 @@ if rank == MASTER:
     min_result = min(final_result, key=lambda x: x[1])
     print("LCS:", min_result[1], end=" ")
 ```
-## Analýza výsledkov
+## Analýza výsledkov:
 ### Overenie funkčnosti
 Overenie funkčnosti spočívalo v porovnávaní výsledkom medzi výsledkami paralelnej verzie, sekvenčnej verzie (ktorá bola implementovaná dynamickým programovaním, ale nie verziou antidiagonál) a verzie tretej strany, ktorá je dostupná na internete (viď. zdroje).
 #### Vstup
@@ -170,10 +169,6 @@ LCS: 0
 LCS: 0 
 LCS: 0 
 ```
-
-
-
-
 ### Analýza časov viacerých experimentov
 #### Paralelná verzia vs sekvenčná verzia
 Táto časť dokumentácie slúži na zobrazenie a porovnanie výsledkov medzi paralelným a sekvenčným prístupom pomocou grafov. Z grafu je možné vyčítať, že pri krátkych reťazcoch je efektívnejšia sekvenčná verzia. Je to z dôvodu, že samotný výpočet trvá krátko a v paralelnej verzii sa stráca čas posielaním dát medzi pracovnými uzlami medzi sebou a CUDOU. Avšak so zväčšujúcim sa vstupom už jednoznačne vidno lepšiu efektivitu paralelného riešenia.
@@ -206,16 +201,7 @@ Po porovnaní medzi sekvenčnou a paralelnou verziou prichádza porovnanie rôzn
 
 ![image](https://github.com/RichardKorosi/Korosi-111313-PPDS2024/assets/99643046/862c6053-c59a-4a47-8330-995b0a0c2a92)
 
-
-
-
-
-
-
-
-
-
-## Zdroje
+## Zdroje:
 Inšpirácie, využité časti kódu a podobne:
 * [README template](https://github.com/matiassingers/awesome-readme)
 * [PEP 8 & PEP 257 validator](https://www.codewof.co.nz/style/python3/)
