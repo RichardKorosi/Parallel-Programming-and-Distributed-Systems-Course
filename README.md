@@ -170,46 +170,34 @@ LCS: 0
 LCS: 0 
 LCS: 0 
 ```
+
+
+
+
 ### Analýza časov viacerých experimentov
-Táto časť dokumentácie slúži na zobrazenie a porovnanie výsledkov medzi paralelným a sekvenčným prístupom pomocou grafov. Tabuľka nižšie slúži na porovnanie paralelných verzií medzi sebou. Z grafu je možné vyčítať, že pri krátkych reťazcoch je efektívnejšia sekvenčná verzia. Je to z dôvodu, že samotný výpočet trvá krátko a v paralelnej verzii sa stráca čas posielaním dát medzi pracovnými uzlami medzi sebou a CUDOU.
-![image](https://github.com/RichardKorosi/Korosi-111313-PPDS2024/assets/99643046/ad912126-004d-4b86-bd3a-d802d5484d33)
+#### Paralelná verzia vs sekvenčná verzia
+Táto časť dokumentácie slúži na zobrazenie a porovnanie výsledkov medzi paralelným a sekvenčným prístupom pomocou grafov. Z grafu je možné vyčítať, že pri krátkych reťazcoch je efektívnejšia sekvenčná verzia. Je to z dôvodu, že samotný výpočet trvá krátko a v paralelnej verzii sa stráca čas posielaním dát medzi pracovnými uzlami medzi sebou a CUDOU. Avšak so zväčšujúcim sa vstupom už jednoznačne vidno lepšiu efektivitu paralelného riešenia.
 
-![image](https://github.com/RichardKorosi/Korosi-111313-PPDS2024/assets/99643046/b42c1653-0d43-402d-8b53-324bb37fef88)
+![image](https://github.com/RichardKorosi/Korosi-111313-PPDS2024/assets/99643046/4266e664-9014-46f1-bf8b-bf863704a52d)
 
-![image](https://github.com/RichardKorosi/Korosi-111313-PPDS2024/assets/99643046/d058daa8-d05f-4076-9733-47688d914cb8)
+#### Rôzne nastavenia paralelnej verzie
+Po porovnaní medzi sekvenčnou a paralelnou verziou prichádza porovnanie rôznych nastavení (počet CUDA jadier prístupných jednému pracovnému uzlu) paralelnej verzie. (POZNÁMKA: sekvenčný experiment bol pre veľké vstupy vypnutý z dôvodu ušetrenia času pri experimentoch).
+<table style="width:100%">
+  <tr>
+    <td align="center"><img src="https://github.com/RichardKorosi/Korosi-111313-PPDS2024/assets/99643046/c79d9f53-1980-4547-a55d-bfbfac73ee75" style="width:100%"></td>
+    <td align="center"><img src="https://github.com/RichardKorosi/Korosi-111313-PPDS2024/assets/99643046/30ff3992-31bf-443a-a7e8-ffcc505def79" style="width:100%"></td>
+  </tr>
+  <tr>
+    <td align="center"><img src="https://github.com/RichardKorosi/Korosi-111313-PPDS2024/assets/99643046/9c3cc965-6eeb-44ec-98ec-9004329ce1fe" style="width:100%"></td>
+    <td align="center"><img src="https://github.com/RichardKorosi/Korosi-111313-PPDS2024/assets/99643046/58dba4a4-b5e7-4466-920b-b073fce1f122" style="width:100%"></td>
+  </tr>
+</table>
 
-![image](https://github.com/RichardKorosi/Korosi-111313-PPDS2024/assets/99643046/6a140805-c6f7-4da5-a68e-9552f9d1fccb)
 
-![image](https://github.com/RichardKorosi/Korosi-111313-PPDS2024/assets/99643046/046a021d-56c8-4fe1-94ce-f9e71534d79b)
 
-```
-| Lengths of strings | Number of threads | Threads per block x Blocks per grid | Measured time [s] |
-|--------------------|-------------------|-------------------------------------|-------------------|
-| 44x56x30          | 2304               | 256x9                               | 0.0047264         |
-| 44x56x30          | 1024               | 32x32                               | 0.00359724        |
-| 44x56x30          | 32                 | 32x1                                | 0.00357452        |
-| 44x56x30          | 16                 | 16x1                                | 0.00393           |
-| 220x280x150       | 2304               | 256x9                               | 0.0144526         |
-| 220x280x150       | 1024               | 32x32                               | 0.0141145         |
-| 220x280x150       | 32                 | 32x1                                | 0.0220476         |
-| 220x280x150       | 16                 | 16x1                                | 0.0275134         |
-| 660x840x450       | 2304               | 256x9                               | 0.0490619         |
-| 660x840x450       | 1024               | 32x32                               | 0.0455269         |
-| 660x840x450       | 32                 | 32x1                                | 0.0800529         |
-| 660x840x450       | 16                 | 16x1                                | 0.117956          |
-| 1100x1400x750     | 2304               | 256x9                               | 0.0899491         |
-| 1100x1400x750     | 1024               | 32x32                               | 0.0852716         |
-| 1100x1400x750     | 32                 | 32x1                                | 0.0727983         |
-| 1100x1400x750     | 16                 | 16x1                                | 0.233065          |
-| 1540x1960x1050    | 2304               | 256x9                               | 0.114236          |
-| 1540x1960x1050    | 1024               | 32x32                               | 0.117944          |
-| 1540x1960x1050    | 32                 | 32x1                                | 0.160557          |
-| 1540x1960x1050    | 16                 | 16x1                                | 0.272191          |
-| 1980x2520x1350    | 2304               | 256x9                               | 0.149885          |
-| 1980x2520x1350    | 1024               | 32x32                               | 0.161764          |
-| 1980x2520x1350    | 32                 | 32x1                                | 0.264881          |
-| 1980x2520x1350    | 16                 | 16x1                                | 0.403933          |
-```
+
+
+
 ## Zdroje
 Inšpirácie, využité časti kódu a podobne:
 * [README template](https://github.com/matiassingers/awesome-readme)
