@@ -55,7 +55,7 @@ def cuda_kernel(dp, col_string, row_string, start_col,
     col = start_col - pos * elements_for_thread
     row = start_row + pos * elements_for_thread
     for i in range(elements_for_thread):
-        if col < 1 or row > len(dp[0]):
+        if col < 1 or row >= len(dp[0]):
             break
         if (col_string[col - 1] == row_string[row - 1]
                 and col_string[col - 1] != 42):
