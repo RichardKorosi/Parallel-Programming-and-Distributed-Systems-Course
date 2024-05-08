@@ -207,9 +207,9 @@ Inšpirácie, využité časti kódu a podobne:
 * [PEP 8 & PEP 257 validator](https://www.codewof.co.nz/style/python3/)
 * [Conventional Commits guide](https://www.conventionalcommits.org/en/v1.0.0/)
 * [Matplotlib grouped bar chart with labels](https://matplotlib.org/stable/gallery/lines_bars_and_markers/barchart.html#sphx-glr-gallery-lines-bars-and-markers-barchart-py)
-* [Teória ohľadom LCS](https://cse.buffalo.edu/faculty/miller/Courses/CSE633/Lavanya-Nadanasabapathi-Spring-2022.pdf)
-* [Teória ohľadom LCS](https://elearn.elf.stuba.sk/moodle/pluginfile.php/77449/mod_resource/content/1/Prednaska_12.pdf)
-* [LCS online 'calculator'](https://www.cs.usfca.edu/~galles/visualization/DPLCS.html)
+* [Teória ohľadom LCS - externá prednáška](https://cse.buffalo.edu/faculty/miller/Courses/CSE633/Lavanya-Nadanasabapathi-Spring-2022.pdf)
+* [Teória ohľadom LCS - prednáška PPDS](https://elearn.elf.stuba.sk/moodle/pluginfile.php/77449/mod_resource/content/1/Prednaska_12.pdf)
+* [LCS online 'kalkulátor'](https://www.cs.usfca.edu/~galles/visualization/DPLCS.html)
 * [CUDA Warmup](https://shorturl.at/eklAF)
 
 
