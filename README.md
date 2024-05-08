@@ -207,6 +207,8 @@ Po porovnaní medzi sekvenčnou a paralelnou verziou prichádza porovnanie rôzn
 </table>
 
 ![image](https://github.com/RichardKorosi/Korosi-111313-PPDS2024/assets/99643046/862c6053-c59a-4a47-8330-995b0a0c2a92)
+## Záver:
+Z tabuľky a grafov vidno jednoznačný efekt paralelizácie na problém nájdenia LCS medzi troma reťazcami. Pri grafoch a tabuľke, ktoré sa zaoberali porvnaním verzií s rôznym počtom CUDA jadier je taktiež povšimnutiahodný fakt, že zozačiatku boli všetky verzie približne rovnako rýchle a to z dôvodu, že aj verzie s menším počtom CUDA jadier mali dostatok jadier na to aby každé jadro nemuselo počítať príliš veľa elementov v "dp" matici. Pri väčších vstupoch už verzie s nižším počtom CUDA jadier nestíhali, tým najlepším práve z toho dôvodu, že jedno CUDA jadro muselo spracovať už pomerne dlhé časti antidiagonál.
 
 ## Zdroje:
 Inšpirácie, využité časti kódu a podobne:
