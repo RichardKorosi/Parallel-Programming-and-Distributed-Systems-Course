@@ -145,6 +145,11 @@ source3 = ["l****o**n**g**e***s*t*" * i for i in [1, 5, 15, 25, 35, 45]]
 source1 = ["**x***yyyy**z*zz********" * i for i in [1, 5, 15, 25, 35, 45]]
 source2 = ["xxyyy**z*zz**x*" * i for i in [1, 5, 15, 25, 35, 45]]
 source3 = ["a**b***cd**" * i for i in [1, 5, 15, 25, 35, 45]]
+-------
+source1 = ["qkajflpwuzvbnmcxieoruytahgdjsqpftzvnklsoirqwpfxvcmznehuytpoasjlxqikwmgfncdybheusjzpwq"]
+source2 = ["rwpfqzmvnxylkguhdpotieascbjflkrwpgvnquzymldjcxobvkpytienmrwqalsxfjuqzgoatphvknwcxidbej"]
+source3 = ["vcmzujqpnksohbrwigecxyfuqzvdlatpcnrxjsqkiwmgeaopbvnlrykdshcixftuqpajzomfwnkstgubvycxlhei"]
+
 ```
 #### Výstup
 ```
@@ -167,7 +172,9 @@ LCS: 0
 LCS: 0 
 LCS: 0 
 LCS: 0 
-LCS: 0 
+LCS: 0
+--------
+LCS: 29 vmujqpnksorwfvcnsqiwmgndhujzw
 ```
 ### Analýza časov viacerých experimentov
 #### Paralelná verzia vs sekvenčná verzia
