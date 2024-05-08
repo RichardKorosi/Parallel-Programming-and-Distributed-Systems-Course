@@ -193,6 +193,23 @@ Po porovnaní medzi sekvenčnou a paralelnou verziou prichádza porovnanie rôzn
   </tr>
 </table>
 
+<table style="width:100%">
+  <tr>
+    <td align="center"><img src="https://github.com/RichardKorosi/Korosi-111313-PPDS2024/assets/99643046/70a84592-1c97-48d8-a343-90327779d190" style="width:100%"></td>
+    <td align="center"><img src="https://github.com/RichardKorosi/Korosi-111313-PPDS2024/assets/99643046/7471f74a-7b64-4350-bdca-4ae4e9c64e68" style="width:100%"></td>
+  </tr>
+  <tr>
+    <td align="center"><img src="https://github.com/RichardKorosi/Korosi-111313-PPDS2024/assets/99643046/21b0f847-3a04-4734-a384-378200c85a34" style="width:100%"></td>
+    <td align="center"><img src="https://github.com/RichardKorosi/Korosi-111313-PPDS2024/assets/99643046/23871351-5bb3-4898-bc41-5d62bbe6b400" style="width:100%"></td>
+  </tr>
+</table>
+
+![image](https://github.com/RichardKorosi/Korosi-111313-PPDS2024/assets/99643046/862c6053-c59a-4a47-8330-995b0a0c2a92)
+
+
+
+
+
 
 
 
