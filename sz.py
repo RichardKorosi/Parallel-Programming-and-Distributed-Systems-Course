@@ -8,6 +8,8 @@ Sources used in the implementation:
     NVDIA Forum: https://shorturl.at/eklAF
 - Matplotlib chart:
     Matplotlib documentation: https://shorturl.at/iuwA6
+- Code developed with help of:
+   Github Copilot: https://copilot.github.com/
 
 More info about the assignment can be found in the README.md document.
 """
