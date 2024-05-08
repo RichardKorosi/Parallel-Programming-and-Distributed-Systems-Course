@@ -129,6 +129,32 @@ if rank == MASTER:
     min_result = min(final_result, key=lambda x: x[1])
     print("LCS:", min_result[1], end=" ")
 ```
+Algoritmus získania výsledku z matice "dp" je nasledovný:
+1) Algoritmus začína vpravo dole v matici "dp"
+2) Na základe určených pravidiel postupne smeruje buď: doľava, hore, šikmo doľava hore.
+3) V prípade keď postupuje šikmo doľava hore, algoritmus si ukladá príslušný znak reprezentujúci dané políčko z ktorého odchádza.
+```py
+def get_result(dp, row_string, col_string):
+    row = len(row_string)
+    col = len(col_string)
+    result = ""
+    while row > 0 and col > 0:
+        if dp[row, col - 1] > dp[row - 1, col]:
+            col -= 1
+
+        elif dp[row, col - 1] < dp[row - 1, col]:
+            row -= 1
+
+        elif dp[row, col - 1] == dp[row - 1, col]:
+            if dp[row, col] == dp[row - 1, col]:
+                row -= 1
+            else:
+                result = row_string[row - 1] + result
+                row -= 1
+                col -= 1
+
+    return result, len(result)
+```
 ## Analýza výsledkov:
 ### Overenie funkčnosti
 Overenie funkčnosti spočívalo v porovnávaní výsledkom medzi výsledkami paralelnej verzie, sekvenčnej verzie (ktorá bola implementovaná dynamickým programovaním, ale nie verziou antidiagonál) a verzie tretej strany, ktorá je dostupná na internete (viď. zdroje).
@@ -178,7 +204,7 @@ LCS: 29 vmujqpnksorwfvcnsqiwmgndhujzw
 ```
 ### Analýza časov viacerých experimentov
 #### Paralelná verzia vs sekvenčná verzia
-Táto časť dokumentácie slúži na zobrazenie a porovnanie výsledkov medzi paralelným a sekvenčným prístupom pomocou grafov. Z grafu je možné vyčítať, že pri krátkych reťazcoch je efektívnejšia sekvenčná verzia. Je to z dôvodu, že samotný výpočet trvá krátko a v paralelnej verzii sa stráca čas posielaním dát medzi pracovnými uzlami medzi sebou a CUDOU. Avšak so zväčšujúcim sa vstupom už jednoznačne vidno lepšiu efektivitu paralelného riešenia.
+Táto časť dokumentácie slúži na zobrazenie a porovnanie výsledkov medzi paralelným a sekvenčným prístupom pomocou grafu. Z grafu je možné vyčítať, že pri krátkych reťazcoch je efektívnejšia sekvenčná verzia. Je to z dôvodu, že samotný výpočet trvá krátko a v paralelnej verzii sa stráca čas posielaním dát medzi pracovnými uzlami medzi sebou a CUDOU. Avšak so zväčšujúcim sa vstupom už jednoznačne vidno lepšiu efektivitu paralelného riešenia.
 
 ![image](https://github.com/RichardKorosi/Korosi-111313-PPDS2024/assets/99643046/4266e664-9014-46f1-bf8b-bf863704a52d)
 
