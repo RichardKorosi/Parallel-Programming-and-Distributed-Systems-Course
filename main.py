@@ -1,8 +1,12 @@
 """This file is implementation of the 'twelfth' assignment of the PPDS.
 
-The solution of this assignment was inspired by the following source(s):
+The solution of this assignment was inspired by the following sources:
 PPDS course code examples: https://shorturl.at/PxxIS
 Rich progress bar: https://shorturl.at/4a9AD
+
+The solution was developed with help of the following sources:
+ChatGPT: https://chatgpt.com
+Github Copilot: https://github.com/features/copilot
 
 More info about the assignment can be found in the README.md document.
 """
