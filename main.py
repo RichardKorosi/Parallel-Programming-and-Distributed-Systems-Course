@@ -1,3 +1,12 @@
+"""This file is implementation of the 'twelfth' assignment of the PPDS.
+
+The solution of this assignment was inspired by the following source(s):
+PPDS course code examples: https://shorturl.at/PxxIS
+Rich progress bar: https://shorturl.at/4a9AD
+
+More info about the assignment can be found in the README.md document.
+"""
+
 import asyncio
 import aiohttp
 import os
@@ -5,6 +14,17 @@ from rich.progress import Progress
 
 
 async def task(name, work_queue, progress):
+    """Download files from the URLs in the work queue.
+
+    More specifically, this function downloads the files
+    from the URLs in the work queue.
+    The progress bar is updated during the download process.
+
+    Keyword arguments:
+    name -- the name of the task
+    work_queue -- the work queue with the URLs
+    progress -- the progress bar
+    """
     async with aiohttp.ClientSession() as session:
         while not work_queue.empty():
             url = await work_queue.get()
@@ -12,7 +32,8 @@ async def task(name, work_queue, progress):
                 total_size = int(response.headers.get('content-length', 0))
                 filename = os.path.basename(url)
 
-                task_id = progress.add_task(f"Task {name} downloading: {url}", total=total_size,)
+                task_id = progress.add_task(f"Task {name} downloading: "
+                                            f"{url}", total=total_size, )
 
                 with open(filename, 'wb') as file:
                     while True:
@@ -21,10 +42,21 @@ async def task(name, work_queue, progress):
                             break
                         file.write(chunk)
                         downloaded_size = os.path.getsize(filename)
-                        progress.update(task_id, advance=len(chunk), description=f"Task {name} downloading: {url} ({downloaded_size}/{total_size} bytes)")
+                        progress.update(task_id, advance=len(chunk),
+                                        description=f"Task"
+                                                    f"{name} downloading: "
+                                                    f"{url} ({downloaded_size}"
+                                                    f"/{total_size} bytes)")
 
 
 async def main():
+    """Execute the main program.
+
+    More specifically, this function creates a work
+    queue and fills it with the URLs. Then it starts three
+    tasks that download the files from the URLs in the work
+    queue.
+    """
     work_queue = asyncio.Queue()
 
     urls = [
