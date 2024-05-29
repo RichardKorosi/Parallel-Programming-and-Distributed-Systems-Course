@@ -14,7 +14,9 @@ async def task(name, work_queue):
 
                 with open(filename, 'wb') as f, tqdm(
                         total=total_size,
-                        desc=f'Task {name} downloading: {url}'
+                        desc=f'Task {name} downloading: {url}',
+                        unit='B',
+                        unit_scale=True,
                 ) as pbar:
                     chunk_size = total_size // 100
                     async for chunk in response.content.iter_chunked(chunk_size):
