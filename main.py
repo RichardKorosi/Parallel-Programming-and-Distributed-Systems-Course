@@ -64,9 +64,12 @@ async def main():
     work_queue = asyncio.Queue()
 
     urls = [
-        'https://www.fei.stuba.sk/buxus/docs/studium_od_2024/Skusky_Vsetky_predmety_LS_23_24_4.pdf',
-        'https://www.fei.stuba.sk/buxus/docs/studium_od_2024/Skusky_podla_rocnikov_a_odborov_LS_23_24_4.pdf',
-        'https://www.fei.stuba.sk/buxus/docs/studium_od_2024/Skusky_vo_velkych_miestnostiach_LS_23_24_4.pdf',
+        'https://www.fei.stuba.sk/buxus/docs/studium_od_2024/'
+        'Skusky_Vsetky_predmety_LS_23_24_4.pdf',
+        'https://www.fei.stuba.sk/buxus/docs/studium_od_2024/'
+        'Skusky_podla_rocnikov_a_odborov_LS_23_24_4.pdf',
+        'https://www.fei.stuba.sk/buxus/docs/studium_od_2024/'
+        'Skusky_vo_velkych_miestnostiach_LS_23_24_4.pdf',
         'https://ploszek.com/ppds/2024-04.Paralelne_vypocty_1.pdf',
         'https://ploszek.com/ppds/2024-05.1.Paralelne_vypocty_2.pdf',
         'https://ploszek.com/ppds/2024-06.Paralelne_vypocty_3.pdf',
