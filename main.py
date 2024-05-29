@@ -43,7 +43,7 @@ async def task(name, work_queue, progress):
                         file.write(chunk)
                         downloaded_size = os.path.getsize(filename)
                         progress.update(task_id, advance=len(chunk),
-                                        description=f"Task"
+                                        description=f"Task "
                                                     f"{name} downloading: "
                                                     f"{url} ({downloaded_size}"
                                                     f"/{total_size} bytes)")
@@ -72,12 +72,12 @@ async def main():
         await work_queue.put(url)
 
     with Progress() as progress:
-        tasks = [
+        a = asyncio.gather(
             task('One', work_queue, progress),
             task('Two', work_queue, progress),
             task('Three', work_queue, progress)
-        ]
-        await asyncio.gather(*tasks)
+        )
+        await a
 
 
 if __name__ == '__main__':
