@@ -54,6 +54,10 @@ async def task(name, work_queue, progress):
 
 ```
 
+## Výsledok:
+![ezgif-3-c9e5d7c30a](https://github.com/RichardKorosi/Korosi-111313-PPDS2024/assets/99643046/e0068409-e8b6-44cb-921c-850aa2eddbc8)
+
+
 ## Zdroje:
 Inšpirácie, využité časti kódu a podobne:
 * [README template](https://github.com/matiassingers/awesome-readme)
