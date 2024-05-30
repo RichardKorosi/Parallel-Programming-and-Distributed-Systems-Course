@@ -17,6 +17,8 @@ Následne sa pomocou `asyncio.gather` zavolajú 3 `Task-y` s parametrami
 1) Názov Task-u (One, Two, Three)
 2) Asynchrónna rada s URL adresami
 3) Inštancia triedy Progress (viď. zdroje `Progress bar`)
+
+
 Následne začne čakať na dokončenie všetkých úloh/task-ov.
 ```py
 async def main():
