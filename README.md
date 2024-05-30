@@ -12,10 +12,10 @@ ukážka sťahovania aspoň dvoch súborov.
 Časti implementácie boli inšpirované a prebrané z poskytnutých kódov z cvičení (viď. zdroje).
 
 ### Main
-V main funkcii sa najprv vytvorí asynchrónna rada a následne sa do nej vložia URL adresy.
+V main funkcii sa najprv vytvorí "asynchrónna" rada a následne sa do nej vložia URL adresy.
 Následne sa pomocou `asyncio.gather` zavolajú 3 `Task-y` s parametrami
 1) Názov Task-u (One, Two, Three)
-2) Asynchrónna rada s URL adresami
+2) "Asynchrónna" rada s URL adresami
 3) Inštancia triedy Progress (viď. zdroje `Progress bar`)
 
 
@@ -44,10 +44,10 @@ async def main():
 
 ### Task
 Funkcia task už slúži na asynchrónne sťahovanie súborov.
-Funkcia najskôr vytvorí reláciu (triedu) `ClientSession` s názvom session. Následne vojde do cyklu, v ktorom iteruje cez asynchrónnu radu a v prípade, že nie je prázda zoberie si z nej URL.
+Funkcia najskôr vytvorí reláciu (triedu) `ClientSession` s názvom session. Následne vojde do cyklu, v ktorom iteruje cez "asynchrónnu" radu a v prípade, že nie je prázda zoberie si z nej URL.
 `Await` pri získavaní URL zabezpečí, že funkcia začne (asynchrónne) čakať na dostupnosť položky v rade a teda ostatné asynchrónne funkcie môžu zatiaľ pokračovať.
-Po získaní URL spraví funkcia asynchrónnu `GET` požiadavku na danú URL adresu, odpoveď si uloží do triedy `ClientObject`, v našom prípade s názvom `response` (viď. zdroje `Asyncio Client Quickstart`).
-Následne funkcia získa veľkosť sťahovaného súboru, jeho názov a pridá úlohu do sledovania a vráti jej ID (viď. zdroje `Progress bar`).
+Po získaní URL spraví funkcia asynchrónnu `GET` požiadavku na danú URL adresu, odpoveď si uloží do triedy `ClientResponse`, v našom prípade s názvom `response` (viď. zdroje `Asyncio Client Quickstart`).
+Následne funkcia získa veľkosť sťahovaného súboru, jeho názov a pridá úlohu do sledovania progresu a vráti jej ID (viď. zdroje `Progress bar`).
 
 ```py
 async def task(name, work_queue, progress):
@@ -74,7 +74,7 @@ async def task(name, work_queue, progress):
 ```
 Následne otvorí súbor v režime na zápis a vojde do cyklu.
 V cykle sa najskôr pokúsi prečítať časť dát (1024 bajtov, v prípade že ostáva menej bajtov prečíta ich všetky do konca). Ak sa funkcii nepodarí už prečítať žiadne dáta (je už na konci), tak sa cyklus preruší.
-V opačnom prípade zapíše do súboru daný `chunk` dát a zaktualizuje aktuálnu veľkosť sťahovaného súboru a následne zaktualizuje aj samotný progress bar. Pri získavaní časti/chunk-u dát sa opäť volá aj `await`, to zapríčiní, že sa funkcia začne asynchrónne čakať kým neobdrží potrebné dáta (kým sa nestiahnu). Počas doby čakania teda neblokuje iné asynchrónne funkcie a teda umožňuje ich vykonávanie.
+V opačnom prípade zapíše do súboru daný `chunk` dát a zaktualizuje aktuálnu veľkosť sťahovaného súboru a následne zaktualizuje aj samotný progress bar. Pri získavaní časti/chunk-u dát sa opäť volá aj `await`, to zapríčiní, že funkcia začne asynchrónne čakať kým neobdrží potrebné dáta (kým sa nestiahnu). Počas doby čakania teda neblokuje iné asynchrónne funkcie a teda umožňuje ich vykonávanie.
 
 
 ## Výsledok:
