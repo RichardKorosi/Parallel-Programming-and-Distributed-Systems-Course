@@ -8,6 +8,51 @@ ukážka sťahovania aspoň dvoch súborov.
 2) Vo výstupe aplikácie je pri progress bare vypísaná adresa súboru (odkiaľ sa sťahuje).
 3) Súbor bude stiahnutý na disk.
 
+## Implementácia:
+```py
+async def main():
+    work_queue = asyncio.Queue()
+    urls = [
+        'https://ploszek.com/ppds/2024-04.Paralelne_vypocty_1.pdf',
+        'https://ploszek.com/ppds/2024-05.1.Paralelne_vypocty_2.pdf',
+        'https://ploszek.com/ppds/2024-06.Paralelne_vypocty_3.pdf',
+        'https://ploszek.com/ppds/2024-08.cuda.pdf',
+        'https://ploszek.com/ppds/2024-11.async.pdf',
+        'https://ploszek.com/ppds/2024-12.async2.pdf',
+    ]
+    for url in urls:
+        await work_queue.put(url)
+    with Progress() as progress:
+        a = asyncio.gather(
+            task('One', work_queue, progress),
+            task('Two', work_queue, progress),
+            task('Three', work_queue, progress)
+        )
+        await a
+```
+```py
+async def task(name, work_queue, progress):
+    async with aiohttp.ClientSession() as session:
+        while not work_queue.empty():
+            url = await work_queue.get()
+            async with session.get(url) as response:
+                total_size = int(response.headers.get('content-length', 0))
+                filename = os.path.basename(url)
+                task_id = progress.add_task(f"Task {name} downloading: "
+                                            f"{url}", total=total_size, )
+                with open(filename, 'wb') as file:
+                    while True:
+                        chunk = await response.content.read(1024)
+                        if not chunk:
+                            break
+                        file.write(chunk)
+                        downloaded_size = os.path.getsize(filename)
+                        progress.update(task_id, advance=len(chunk), description=f"Task "
+                                                    f"{name} downloading: "
+                                                    f"{url} ({downloaded_size}"
+                                                    f"/{total_size} bytes)")
+
+```
 
 ## Zdroje:
 Inšpirácie, využité časti kódu a podobne:
