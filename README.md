@@ -9,6 +9,14 @@ ukážka sťahovania aspoň dvoch súborov.
 3) Súbor bude stiahnutý na disk.
 
 ## Implementácia:
+Časti implementácie boli inšpirované a prebrané z poskytnutých kódov z cvičení (viď. zdroje).
+
+### Main
+V main funkcii sa najprv vytvorí asynchrónna rada a následne sa do nej vložia URL adresy.
+Následne sa pomocou `asyncio.gather` zavolajú 3 `Task-y` s parametrami
+1) Názov Task-u (One, Two, Three)
+2) Asynchrónna rada s URL adresami
+3) Inštancia triedy Progress (viď. zdroje Progress bar)
 ```py
 async def main():
     work_queue = asyncio.Queue()
@@ -30,6 +38,10 @@ async def main():
         )
         await a
 ```
+
+### Task
+Funkcia task už slúži na sťahovanie súborov.
+Funkcia najskôr vytvorí reláciu ClientSession s názvom session. Následne vojde do cyklu, v ktorom iteruje cez asynchrónnu radu a v prípade, že nie je prázda zoberie si z nej URL.
 ```py
 async def task(name, work_queue, progress):
     async with aiohttp.ClientSession() as session:
@@ -66,5 +78,6 @@ Inšpirácie, využité časti kódu a podobne:
 * [Skripty a teória z predmetu](https://elearn.elf.stuba.sk/moodle/course/view.php?id=699)
 * [Využité časti kódu z cvičení](https://shorturl.at/PxxIS)
 * [Progress bar](https://shorturl.at/4a9AD)
+* [Asyncio Client Quickstart](https://docs.aiohttp.org/en/stable/client_quickstart.html)
 * [ChatGPT](https://chatgpt.com)
 * [Github copilot](https://github.com/features/copilot)
